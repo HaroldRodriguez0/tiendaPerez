@@ -1,12 +1,21 @@
-import { Role, User } from "../models/index.js";
+import { Categoria, Product, Role, User } from "../models/index.js";
 // parseNumber ( brinda inf como el pais )
 import parseNumber, { isValidPhoneNumber } from "libphonenumber-js";
 
 const esRolValido = async (rol) => {
-  if( rol ){
+  if (rol) {
     const existeRol = await Role.findOne({ rol });
     if (!existeRol) {
       throw new Error(`El rol ${rol} no esta registrado`);
+    }
+  }
+};
+
+const categorialValida = async (categoria) => {
+  if (categoria) {
+    const existeRol = await Categoria.findOne({ categoria });
+    if (!existeRol) {
+      throw new Error(`La categoria ${categoria} no esta registrada`);
     }
   }
 };
@@ -39,12 +48,38 @@ const movilValido = async (movil) => {
   }
 };
 
-  const existeUsuarioxID = async (id) => {
-    const existeUsuario = await User.findById(id);
-    if (!existeUsuario) {
-      throw new Error(`El ID ${id} no existe `);
+const existeUsuarioxID = async (id) => {
+  const existeUsuario = await User.findById(id);
+  if (!existeUsuario) {
+    throw new Error(`El ID ${id} no existe `);
+  }
+};
+
+const modeloValido = async (name,data) => {
+  const { modelo } = data.req.body;
+   if (!modelo) {
+    const nameDuplicado = await Product.findOne({ name });
+    if (nameDuplicado) {
+      throw new Error(
+        `El modelo es obligatorio si existe otro producto con el mismo nombre`
+      );
     }
-  };
+  } else {
+    const modeloDuplicado = await Product.findOne({ modelo });
+    if (modeloDuplicado) {
+      throw new Error(
+        `El modelo ya existe`
+      );
+    }
+  } 
+};
 
-
-export { esRolValido, emailExiste, nameExiste, movilValido, existeUsuarioxID };
+export {
+  esRolValido,
+  emailExiste,
+  nameExiste,
+  movilValido,
+  existeUsuarioxID,
+  categorialValida,
+  modeloValido,
+};

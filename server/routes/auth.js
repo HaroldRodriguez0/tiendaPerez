@@ -15,7 +15,6 @@ const router = Router();
 router.post(
   '/login',
   [// middlewares
-    check('email','El email es obligatorio').isEmail(),
     check('password','El password debe de ser de 6 caracteres').isLength({ min:6 }),
     validarCampo
   ], 

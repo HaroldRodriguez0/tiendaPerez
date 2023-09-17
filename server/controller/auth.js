@@ -47,8 +47,6 @@ const register = async (req, res = response) => {
   }
 };
 
-
-
 const verificationEmail = async (req, res = response) => {
   try {
     const { token } = req.params;
@@ -80,20 +78,27 @@ const verificationEmail = async (req, res = response) => {
   }
 };
 
-
-
 const login = async (req, res = response) => {
 
-  const { email, password } = req.body;
-
+  const { name, email, password } = req.body;
+  let user;
   try {
-
-    // Verificar si el email existe
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({
-        msg: "Usuario / Password no son correctos",
-      });
+    if (email) {
+      // Verificar si el email existe
+      user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({
+          msg: "Usuario / Password no son correctos",
+        });
+      }
+    }else{
+      // Verificar si el email existe
+      user = await User.findOne({ name });
+      if (!user) {
+        return res.status(400).json({
+          msg: "Usuario / Password no son correctos",
+        });
+      }
     }
 
     // Verificar si el usuario esta activo
@@ -114,13 +119,12 @@ const login = async (req, res = response) => {
     // Generar el JWT
     const token = await generarJWT(user.id);
 
-    console.log(token)
+    console.log(token);
 
     res.status(200).json({
       user,
       token,
     });
-
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -128,8 +132,6 @@ const login = async (req, res = response) => {
     });
   }
 };
-
-
 
 const verificationDelete = async (req, res = response) => {
   // Eliminando usuarios no verificados
@@ -147,39 +149,38 @@ const verificationDelete = async (req, res = response) => {
   }
 };
 
-
-
 const forgotPassword = async (req, res = response) => {
   try {
-
     const { name, email, password, movil } = req.body;
     const user = await User.findOne({ name });
 
-    if( user && user.email === email && user.movil === movil ){
-
+    if (user && user.email === email && user.movil === movil) {
       // Encriptar la contrsena
       const salt = bcryptjs.genSaltSync(11);
       const newPassword = bcryptjs.hashSync(password, salt);
-      
-      await User.updateOne( {name}, { password: newPassword} );
+
+      await User.updateOne({ name }, { password: newPassword });
 
       res.status(200).json({
         msg: "Contraseña cambiada con Exito",
       });
-    }
-    else{
+    } else {
       res.status(400).json({
         msg: "Credenciales invalidas",
       });
     }
-
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
       msg: "Please talk to the administrator",
     });
   }
-}
+};
 
-
-export { register, verificationEmail, verificationDelete, login, forgotPassword };
+export {
+  register,
+  verificationEmail,
+  verificationDelete,
+  login,
+  forgotPassword,
+};
