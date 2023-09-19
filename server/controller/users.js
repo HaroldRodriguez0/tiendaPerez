@@ -78,6 +78,7 @@ const usersPorNameEmail = async (req, res = response) => {
      ])
   
     res.status(200).json({
+      total,
       results: users 
     })
 

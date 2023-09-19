@@ -12,7 +12,7 @@ const esRolValido = async (rol) => {
 };
 
 const categorialValida = async (categoria) => {
-  if (categoria) {
+  if (categoria || categoria === '') {
     const existeRol = await Categoria.findOne({ categoria });
     if (!existeRol) {
       throw new Error(`La categoria ${categoria} no esta registrada`);
@@ -55,6 +55,13 @@ const existeUsuarioxID = async (id) => {
   }
 };
 
+const existeProductoxID = async ( id ) => {
+  const existeProducto = await Product.findById( id );
+  if ( !existeProducto ) {
+    throw new Error(`El ID ${id} no existe `);
+  }
+};
+
 const modeloValido = async (name,data) => {
   const { modelo } = data.req.body;
    if (!modelo) {
@@ -82,4 +89,5 @@ export {
   existeUsuarioxID,
   categorialValida,
   modeloValido,
+  existeProductoxID,
 };

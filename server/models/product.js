@@ -14,7 +14,7 @@ const ProductSchema = Schema({
 
   categoria: {
     type: String,
-    required: true,
+    required: [true, "la categoria es obligatoria"],
   },
 
   cantAlmacen: {
@@ -31,7 +31,6 @@ const ProductSchema = Schema({
 
   img: {
     type: String,
-    required: [true, "la imagen es obligatoria"],
   },
 
   modelo: {
