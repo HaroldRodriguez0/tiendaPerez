@@ -3,7 +3,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
-import { authRoutes, productRouters, usersRoutes, }  from './routes/index.js'
+import { authRoutes, inventarioRouters, productRouters, usersRoutes, }  from './routes/index.js'
 import { fileURLToPath } from "url";
 import { dbConnection } from "./db/config.js";
 
@@ -34,6 +34,7 @@ app.use( express.json() );
 app.use('/api/auth', authRoutes );
 app.use('/api/users', usersRoutes );
 app.use('/api/product', productRouters );
+app.use('/api/inventario', inventarioRouters );
 
 
 // Escuchar peticiones

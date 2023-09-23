@@ -19,8 +19,6 @@ const register = async (req, res = response) => {
     // Generar el JWT
     const token = await generarJWT(user._id);
 
-    console.log(token);
-
     // enviar mensaje
     const url = `http://localhost:4000/api/auth/verification/${token}`;
     const result = await transporter
@@ -118,8 +116,6 @@ const login = async (req, res = response) => {
 
     // Generar el JWT
     const token = await generarJWT(user.id);
-
-    console.log(token);
 
     res.status(200).json({
       user,

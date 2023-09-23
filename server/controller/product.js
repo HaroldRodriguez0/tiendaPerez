@@ -1,5 +1,5 @@
 import { response } from "express";
-import { imagemin_sharp } from "../helpers/index.js";
+import { autocalcularAlmacen, autocalcularAlmacenAdmin, autocalcularToolsCafeteria, imagemin_sharp } from "../helpers/index.js";
 import { Product } from "../models/index.js";
 
 const newProduct = async (req, res = response) => {
@@ -40,6 +40,8 @@ const newProduct = async (req, res = response) => {
       }
     );
 
+    autocalcularAlmacen( product );
+
     // Guardar en DB
     product.img = filename;
     await product.save();
@@ -72,21 +74,7 @@ const editAdmin = async (req, res = response) => {
       );
     }
 
-    // si la cantidad en tienda a editar es mayor a la actual autocalcular cantidad en almacen
-    if (data.cantTienda && data.cantTienda > lastProduct.cantTienda) {
-      data.cantAlmacen -= ( data.cantTienda - lastProduct.cantTienda );
-    }
-    
-    data.cantAlmacen = lastProduct.cantAlmacen
-
-    // si la cantidad en tienda () a editar es mayor a la actual autocalcular cantidad en almacen
-    for (const key in data.numero) {
-        if (lastProduct.numero.get(key).tienda  && data.numero[key].tienda > lastProduct.numero.get(key).tienda ) {
-
-          data.numero[key].almacen -= ( data.numero[key].tienda - lastProduct.numero.get(key).tienda );
-          data.cantAlmacen -= ( data.numero[key].tienda - lastProduct.numero.get(key).tienda );
-        } 
-    } 
+    autocalcularAlmacenAdmin( data, lastProduct );
 
     const product = await Product.findByIdAndUpdate(id, data, { new: true });
 
@@ -102,23 +90,24 @@ const editAdmin = async (req, res = response) => {
   }
 };
 
-const editShop = async (req, res = response) => {
+const edit = async (req, res = response) => {
   try {
-    const { cantTienda } = req.body;
+    const { cantTienda, numero, color, tipo } = req.body;
+    const data = { cantTienda, numero, color, tipo } ;
     const { id } = req.params;
     const lastProduct = await Product.findById(req.params.id);
 
-    if (cantTienda > lastProduct.cantTienda) {
+    const autocalcular = autocalcularToolsCafeteria( data, lastProduct, res );
+
+    if(!autocalcular ) {
+      const product = await Product.findByIdAndUpdate(id, data, { new: true });
+
+      res.status(200).json({
+        product,
+        msg: "Producto actualizado con !Exito",
+      });
     }
 
-    const product = await Product.findByIdAndUpdate(id, cantTienda, {
-      new: true,
-    });
-
-    res.status(200).json({
-      product,
-      msg: "Producto actualizado con !Exito",
-    });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -126,6 +115,7 @@ const editShop = async (req, res = response) => {
     });
   }
 };
+
 
 const deleteProduct = async (req, res = response) => {
   try {
@@ -163,6 +153,7 @@ const getProduct = async (req, res = response) => {
   }
 };
 
+
 const getProductName = async (req, res = response) => {
   try {
     const { name } = req.params;
@@ -192,7 +183,7 @@ const getProductName = async (req, res = response) => {
 export {
   newProduct,
   editAdmin,
-  editShop,
+  edit,
   deleteProduct,
   getProduct,
   getProductName,

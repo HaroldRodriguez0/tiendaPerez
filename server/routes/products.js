@@ -5,9 +5,9 @@ host + /api/product/...
 
 import { Router } from 'express';
 import { check } from 'express-validator';
-import { deleteProduct, editAdmin, editShop, getProduct, getProductName, newProduct } from "../controller/product.js";
+import { deleteProduct, edit, editAdmin, getProduct, getProductName, newProduct } from "../controller/product.js";
 import { upload } from '../helpers/index.js';
-import { categorialValida, existeProductoxID, modeloValido } from "../middlewares/dbValidator.js";
+import { categorialValida, existeProductoxID, modeloValido, validarProductorole } from "../middlewares/dbValidator.js";
 import { esAdminRole, tieneRole, validarCampo, validarJWT } from "../middlewares/index.js";
 
 const router = Router();
@@ -39,14 +39,14 @@ router.put('/editAdmin/:id',
   validarCampo,
 ], upload.single('picture'), editAdmin );
 
-router.put('/editShop/:id',
+router.put('/edit/:id',
 [// middlewares
   validarJWT, 
-  tieneRole('ADMIN_ROLE','SHOP_ROLE'),
+  tieneRole('ADMIN_ROLE','TOOLS_ROLE','CAFETERIA_ROLE'),
   check('id', 'No es un id de Mongo ').isMongoId(),
-  check('id').custom( existeProductoxID ),
+  validarProductorole(),
   validarCampo,
-], editShop );
+], edit );
 
 router.delete('/delete/:id',
 [// middlewares

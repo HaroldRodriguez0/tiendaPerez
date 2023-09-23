@@ -12,7 +12,7 @@ const esRolValido = async (rol) => {
 };
 
 const categorialValida = async (categoria) => {
-  if (categoria || categoria === '') {
+  if (categoria || categoria === "") {
     const existeRol = await Categoria.findOne({ categoria });
     if (!existeRol) {
       throw new Error(`La categoria ${categoria} no esta registrada`);
@@ -28,9 +28,16 @@ const emailExiste = async (email = "") => {
 };
 
 const nameExiste = async (name = "") => {
-  const existeEmail = await User.findOne({ name });
-  if (existeEmail) {
+  const existeName = await User.findOne({ name });
+  if (existeName) {
     throw new Error(`El name ${name} ya esta registrado`);
+  }
+};
+
+const nameNoExiste = async (name = "") => {
+  const existeName = await Product.findOne({ name });
+  if (!existeName) {
+    throw new Error(`El name ${name} NO esta registrado`);
   }
 };
 
@@ -55,16 +62,37 @@ const existeUsuarioxID = async (id) => {
   }
 };
 
-const existeProductoxID = async ( id ) => {
-  const existeProducto = await Product.findById( id );
-  if ( !existeProducto ) {
+const existeProductoxID = async (id) => {
+  const existeProducto = await Product.findById(id);
+  if (!existeProducto) {
     throw new Error(`El ID ${id} no existe `);
   }
 };
 
-const modeloValido = async (name,data) => {
+const validarProductorole = () => {
+  return async (req, res = response, next) => {
+    const existeProducto = await Product.findById(req.params.id);
+    if (!existeProducto) {
+      return res.status(401).json({
+        smg: `El ID ${id} no existe `
+      })
+    } else if (
+      (existeProducto.categoria === "UTILES" &&
+        req.user.rol === "CAFETERIA_ROLE") ||
+      (existeProducto.categoria === "CAFETERIA" &&
+        req.user.rol === "TOOLS_ROLE")
+    ) {
+      return res.status(401).json({
+        smg: `No tienes permisos `
+      })
+    }
+    next();
+  };
+};
+
+const modeloValido = async (name, data) => {
   const { modelo } = data.req.body;
-   if (!modelo) {
+  if (!modelo) {
     const nameDuplicado = await Product.findOne({ name });
     if (nameDuplicado) {
       throw new Error(
@@ -74,20 +102,20 @@ const modeloValido = async (name,data) => {
   } else {
     const modeloDuplicado = await Product.findOne({ modelo });
     if (modeloDuplicado) {
-      throw new Error(
-        `El modelo ya existe`
-      );
+      throw new Error(`El modelo ya existe`);
     }
-  } 
+  }
 };
 
 export {
   esRolValido,
   emailExiste,
   nameExiste,
+  nameNoExiste,
   movilValido,
   existeUsuarioxID,
   categorialValida,
   modeloValido,
   existeProductoxID,
+  validarProductorole,
 };
