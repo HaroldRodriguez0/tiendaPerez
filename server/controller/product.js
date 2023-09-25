@@ -102,7 +102,7 @@ const edit = async (req, res = response) => {
     if(!autocalcular ) {
       const product = await Product.findByIdAndUpdate(id, data, { new: true });
 
-      res.status(200).json({
+      return res.status(200).json({
         product,
         msg: "Producto actualizado con !Exito",
       });
@@ -110,7 +110,7 @@ const edit = async (req, res = response) => {
 
   } catch (error) {
     console.log(error.message);
-    res.status(500).json({
+    return res.status(500).json({
       msg: "Please talk to the administrator",
     });
   }
