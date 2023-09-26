@@ -56,7 +56,7 @@ const newProduct = async (req, res = response) => {
       msg: "Please talk to the administrator",
     });
   }
-};
+}; 
 
 const editAdmin = async (req, res = response) => {
   try {
@@ -74,7 +74,10 @@ const editAdmin = async (req, res = response) => {
       );
     }
 
-    autocalcularAlmacenAdmin( data, lastProduct );
+    await autocalcularAlmacenAdmin( data, lastProduct ).catch(error => {
+      // Aquí puedes manejar el error que ocurra durante la operación, por ejemplo:
+      console.error(error);
+    });
 
     const product = await Product.findByIdAndUpdate(id, data, { new: true });
 

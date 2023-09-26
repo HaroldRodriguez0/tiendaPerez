@@ -5,13 +5,13 @@ host + /api/inventario/...
 
 import { Router } from 'express';
 import { check } from 'express-validator';
-import { editCopieInventario, editNewCopie, newCopieInventario } from '../controller/inventario.js';
+import { editCopieInventario, editNewCopie, getCopieInventario, /* newCopieInventario */ } from '../controller/inventario.js';
 import { categorialValida, nameNoExiste } from '../middlewares/dbValidator.js';
 import { tieneRole, validarCampo, validarJWT } from '../middlewares/index.js';
 
 const router = Router();
 
-router.post(  
+/* router.post(  
   '/newCopie',
   [// middlewares
     validarJWT,
@@ -24,7 +24,7 @@ router.post(
     check('precio','El precio es obligatorio').not().isEmpty(),
     validarCampo,
   ],
-  newCopieInventario );
+  newCopieInventario ); */
 
 router.put(
   '/editNewCopie',
@@ -50,7 +50,8 @@ router.put(
   ],
   editCopieInventario );
 
-  // get que muestre el [] de productos
+  router.get('/', getCopieInventario );
+
   // Si el Admin annade productos a la tienda tiene q sumar a la cantidadTienda de copieInventario
 
 

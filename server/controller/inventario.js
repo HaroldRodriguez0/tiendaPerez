@@ -2,7 +2,7 @@ import { request, response } from "express";
 import { CopieInventario, Product } from "../models/index.js";
 import { edit } from "./product.js";
 
-const newCopieInventario = async (req, res = response) => {
+/* const newCopieInventario = async (req, res = response) => {
   try {
 
     let lastProValor = null, cont = null, cantidadTienda = null, valor = null;
@@ -76,7 +76,7 @@ const newCopieInventario = async (req, res = response) => {
     });
   }
 };
-
+ */
 
 const editNewCopie = async (req, res = response) => {
   try {
@@ -118,7 +118,7 @@ const editNewCopie = async (req, res = response) => {
     }
     // Hacer la modificacion en CopieInventario
     if( cont ){
-      const productEncontrado = products.find( elemento => elemento.name === name && elemento.modelo === modelo && elemento[ tipoProd ] === valor );
+      const productEncontrado = products.find( elemento => elemento.name === name && elemento.modelo === modelo && elemento[ tipoProd ] === valor && elemento.precio === precio);
       
       if( productEncontrado ){
 
@@ -128,6 +128,7 @@ const editNewCopie = async (req, res = response) => {
           { // Usa arrayFilters para especificar las condiciones del producto
             arrayFilters: [
               {
+                "elem.precio": precio,
                 "elem.name": name,
                 "elem.modelo": modelo,
                 [`elem.${tipoProd}`]: valor
@@ -167,6 +168,7 @@ const editNewCopie = async (req, res = response) => {
           { // Usa arrayFilters para especificar las condiciones del producto
             arrayFilters: [
               {
+                "elem.precio": precio,
                 "elem.name": name,
               }
             ]
@@ -274,4 +276,39 @@ const editCopieInventario = async (req, res = response) => {
   }
 };
 
-export { newCopieInventario, editCopieInventario, editNewCopie };
+
+const getCopieInventario = async (req, res = response) => {
+  try {
+
+    // const { id } = await CopieInventario.findOne();
+
+    const copieInventario = await CopieInventario.aggregate([
+      {
+        $project: {
+          products: {
+            $filter: {
+              input: "$products",
+              as: "product",
+              cond: { $ne: ["$$product.cantidad", 0] }
+            }
+          }
+        }
+      }
+    ])
+
+/*     await CopieInventario.updateOne(
+      { _id: id }, { $set: { products: [] } }
+    )
+     */
+    res.status(200).json({
+      copieInventario
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
+export { /* newCopieInventario, */ editCopieInventario, editNewCopie, getCopieInventario };
