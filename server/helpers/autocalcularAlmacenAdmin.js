@@ -4,7 +4,7 @@ import { CopieInventario } from "../models/index.js";
 export const autocalcularAlmacenAdmin = async ( data, lastProduct ) => {
 
   const { id, products } = await CopieInventario.findOne();
-  let dataValor , lastProValor, cont, tipoProd ;
+  let dataValor , lastProValor, cont, tipoProd, cantidadTienda ;
 
   if( data.numero ){
     dataValor = data.numero;
@@ -89,22 +89,8 @@ export const autocalcularAlmacenAdmin = async ( data, lastProduct ) => {
           }
         )
       }
-      else if( data.name === lastProduct.name && data.modelo === lastProduct.modelo && data.modelo === lastProduct.modelo && dataValor[key].tienda === lastProValor.get(key).tienda){
-
-        cantidadTienda = lastProValor.get( key ).tienda ;
-        await CopieInventario.updateOne(
-          { _id: id },
-          { $push: { products: {
-            "name": data.name,
-            "categoria": data.categoria,
-            "cantidad": data.cantidad,
-            "precio": data.precio,
-            "cantidadTienda": cantidadTienda,
-            "modelo": data.modelo,
-            [tipoProd]: key
-          } } }
-        )
-      }else{
+      else if( data.name !== lastProduct.name || data.precio !== lastProduct.precio || data.modelo !== lastProduct.modelo || dataValor[key].tienda !== lastProValor.get(key).tienda){
+        
         throw new Error(`En estos momentos no puede realizar estos cambios`);
       }
     }
@@ -142,18 +128,9 @@ export const autocalcularAlmacenAdmin = async ( data, lastProduct ) => {
           }
         )
       }
-      else{
-        cantidadTienda = lastProduct.cantTienda;
-        await CopieInventario.updateOne(
-          { _id: id },
-          { $push: { products: {
-            "name": data.name,
-            "categoria": data.categoria,
-            "cantidad": data.cantidad,
-            "precio": data.precio,
-            "cantidadTienda": cantidadTienda,
-          } } }
-        )
+      else if( data.name !== lastProduct.name || data.precio !== lastProduct.precio ){
+        
+        throw new Error(`En estos momentos no puede realizar estos cambios`);
       }
       break;
   }

@@ -34,7 +34,6 @@ router.put('/editAdmin/:id',
   esAdminRole,
   check('id', 'No es un id de Mongo ').isMongoId(),
   check('id').custom( existeProductoxID ),
-  check('name',).custom( modeloValido ),
   check('categoria').custom( categorialValida),
   validarCampo,
 ], upload.single('picture'), editAdmin );

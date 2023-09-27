@@ -1,5 +1,5 @@
 import { request, response } from "express";
-import { CopieInventario, Product } from "../models/index.js";
+import { CopieInventario, Inventario, Product } from "../models/index.js";
 import { edit } from "./product.js";
 
 /* const newCopieInventario = async (req, res = response) => {
@@ -280,8 +280,6 @@ const editCopieInventario = async (req, res = response) => {
 const getCopieInventario = async (req, res = response) => {
   try {
 
-    // const { id } = await CopieInventario.findOne();
-
     const copieInventario = await CopieInventario.aggregate([
       {
         $project: {
@@ -296,10 +294,6 @@ const getCopieInventario = async (req, res = response) => {
       }
     ])
 
-/*     await CopieInventario.updateOne(
-      { _id: id }, { $set: { products: [] } }
-    )
-     */
     res.status(200).json({
       copieInventario
     });
@@ -311,4 +305,43 @@ const getCopieInventario = async (req, res = response) => {
   }
 };
 
-export { /* newCopieInventario, */ editCopieInventario, editNewCopie, getCopieInventario };
+const newInventario = async (req, res = response) => {
+  try {
+    const { id } = await CopieInventario.findOne();
+    const { products } = await CopieInventario.findOne();
+    const date = new Date(); date.setHours(0, 0, 0, 0);
+    
+    const encontrarDate = await Inventario.find({ date: { $eq: date } })
+
+    if( !encontrarDate.length === 0 ){
+      return res.status(400).json({
+        msg: "Ya existe un inventario con la misma fecha",
+      });
+    }
+
+    const inventario = new Inventario({
+      date ,
+      usuario: req.user._id,
+      products
+    });
+
+    await inventario.save();
+
+    await CopieInventario.updateOne(
+      { _id: id }, { $set: { products: [] } }
+    ) 
+
+    return res.status(200).json({
+      inventario,
+      msg: "Inventario creado",
+    });
+    
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+}
+
+export { /* newCopieInventario, */ editCopieInventario, editNewCopie, getCopieInventario, newInventario };

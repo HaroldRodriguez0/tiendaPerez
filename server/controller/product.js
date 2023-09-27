@@ -74,17 +74,22 @@ const editAdmin = async (req, res = response) => {
       );
     }
 
-    await autocalcularAlmacenAdmin( data, lastProduct ).catch(error => {
-      // Aquí puedes manejar el error que ocurra durante la operación, por ejemplo:
+    await autocalcularAlmacenAdmin( data, lastProduct )
+    .then( async ()=> {
+      const product = await Product.findByIdAndUpdate(id, data, { new: true });
+
+      return res.status(200).json({
+        product,
+        msg: "Producto actualizado con !Exito",
+      });
+    })
+    .catch(error => {
       console.error(error);
+      return res.status(400).json({
+        msg: error.message
+      });
     });
 
-    const product = await Product.findByIdAndUpdate(id, data, { new: true });
-
-    res.status(200).json({
-      product,
-      msg: "Producto actualizado con !Exito",
-    });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({

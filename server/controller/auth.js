@@ -90,8 +90,8 @@ const login = async (req, res = response) => {
         });
       }
     }else{
-      // Verificar si el email existe
-      user = await User.findOne({ name });
+      // Verificar si el name existe
+      user = await User.findOnename({ name });
       if (!user) {
         return res.status(400).json({
           msg: "Usuario / Password no son correctos",

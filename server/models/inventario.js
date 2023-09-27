@@ -2,9 +2,10 @@ import { Schema, model } from "mongoose";
 
 const InventarioSchema = Schema({
 
-  fecha: {
+  date: {
     type: Date,
-    required: true
+    required: true,
+    undefined, 
   },
 
   usuario: {
@@ -13,8 +14,8 @@ const InventarioSchema = Schema({
     required: true
   },
 
-  productos: {
-    type: Map,
+  products: {
+    type: Array,
     of: {
       name: { type: String, required: [true ,  "el name es obligatorio"] },
       cantidad: { type: Number, required: [true ,  "la cantidad es obligatorio"], min: 0 },
