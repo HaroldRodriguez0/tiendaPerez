@@ -47,27 +47,43 @@ const register = async (req, res = response) => {
 
 const verificationEmail = async (req, res = response) => {
   try {
-    const { token } = req.params;
+
+    const { token: tokeno } = req.params;
+
+    let arr = [...tokeno];
+    arr.splice(45, 47);
+    let token = arr.join("");
 
     const { uid } = jwt.verify(token, process.env.JWT_SECRET);
 
     // leer el usuario que corresponde al uid
     const user = await User.findById(uid);
-    user.estado = 1;
-
-    // Guardar en DB
-    await user.save();
 
     if (user) {
-      res.status(200).json({
-        user,
+
+      // Guardar en DB
+      user.estado = true
+      await user.save();
+
+      const data = {
+        uid: user.id,
         token,
-      });
+      };
+      const query = new URLSearchParams (data).toString ();
+      const url = "http://localhost:5173/verification";
+      const fullUrl = url + "?" + query;
+      res.redirect (fullUrl);
+
+     /*  res.status(200).json({
+        uid: user.id,
+        token,
+      }); */
     } else {
       res.status(400).json({
         msg: "Verificacion fallida",
       });
-    }
+    } 
+
   } catch (err) {
     console.log(err.message);
     res.status(500).json({
@@ -91,7 +107,7 @@ const login = async (req, res = response) => {
       }
     }else{
       // Verificar si el name existe
-      user = await User.findOnename({ name });
+      user = await User.findOne({ name });
       if (!user) {
         return res.status(400).json({
           msg: "Usuario / Password no son correctos",

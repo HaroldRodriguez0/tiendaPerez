@@ -6,14 +6,17 @@ import { Router } from "express";
 import { check } from "express-validator";
 import {
   editCopieInventario,
+  editInventario,
   editNewCopie,
-  getCopieInventario, /* newCopieInventario */
+  getCopieInventario, getInventario, /* newCopieInventario */
   newInventario,
 } from "../controller/inventario.js";
-import { categorialValida, nameNoExiste } from "../middlewares/dbValidator.js";
+import { categorialValida, inventarioExiste, nameNoExiste } from "../middlewares/dbValidator.js";
 import { tieneRole, validarCampo, validarJWT } from "../middlewares/index.js";
 
 const router = Router();
+
+// COPIE - INVENTARIO
 
 /* router.post(  
   '/newCopie',
@@ -60,8 +63,10 @@ router.put(
 
 router.get("/", getCopieInventario);
 
+// INVENTARIO
+
 router.post(
-  "/NewInventario",
+  "/newInventario",
   [
     // middlewares
     validarJWT,
@@ -70,5 +75,22 @@ router.post(
   ],
   newInventario
 );
+
+router.post( "/newInventario/aut", newInventario );
+
+router.put(
+  "/editInventario/:id",
+  [
+    // middlewares
+    validarJWT,
+    tieneRole( "ADMIN_ROLE" ),
+    check('id', 'No es un id de Mongo ').isMongoId(),
+    check('id').custom( inventarioExiste ),
+    validarCampo,
+  ],
+  editInventario
+);
+
+router.get("/get", getInventario );
 
 export default router;

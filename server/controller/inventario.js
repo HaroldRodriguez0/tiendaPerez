@@ -313,7 +313,7 @@ const newInventario = async (req, res = response) => {
     
     const encontrarDate = await Inventario.find({ date: { $eq: date } })
 
-    if( !encontrarDate.length === 0 ){
+    if( encontrarDate.length !== 0 ){
       return res.status(400).json({
         msg: "Ya existe un inventario con la misma fecha",
       });
@@ -321,7 +321,7 @@ const newInventario = async (req, res = response) => {
 
     const inventario = new Inventario({
       date ,
-      usuario: req.user._id,
+      usuario: req.user,
       products
     });
 
@@ -344,4 +344,76 @@ const newInventario = async (req, res = response) => {
   }
 }
 
-export { /* newCopieInventario, */ editCopieInventario, editNewCopie, getCopieInventario, newInventario };
+const editInventario = async (req, res = response) => {
+  try {
+    let tipoProd , valor , update;
+
+    const { index, name, cantidad, precio, modelo, numero, color, tipo } = req.body;
+    //const { id, products } = await Inventario.findById(req.params.id);
+    // Validar que el id exista
+
+    if( modelo ){
+      numero && ( tipoProd = 'numero', valor = numero );
+      color && ( tipoProd = 'color', valor = color );
+      tipo && ( tipoProd = 'tipo', valor = tipo );
+
+      update = { $set: { 
+        [`products.${index}.name`]: name, 
+        [`products.${index}.cantidad`]: cantidad, 
+        [`products.${index}.precio`]:  precio, 
+        [`products.${index}.modelo`]: modelo, 
+        [`products.${index}.${tipoProd}`]: valor
+       } 
+      };
+    }
+    else{
+      update = { $set: { 
+        [`products.${index}.name`]: name, 
+        [`products.${index}.cantidad`]: cantidad, 
+        [`products.${index}.precio`]:  precio, 
+       } 
+      };
+    }
+    
+    await Inventario.updateOne( { _id: req.params.id } , update );
+
+    return res.status(200).json({
+      msg: "Inventario actualizado con exito",
+    });
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+}
+
+// extraer el ultimo inventario creado
+const getInventario = async (req, res = response) => {
+  try {
+
+    let inventario;
+    //req.body.date = new Date(2023, 8, 27);
+    const { date } = req.body;
+
+    if( date ){
+      inventario = await Inventario.findOne({ date });
+    }
+    else{
+      inventario = await Inventario.findOne();
+    }
+
+    return res.status(200).json({
+      inventario 
+    });
+    
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+}
+
+export { /* newCopieInventario, */ editCopieInventario, editNewCopie, getCopieInventario, newInventario, editInventario, getInventario };

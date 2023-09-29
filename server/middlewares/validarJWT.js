@@ -7,9 +7,9 @@ import { User } from '../models/index.js';
 const validarJWT = async ( req, res = response, next ) => {
 
   // x-token headers
-  const token = req.header('x-token');
+  const tokeno = req.header('x-token');
 
-  if ( !token ){
+  if ( !tokeno ){
     return res.status(401).json({
       msg: 'No hay token en la peticion'
     })
@@ -17,13 +17,18 @@ const validarJWT = async ( req, res = response, next ) => {
 
   try {
 
+    let arr = [...tokeno];
+    arr.splice(45, 47);
+    let token = arr.join("");
+
     const { uid } = jwt.verify(
       token,
       process.env.JWT_SECRET
     );
 
     // leer el usuario que corresponde al uid
-    const user = await User.findById( uid );
+    const { _doc } = await User.findById( uid );
+    const { password, __v, ...user  } = _doc;
 
     if( !user ){
       return res.status(401).json({

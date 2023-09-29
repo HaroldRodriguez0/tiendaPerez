@@ -6,6 +6,7 @@ import { autocalcularAlmacenAdmin } from "./autocalcularAlmacenAdmin.js";
 import { autocalcularAlmacen } from "./autocalcularAlmacen.js";
 import { autocalcularToolsCafeteria } from "./autocalcularToolsCafeteria.js";
 
+
 export {
   generarJWT,
   transporter,
@@ -13,5 +14,6 @@ export {
   imagemin_sharp,
   autocalcularAlmacenAdmin,
   autocalcularAlmacen,
-  autocalcularToolsCafeteria
+  autocalcularToolsCafeteria,
+
 }

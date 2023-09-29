@@ -1,4 +1,4 @@
-import { Categoria, Product, Role, User } from "../models/index.js";
+import { Categoria, Inventario, Product, Role, User } from "../models/index.js";
 // parseNumber ( brinda inf como el pais )
 import parseNumber, { isValidPhoneNumber } from "libphonenumber-js";
 
@@ -69,6 +69,13 @@ const existeProductoxID = async (id) => {
   }
 };
 
+const inventarioExiste = async (id) => {
+  const existeProducto = await Inventario.findById(id);
+  if (!existeProducto) {
+    throw new Error(`El ID ${id} no existe `);
+  }
+};
+
 const validarProductorole = () => {
   return async (req, res = response, next) => {
     const existeProducto = await Product.findById(req.params.id);
@@ -118,4 +125,5 @@ export {
   modeloValido,
   existeProductoxID,
   validarProductorole,
+  inventarioExiste
 };

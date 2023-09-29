@@ -1,4 +1,5 @@
 
+
 export const autocalcularAlmacen = ( data ) => {
   let dataValor, cont, tienda=0, almacen=0 ;
 

@@ -11,7 +11,6 @@ const InventarioSchema = Schema({
   usuario: {
     type: Schema.Types.ObjectId,
     ref: 'User', 
-    required: true
   },
 
   products: {
