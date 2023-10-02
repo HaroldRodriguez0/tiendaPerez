@@ -1,35 +1,55 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-
+import { useDispatch } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import { authRegister } from "../reducer/authReducer";
+import { api } from "../api/myApi";
 
 export const Verification = () => {
-
-  const [data, setData] = useState (null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [data, setData] = useState(null);
   const search = useLocation().search;
 
-useEffect(() => {
-  
-  const params = new URLSearchParams (search);
-  const uid = params.get ("uid");
-  const token = params.get ("token");
-  setData({ uid, token });
-}, [search])
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    const uid = params.get("uid");
+    const token = params.get("token");
+    // hacer peticion  para buscar el user con ese uid y guardar en store sus datos
+    api.get( `/users/${uid}` )
+      .then(body => {
+        setData({ token, ...body.data.user });
+      })
+      .catch(error => {
+        console.log(error);
+        navigate("/login");
+        Swal.fire('Error', error.response.data.msg, 'error');
+        return;
+      });
+  }, [search, navigate]);
 
-    
-
-
+  useEffect(() => {
+    if (data) {
+      dispatch(authRegister(data));
+      navigate("/");
+      Swal.fire("Éxito", "Registro exitoso", "success");
+      return;
+    }
+  }, [data, dispatch, navigate]);  
 
   return (
-    <div>
-      {data ? (
-        <div>
-          <p>Bienvenido {data.uid}, tienes {data.token} años</p>
-        </div>
-      ) : (
-        <div>
-          <p>Cargando información...</p>
-        </div>
-      )}
-    </div>
-  )
-}
+    <Box
+        sx={{
+          display: "flex",
+          width: "100%",
+          height: "92vh",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress color="success"  size="10rem" />
+      </Box>
+  );
+};

@@ -69,15 +69,12 @@ const verificationEmail = async (req, res = response) => {
         uid: user.id,
         token,
       };
+      // guardar la informacion en los params
       const query = new URLSearchParams (data).toString ();
       const url = "http://localhost:5173/verification";
       const fullUrl = url + "?" + query;
       res.redirect (fullUrl);
 
-     /*  res.status(200).json({
-        uid: user.id,
-        token,
-      }); */
     } else {
       res.status(400).json({
         msg: "Verificacion fallida",

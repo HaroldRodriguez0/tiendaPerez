@@ -1,16 +1,12 @@
-
-
-
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { HomeScreen } from './HomeScreen';
-import { PrivateRouter } from './PrivateRouter';
-import { PublicRouter } from './PublicRouters';
-import { Verification } from './Verification';
-import { useDispatch, useSelector } from 'react-redux';
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HomeScreen } from "../components/HomeScreen";
+import { Verification } from "./Verification";
+import { NavBar } from "../components/navBar/NavBar";
+import { Container } from "@mui/system";
+import { LoginScreen } from "../components/login&register/LoginScreen";
 
 export const AppRouter = () => {
-
-/*   const dispatch = useDispatch();
+  /*   const dispatch = useDispatch();
   const { checking } = useSelector( state => state.auth );
 
   useEffect(() => {
@@ -24,26 +20,16 @@ export const AppRouter = () => {
   }
  */
 
-
   return (
     <BrowserRouter>
-    <Routes>
-
-    <Route path="/verification/*" element={ <Verification /> }/>
-
-    <Route path="/" element={
-      <PublicRouter>
-        <HomeScreen/> 
-      </PublicRouter>}/>
-
-    <Route path="/*" element={
-      <PrivateRouter>
-       
-      </PrivateRouter>}/>
-
-    </Routes> 
-  </BrowserRouter>
-  )
-}
-
-
+      <NavBar />
+      <Container >
+        <Routes>
+          <Route path="/verification/*" element={<Verification />} />
+          <Route path="/login" element={<LoginScreen />} />
+          <Route path="/*" element={<HomeScreen />} />
+        </Routes>
+      </Container>
+    </BrowserRouter>
+  );
+};

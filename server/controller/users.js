@@ -30,7 +30,22 @@ const users = async (req, res = response) => {
   }
 };
 
+const usersxId = async (req, res = response) => {
+  try {
 
+    const user = await User.findById( req.params.id )
+
+    res.status(200).json({
+      user
+    })
+    
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+}
 
 const usersBanned = async (req, res = response) => {
   try {
@@ -138,6 +153,7 @@ const usersEdit = async (req, res = response) => {
 
 export {
   users,
+  usersxId,
   usersBanned,
   usersPorNameEmail,
   usersEdit
