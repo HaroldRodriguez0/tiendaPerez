@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
@@ -17,15 +18,110 @@ import {
   CircularProgress,
   Grid,
   Typography,
+  FormHelperText,
 } from "@mui/material";
+import { useForm } from "../../hooks/useForm";
+import { api } from "../../api/myApi";
+import Swal from "sweetalert2";
+import { authLogin, authRegister } from "../../reducer/authReducer";
+import { useNavigate } from "react-router-dom";
 
 export const LoginScreen = () => {
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { rol } = useSelector((state) => state.auth);
+  const [login, setfirst] = useState(true);
+  const [codigoPais, setcodigoPais] = useState();
+  const [loading, setLoading] = useState(false);
+  const [errorpassword, seterrorpassword] = useState(false);
+  const [errorname, seterrorname] = useState('');
+  const [erroremail, seterroremail] = useState('');
+  const [errormovil, seterrormovil] = useState('');
+
+  const [loginForm, handleloginForm, loginReset] = useForm({
+    nameEmail: "",
+    password: "",
+  });
+
+  const [registerForm, handleregisterForm, registeReset] = useForm({
+    name: "",
+    email: "",
+    movil: "",
+    password: "",
+  });
+
+  const { name, email, movil, password } = registerForm;
+
   const [showPassword, setShowPassword] = useState(false);
-
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
+  };
+
+  const handleLogin = async () => {
+    const regex = /^.{6,}$/;
+    const validator = regex.test(loginForm.password);
+    seterrorpassword(!validator ? true : false);
+
+    if (validator) {
+      await api
+        .post("/auth/login", { ...loginForm })
+        .then(({ data }) => {
+          dispatch(authLogin({ token: data.token, ...data.user }));
+          navigate("/");
+        })
+        .catch(({ response }) => {
+          Swal.fire("Error", response.data.msg, "error");
+          return;
+        });
+    }
+  };
+
+  const handleRegister = async () => {
+    registerForm.movil = "+" + codigoPais.phone + movil;
+    console.log(registerForm);
+    await api
+      .post("/auth/register", { ...registerForm })
+      .then(({ data }) => {
+        dispatch(authRegister({ token: data.token, ...data.user }));
+        navigate("/");
+      })
+      .catch(({ response }) => {
+        let keys = [];
+        const {errors} = response.data;
+        for (const key in errors) {
+
+          keys.push(key,errors[key].msg);
+
+/*        ( key === 'name' ) ? seterrorname(errors[key].msg) :seterrorname('');
+          ( key === 'email' ) ? seterroremail(errors[key].msg) :seterroremail('');
+          ( key === 'movil' ) ? seterrormovil(errors[key].msg) :seterrormovil(''); */
+
+          //console.log(errors[key].msg)
+          //console.log(key)
+          
+        }
+
+        console.log(keys)
+        //keys.find(name) ? seterrorname(errors[key].msg) :seterrorname('')
+        console.log(errorname)
+        const regex = /^.{6,}$/;
+        const validator = regex.test(registerForm.password);
+        seterrorpassword(!validator ? true : false);
+        registerForm.movil = '';
+        return;
+      });
+    //registeReset();
+  };
+
+  const handleSubmiteee = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    login ? await handleLogin() : await handleRegister();
+
+    setLoading(false);
   };
 
   return (
@@ -40,59 +136,74 @@ export const LoginScreen = () => {
           <Card
             sx={{
               backgroundColor: "#fafff4",
-              padding: "1rem",
+              p: { xs: "1rem", md: "1rem 7rem" },
             }}
           >
             <Typography variant="h5" textAlign={"center"} color={"black"}>
-              {" "}
-              Edit Producto{/*editing ?"Edit Producto" :"Create Producto"*/}
+              {login ? "Inicio de Sesión" : "Registro"}
             </Typography>
             <CardContent>
-              <form /* onSubmit={handleSubmit} */>
+              <form onSubmit={handleSubmiteee}>
                 <Box display={"flex"} flexDirection={"column"} gap={4}>
-                  <TextField required
-                    sx={{display: 'none' }}
-                    name="nombreproducto"
-                    /* value={producto.nombreproducto} */
-                    variant="standard"display='none'
+                  <TextField
+                    sx={{ display: !login && "none" }}
+                    name="nameEmail"
+                    value={loginForm.nameEmail}
+                    variant="standard"
+                    display="none"
                     label="Nombre o Email"
                     color="success"
-                    /* onChange={handlChange} */
+                    onChange={handleloginForm}
                   />
-                  <TextField required
-                    name="nombreproducto"
-                    /* value={producto.nombreproducto} */
+                  <TextField
+                    sx={{ display: login && "none" }}
+                    name="name"
+                    value={name}
                     variant="standard"
                     label="Nombre..."
                     color="success"
-                    /* onChange={handlChange} */
-                    /* error={''}
-                    helperText={''} */
+                    onChange={handleregisterForm}
+                    error={errorname ?true :false}
+                    helperText={ errorname } 
                   />
-                  <TextField required
-                    name="nombreproducto"
-                    /* value={producto.nombreproducto} */
+                  <TextField
+                    sx={{ display: login && "none" }}
+                    type="email"
+                    name="email"
+                    value={email}
                     variant="standard"
                     label="Email..."
                     color="success"
-                    /* onChange={handlChange} */
+                    onChange={handleregisterForm}
+                    error={erroremail ?true :false}
+                    helperText={ erroremail } 
                   />
-                  <TextField required
-                    name="movil"
-                    /* value={producto.nombreproducto} */
-                    variant="standard"
-                    label="Movil..."
-                    color="success"
-                    /* onChange={handlChange} */
-                  >  </TextField>
-                  < CountrySelect />
-                  <FormControl variant="standard" color="success" required>
+                  <Box sx={{ display: login ? "none" : "flex" }}>
+                    <CountrySelect setcodigoPais={setcodigoPais} />
+                    <TextField
+                      sx={{ width: "100%" }}
+                      type="number"
+                      name="movil"
+                      value={movil}
+                      variant="standard"
+                      label="Movil..."
+                      color="success"
+                      inputProps={{ pattern: "[0-9]+" }}
+                      onChange={handleregisterForm}
+                      error={errormovil ?true :false}
+                      helperText={ errormovil } 
+                    />
+                  </Box>
+                  <FormControl variant="standard" color="success">
                     <InputLabel htmlFor="standard-adornment-password">
                       Password...
                     </InputLabel>
                     <Input
-                      id="standard-adornment-password"
                       type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={login ? loginForm.password : password}
+                      onChange={login ? handleloginForm : handleregisterForm}
+                      error={errorpassword}
                       endAdornment={
                         <InputAdornment position="end">
                           <IconButton
@@ -105,19 +216,48 @@ export const LoginScreen = () => {
                         </InputAdornment>
                       }
                     />
+                    {errorpassword && (
+                      <FormHelperText error>
+                        La contraseña debe tener al menos 6 caracteres.
+                      </FormHelperText>
+                    )}
                   </FormControl>
                 </Box>
                 <Button
-                  sx={{ marginTop: 2 }}
+                  sx={{ marginTop: 4 }}
                   variant="contained"
                   type="submit"
-                  /* disabled={!producto.nombreproducto || !producto.descripcion || !producto.precio || !producto.cantidadproducto} */
+                  disabled={
+                    login
+                      ? !loginForm.nameEmail || !loginForm.password
+                      : !name || !email || !password || !codigoPais || !movil
+                  }
                 >
-                  {/* {loading 
-                  ?<CircularProgress color="inherit" size={24}/> 
-                  :'Save'}  */}
-                  <CircularProgress color="inherit" size={24} />
+                  {loading ? (
+                    <CircularProgress color="inherit" size={24} />
+                  ) : (
+                    "Save"
+                  )}
                 </Button>
+                <Typography
+                  onClick={() => {
+                    setfirst(!login);
+                  }}
+                  sx={{
+                    fontSize: { xs: ".8rem", md: "1rem" },
+                    mt: 3,
+                    textDecoration: "underline",
+                    color: "#26a430",
+                    "&:hover": {
+                      cursor: "pointer",
+                      color: "#86d02d",
+                    },
+                  }}
+                >
+                  {login
+                    ? "¿No tienes una cuenta? Regístrate aquí."
+                    : "Ya tiene una cuenta? Inicie Sesión aquí."}
+                </Typography>
               </form>
             </CardContent>
           </Card>

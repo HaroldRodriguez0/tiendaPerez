@@ -5,6 +5,7 @@ import { NavBar } from "../components/navBar/NavBar";
 import { Container } from "@mui/system";
 import { LoginScreen } from "../components/login&register/LoginScreen";
 
+
 export const AppRouter = () => {
   /*   const dispatch = useDispatch();
   const { checking } = useSelector( state => state.auth );

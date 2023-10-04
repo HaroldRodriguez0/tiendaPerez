@@ -98,7 +98,9 @@ export const NavBar = () => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem sx={{ display: { md: "none" } }} onClick={ () => navigate('/login')}>
+      <MenuItem 
+        sx={{ display: { md: "none" } }} 
+        onClick={ () => {navigate('/login'), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <PersonOutlineOutlinedIcon />
         </IconButton>

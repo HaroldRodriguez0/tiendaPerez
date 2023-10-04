@@ -15,7 +15,7 @@ const router = Router();
 router.post(
   '/login',
   [// middlewares
-    check('password','El password debe de ser de 6 caracteres').isLength({ min:6 }),
+    check('password','La Contraseña debe de ser de 6 caracteres').isLength({ min:6 }),
     validarCampo
   ], 
    login );
@@ -28,7 +28,7 @@ router.post(
     check('name').custom( nameExiste ),
     check('email','El email es obligatorio').isEmail(),
     check('email').custom( emailExiste ),
-    check('password','El password debe de ser de 6 caracteres').isLength({ min:6 }),
+    check('password','La Contraseña debe de ser de 6 caracteres').isLength({ min:6 }),
     check('movil','El movil es obligatorio').not().isEmpty(),
     check('movil').custom( movilValido ),
     check('rol').custom( esRolValido ),
@@ -42,7 +42,7 @@ router.post(
       check('name','El nombre es obligatorio').not().isEmpty(),
       check('email','El email es obligatorio').isEmail(),
       check('movil','El movil es obligatorio').not().isEmpty(),
-      check('password','El password debe de ser de 6 caracteres').isLength({ min:6 }),
+      check('password','La Contraseña debe de ser de 6 caracteres').isLength({ min:6 }),
       validarCampo
     ],
   forgotPassword );

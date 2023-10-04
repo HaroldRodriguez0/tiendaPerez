@@ -91,12 +91,14 @@ const verificationEmail = async (req, res = response) => {
 
 const login = async (req, res = response) => {
 
-  const { name, email, password } = req.body;
+  const { nameEmail, password } = req.body;
   let user;
   try {
-    if (email) {
+    const regex = /^[a-z0-9]+@[a-z0-9]+\.[a-z]{2,}$/i; 
+    const isValid = regex.test(nameEmail);
+    if (isValid) {
       // Verificar si el email existe
-      user = await User.findOne({ email });
+      user = await User.findOne({ email:nameEmail });
       if (!user) {
         return res.status(400).json({
           msg: "Usuario / Password no son correctos",
@@ -104,7 +106,7 @@ const login = async (req, res = response) => {
       }
     }else{
       // Verificar si el name existe
-      user = await User.findOne({ name });
+      user = await User.findOne({ name:nameEmail });
       if (!user) {
         return res.status(400).json({
           msg: "Usuario / Password no son correctos",

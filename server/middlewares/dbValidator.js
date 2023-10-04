@@ -50,7 +50,7 @@ const movilValido = async (movil) => {
 
     const number = isValidPhoneNumber(movil, { extended: true });
     if (!number) {
-      throw new Error(`El movil ${movil} no valido`);
+      throw new Error(`El movil ${movil} no es válido`);
     }
   }
 };
