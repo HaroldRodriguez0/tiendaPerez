@@ -21,6 +21,8 @@ import ZapatoIcon from "../icons/ZapatoIcon";
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
 import { Button, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { authLogout } from "../../reducer/authReducer";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -63,6 +65,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export const NavBar = () => {
+
+  const dispatch = useDispatch();
+  const { rol } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
@@ -99,12 +104,20 @@ export const NavBar = () => {
       onClose={handleMobileMenuClose}
     >
       <MenuItem 
-        sx={{ display: { md: "none" } }} 
+        sx={{ display: (theme) => ((!rol || theme.breakpoints.down('md')) && 'none' ) }} 
         onClick={ () => {navigate('/login'), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <PersonOutlineOutlinedIcon />
         </IconButton>
         <p>Login / Registro</p>
+      </MenuItem>
+      <MenuItem 
+        sx={{ display: (theme) => (rol || theme.breakpoints.down('md') && 'none' ) }} 
+        onClick={ () =>{ dispatch(authLogout()), navigate('/login'), handleMobileMenuClose()}}>
+        <IconButton size="large" aria-label="Inventario" color="inherit">
+          <PersonOutlineOutlinedIcon />
+        </IconButton>
+        <p>Cerrar Sesión</p>
       </MenuItem>
       <MenuItem>
         <IconButton size="large" aria-label="Inventario" color="inherit">

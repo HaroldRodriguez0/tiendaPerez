@@ -16,21 +16,7 @@ export const authSlice = createSlice({
   reducers: {
 
     authLogin: ( state, action ) => {
-      const { uid, name, email, movil, rol, estado, token } = action.payload;
-      localStorage.setItem( 'token', token );
-      localStorage.setItem( 'token-init-date', new Date().getTime() );
-      state.uid = uid;
-      state.name = name;
-      state.email = email;
-      state.movil = movil;
-      state.rol = rol;
-      state.estado = estado;
-    },
-
-    authRegister: ( state, action ) => {
-      const { uid, name, email, movil, rol, estado, token } = action.payload;
-      localStorage.setItem( 'token', token );
-      localStorage.setItem( 'token-init-date', new Date().getTime() );
+      const { uid, name, email, movil, rol, estado } = action.payload;
       state.uid = uid;
       state.name = name;
       state.email = email;
@@ -47,11 +33,12 @@ export const authSlice = createSlice({
       state.movil = '';
       state.rol = '';
       state.estado = '';
+      localStorage.removeItem("token");
     },
 
   },
 })
 
-export const { authLogin, authRegister, authChekingFinish, authLogout} = authSlice.actions
+export const { authLogin, authLogout} = authSlice.actions
 
 export default authSlice.reducer

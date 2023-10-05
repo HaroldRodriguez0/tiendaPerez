@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
-import { authRegister } from "../reducer/authReducer";
+import { authLogin } from "../reducer/authReducer";
 import { api } from "../api/myApi";
 
 export const Verification = () => {
@@ -32,9 +32,16 @@ export const Verification = () => {
 
   useEffect(() => {
     if (data) {
-      dispatch(authRegister(data));
+      dispatch(authLogin(data));
+      localStorage.setItem( 'token', data.token );
       navigate("/");
-      Swal.fire("Éxito", "Registro exitoso", "success");
+      Swal.fire({
+        position: 'top-end',
+        icon: 'success',
+        title: 'Registro Exitoso !!!',
+        showConfirmButton: false,
+        timer: 1500
+      })
       return;
     }
   }, [data, dispatch, navigate]);  

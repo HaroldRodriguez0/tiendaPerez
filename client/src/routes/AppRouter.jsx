@@ -4,27 +4,28 @@ import { Verification } from "./Verification";
 import { NavBar } from "../components/navBar/NavBar";
 import { Container } from "@mui/system";
 import { LoginScreen } from "../components/login&register/LoginScreen";
-
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { keepLogin } from "../actions/auth";
 
 export const AppRouter = () => {
-  /*   const dispatch = useDispatch();
-  const { checking } = useSelector( state => state.auth );
+  const dispatch = useDispatch();
+  const { rol } = useSelector((state) => state.auth)
 
+  // mantener el estado del usuario cuando se recargue la pagina
   useEffect(() => {
 
-    dispatch( startChecking() );
+    if (!rol && localStorage.getItem("token")) {
+      const token = localStorage.getItem("token");
+      dispatch(keepLogin(token));
+    }
 
-  }, [dispatch])
-  
-  if( checking ){
-    return <h1>Espere ...</h1>
-  }
- */
+  }, [dispatch, rol]);
 
   return (
     <BrowserRouter>
       <NavBar />
-      <Container >
+      <Container>
         <Routes>
           <Route path="/verification/*" element={<Verification />} />
           <Route path="/login" element={<LoginScreen />} />

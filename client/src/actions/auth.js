@@ -1,28 +1,23 @@
 
-import Swal from 'sweetalert2'
 import { api } from '../api/myApi';
 import { authLogin } from "../reducer/authReducer";
 
 
-export const startRegister = (name, email, password, movil) => {
+export const keepLogin = ( token ) => {
+
+  console.log(token)
 
   return async (dispatch) => {
 
-    await api.post( '/register', { name, email, password, movil } )
-
-    .then(body => {
-      console.log(body);
-      localStorage.setItem( 'token', body.token );
-      localStorage.setItem( 'token-init-date', new Date().getTime() );
-
-       dispatch( authLogin({
-        uid: body.uid,
-      }))
+    await api.post('/auth/loginToken', {}, {
+      headers: {
+          'x-token': token
+      }
+  })
+  
+    .then(({ data }) => {
+      console.log(data.user)
+      dispatch( authLogin( data.user ))
     })
-
-    .catch(error => {
-      console.log(error);
-      Swal.fire('Error', error.msg, 'error')
-    });
   }
 }

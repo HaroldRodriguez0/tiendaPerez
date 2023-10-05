@@ -5,9 +5,9 @@ host + /api/auth/...
 
 import { Router } from 'express';
 import { check } from 'express-validator';
-import { forgotPassword, login, register, verificationDelete, verificationEmail } from '../controller/auth.js';
+import { forgotPassword, login, loginToken, register, verificationDelete, verificationEmail } from '../controller/auth.js';
 import { emailExiste, esRolValido, movilValido, nameExiste } from '../middlewares/dbValidator.js';
-import { validarCampo } from '../middlewares/index.js';
+import { validarCampo, validarJWT } from '../middlewares/index.js';
 
 const router = Router();
 
@@ -46,6 +46,8 @@ router.post(
       validarCampo
     ],
   forgotPassword );
+ // hacer el loginToken y quitar del reducer que guarde el token hay que ponerlo independiente en cada accion 
+  router.post( '/loginToken', validarJWT, loginToken )
 
   router.get( '/verification/:token', (verificationEmail) );
 
@@ -55,3 +57,5 @@ router.post(
 
 
   export default router;
+
+

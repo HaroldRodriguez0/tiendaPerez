@@ -34,7 +34,7 @@ const register = async (req, res = response) => {
       });
 
     res.status(201).json({
-      msg: "Mensaje enviado con Exito!",
+      msg: "Se ha enviado un mensaje de confirmación a su Email, por favor compruébelo para que Inicie Sesión",
     });
   } catch (err) {
     console.log(err.message);
@@ -64,6 +64,11 @@ const verificationEmail = async (req, res = response) => {
       // Guardar en DB
       user.estado = true
       await user.save();
+
+      // modificar el token
+      let arr = [...token]
+      arr.splice(45, 0, "Tk96ZmRWQVNzZGZBMTJQT0RFUjNzZGZIQUtFQVJNRWFkMjY");
+      token = arr.join(""); 
 
       const data = {
         uid: user.id,
@@ -188,10 +193,29 @@ const forgotPassword = async (req, res = response) => {
   }
 };
 
+const loginToken = async (req, res = response) => {
+  try {
+    req.user.uid = req.user._id;
+    req.user._id = undefined
+
+    console.log(req.user) 
+    res.status(200).json({
+      user: req.user
+    });
+    
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+}
+
 export {
   register,
   verificationEmail,
   verificationDelete,
   login,
   forgotPassword,
+  loginToken
 };

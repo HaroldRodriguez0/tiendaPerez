@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Input from "@mui/material/Input";
@@ -23,14 +23,13 @@ import {
 import { useForm } from "../../hooks/useForm";
 import { api } from "../../api/myApi";
 import Swal from "sweetalert2";
-import { authLogin, authRegister } from "../../reducer/authReducer";
+import { authLogin } from "../../reducer/authReducer";
 import { useNavigate } from "react-router-dom";
 
 export const LoginScreen = () => {
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { rol } = useSelector((state) => state.auth);
   const [login, setfirst] = useState(true);
   const [codigoPais, setcodigoPais] = useState();
   const [loading, setLoading] = useState(false);
@@ -68,14 +67,16 @@ export const LoginScreen = () => {
       await api
         .post("/auth/login", { ...loginForm })
         .then(({ data }) => {
-          dispatch(authLogin({ token: data.token, ...data.user }));
+          dispatch(authLogin({ ...data.user }));
+          localStorage.setItem( 'token', data.token );
           navigate("/");
         })
         .catch(({ response }) => {
-          Swal.fire("Error", response.data.msg, "error");
+          Swal.fire("", response.data.msg, "error");
           return;
         });
     }
+    loginReset();
   };
 
   const handleRegister = async () => {
@@ -84,28 +85,16 @@ export const LoginScreen = () => {
     await api
       .post("/auth/register", { ...registerForm })
       .then(({ data }) => {
-        dispatch(authRegister({ token: data.token, ...data.user }));
         navigate("/");
+        Swal.fire("", data.msg, "info");      
       })
       .catch(({ response }) => {
-        let keys = [];
         const {errors} = response.data;
-        for (const key in errors) {
 
-          keys.push(key,errors[key].msg);
+        ( errors.name ) ? seterrorname(errors.name.msg) :seterrorname('');
+        ( errors.email ) ? seterroremail(errors.email.msg) :seterroremail('');
+        ( errors.movil ) ? seterrormovil(errors.movil.msg) :seterrormovil('');
 
-/*        ( key === 'name' ) ? seterrorname(errors[key].msg) :seterrorname('');
-          ( key === 'email' ) ? seterroremail(errors[key].msg) :seterroremail('');
-          ( key === 'movil' ) ? seterrormovil(errors[key].msg) :seterrormovil(''); */
-
-          //console.log(errors[key].msg)
-          //console.log(key)
-          
-        }
-
-        console.log(keys)
-        //keys.find(name) ? seterrorname(errors[key].msg) :seterrorname('')
-        console.log(errorname)
         const regex = /^.{6,}$/;
         const validator = regex.test(registerForm.password);
         seterrorpassword(!validator ? true : false);
@@ -229,8 +218,8 @@ export const LoginScreen = () => {
                   type="submit"
                   disabled={
                     login
-                      ? !loginForm.nameEmail || !loginForm.password
-                      : !name || !email || !password || !codigoPais || !movil
+                      ? !loginForm.nameEmail || !loginForm.password || loading
+                      : !name || !email || !password || !codigoPais || !movil || loading
                   }
                 >
                   {loading ? (
