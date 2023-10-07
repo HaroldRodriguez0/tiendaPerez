@@ -17,12 +17,15 @@ import MoreIcon from "@mui/icons-material/MoreVert";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import FastfoodOutlinedIcon from "@mui/icons-material/FastfoodOutlined";
+import PersonOffOutlinedIcon from '@mui/icons-material/PersonOffOutlined';
 import ZapatoIcon from "../icons/ZapatoIcon";
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
-import { Button, Container, Typography } from "@mui/material";
+import { Button, Container, Typography, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authLogout } from "../../reducer/authReducer";
+
+const noAmin = ['USER_ROLE', 'CAFETERIA_ROLE', 'TOOLS_ROLE' ];
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -65,7 +68,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export const NavBar = () => {
-
+  const isMobile = useMediaQuery("(max-width:900px)");
   const dispatch = useDispatch();
   const { rol } = useSelector((state) => state.auth);
   const navigate = useNavigate();
@@ -86,7 +89,7 @@ export const NavBar = () => {
     <Menu
       sx={{
         "& .css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper": {
-          backgroundColor: "#fafff4", 
+          backgroundColor: "#fafff4",
         },
       }}
       anchorEl={mobileMoreAnchorEl}
@@ -103,29 +106,39 @@ export const NavBar = () => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      <MenuItem 
-        sx={{ display: (theme) => ((!rol || theme.breakpoints.down('md')) && 'none' ) }} 
-        onClick={ () => {navigate('/login'), handleMobileMenuClose()}}>
+      <MenuItem
+        sx={{
+          display: (rol || !isMobile) && "none",
+        }}
+        onClick={() => {
+          navigate("/login"), handleMobileMenuClose();
+        }}
+      >
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <PersonOutlineOutlinedIcon />
         </IconButton>
         <p>Login / Registro</p>
       </MenuItem>
-      <MenuItem 
-        sx={{ display: (theme) => (rol || theme.breakpoints.down('md') && 'none' ) }} 
-        onClick={ () =>{ dispatch(authLogout()), navigate('/login'), handleMobileMenuClose()}}>
+      <MenuItem
+        sx={{
+          display: (!rol || !isMobile ) && "none",
+        }}
+        onClick={() => {
+          dispatch(authLogout()), navigate("/login"), handleMobileMenuClose();
+        }}
+      >
         <IconButton size="large" aria-label="Inventario" color="inherit">
-          <PersonOutlineOutlinedIcon />
+          <PersonOffOutlinedIcon />
         </IconButton>
         <p>Cerrar Sesión</p>
       </MenuItem>
-      <MenuItem>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <PeopleAltOutlinedIcon />
         </IconButton>
         <p>Usuarios</p>
       </MenuItem>
-      <MenuItem>
+      <MenuItem  sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }}>
         <IconButton size="large" aria-label="venta" color="inherit">
           <Badge badgeContent={1} color="success">
             <CalculateOutlinedIcon />
@@ -133,13 +146,13 @@ export const NavBar = () => {
         </IconButton>
         <p>Venta</p>
       </MenuItem>
-      <MenuItem>
+      <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <InventoryOutlinedIcon />
         </IconButton>
         <p>Inventario diario</p>
       </MenuItem>
-      <MenuItem>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <Inventory2OutlinedIcon />
         </IconButton>
@@ -171,18 +184,18 @@ export const NavBar = () => {
       sx={{
         flexGrow: 1,
         "& .css-1aschtf:hover": { backgroundColor: "rgb(200 255 177 / 25%)" },
-        '& .css-1oqqzyl-MuiContainer-root': { padding: 0 }
+        "& .css-1oqqzyl-MuiContainer-root": { padding: 0 },
       }}
     >
       <AppBar position="static" color="primary" enableColorOnDark>
         <Container>
           <Toolbar sx={{ px: 0 }}>
             <IconButton
-              onClick={ () => navigate('/')}
+              onClick={() => navigate("/")}
               size="large"
               color="inherit"
               aria-label="logo"
-              sx={{ mx: 1, mr: 1, p: 0 }} 
+              sx={{ mx: 1, mr: 1, p: 0 }}
             >
               <Box
                 component="img"
@@ -276,11 +289,12 @@ export const NavBar = () => {
                 </Typography>
               </Button>
               <Button
-                onClick={ () => navigate('/login')}
+                onClick={() => navigate("/login")}
                 size="large"
                 aria-label="Inventario"
                 color="inherit"
-                sx={{ mx: 2 }}
+                sx={{
+                  display: ( rol || isMobile ) && "none", mx: 2 }}
               >
                 <PersonOutlineOutlinedIcon />
                 <Typography
@@ -293,19 +307,38 @@ export const NavBar = () => {
                   Login
                 </Typography>
               </Button>
-            </Box>
-            <IconButton
+              <Button
+                onClick={() => {
+                  dispatch(authLogout()), navigate("/login"), handleMobileMenuClose();
+                }}
                 size="large"
                 aria-label="Inventario"
                 color="inherit"
-                sx={{ display: { md: "none" }, }}
+                sx={{ display: ( !rol || isMobile )  && "none", mx: 2 }}
               >
-                <Badge badgeContent={1} color="success">
-                  <ShoppingCartOutlinedIcon />
-                </Badge>
-              </IconButton>
-            <Box>
-              {/* validar que esto no se muestre a clientes */}
+                <PersonOffOutlinedIcon />
+                <Typography
+                  sx={{
+                    display: { xs: "none", lg: "block" },
+                    ml: 1,
+                    fontSize: "13px",
+                  }}
+                >
+                  Cerrar
+                </Typography>
+              </Button>
+            </Box>
+            <IconButton
+              size="large"
+              aria-label="Inventario"
+              color="inherit"
+              sx={{ display: { md: "none" } }}
+            >
+              <Badge badgeContent={1} color="success">
+                <ShoppingCartOutlinedIcon />
+              </Badge>
+            </IconButton>
+            <Box sx={{ display: ( ( !rol || rol === 'USER_ROLE' ) && !isMobile )  && "none" }}>
               <IconButton
                 size="large"
                 aria-label="show more"

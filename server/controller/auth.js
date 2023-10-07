@@ -198,7 +198,6 @@ const loginToken = async (req, res = response) => {
     req.user.uid = req.user._id;
     req.user._id = undefined
 
-    console.log(req.user) 
     res.status(200).json({
       user: req.user
     });
