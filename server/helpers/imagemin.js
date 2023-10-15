@@ -10,14 +10,14 @@ const imagemin_sharp = async (path, destination, filename, productImg) => {
   const newFileName = `${Date.now()}_${filename}`;
   const ouputPath = `${destination}/${newFileName}`;
 
-  await sharp( path ).resize( 250, 250 )
+  await sharp( path ).resize( 300, 400 )
                      .toFile( ouputPath )
                      .catch( (err) => {
                       console.log(err)
                      });
 
   await imagemin([ ouputPath ], {
-    destination: 'public/assets',
+    destination: 'tmp',
     plugins: [
       imageminJpegtran({ quality: 80 }), // Comprime imagen JPG con calidad del 80% 
       imageminPngquant(), // Comprime imagen PNG
@@ -32,15 +32,17 @@ const imagemin_sharp = async (path, destination, filename, productImg) => {
   if( fs.existsSync( path )){
     fs.unlinkSync( path );
   }
-  if( productImg ){
+/*   if( productImg ){
     const productImgPath = `${destination}/${productImg}`;
-      // Eliminar img-producto
+      // Eliminar img-producto local
     if( fs.existsSync( productImgPath )){
       fs.unlinkSync( productImgPath );
     }
-  }
-
-  return newFileName;
+  } */
+  
+console.log(ouputPath)
+  return ouputPath;
+  
 }
 
 export {

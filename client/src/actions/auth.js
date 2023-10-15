@@ -1,4 +1,5 @@
 
+
 import Swal from 'sweetalert2';
 import { api } from '../api/myApi';
 import { authLogin } from "../reducer/authReducer";
@@ -25,7 +26,8 @@ export const keepLogin = ( token ) => {
         icon: 'info',
         title: 'Le recomendamos que Inicie Sesión',
         showConfirmButton: false,
-        timer: 1500
+        timer: 2000, 
+        customClass: 'swal'
       })
     })
   }

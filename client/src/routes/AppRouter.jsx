@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { keepLogin } from "../actions/auth";
 import { PublicRouter } from "./PublicRouter";
-import { Producto } from "../components/producto/Producto";
+
 
 export const AppRouter = () => {
   const dispatch = useDispatch();

@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Card,
   CardActionArea,
   CardActions,
@@ -12,20 +11,22 @@ import {
 import AddShoppingCartOutlinedIcon from '@mui/icons-material/AddShoppingCartOutlined';
 
 // eslint-disable-next-line react/prop-types
-export const Producto = ({ i }) => {
+export const Producto = ({ i, name }) => {
+
   return (
-    <Card elevation={3} sx={{ maxWidth: 400 }}>
-      <CardActionArea sx={{ "&:hover": { transition:"all .5s ease-in" , backgroundColor: '#f7ffef' } }}>
-        <Box overflow={"hidden"}>
+    <Card elevation={3} sx={{ maxWidth: 400, minHeight: 254 }} >
+      <CardActionArea sx={{ minHeight:204, "&:hover": { transition:"all .5s ease-in" , backgroundColor: '#f7ffef' },border:'1px solid red' }}>
+        <Box  overflow={"hidden"} sx={{height: { xs:"24vh", sm:'auto'}, border:'1px solid black'}}>
           <CardMedia
+            component="img"
             sx={{
-              height: { xs:"25vh", sm:'auto'},
               transition: "1s",
               "&:hover": {
-                transform: "scale(1.1)",
+                transform: "scale(1.12)",
               },
+              objectFit:'cover',
+              objectPosition: '50% 50%'
             }}
-            component="img"
             width="100%"
             height="auto"
             image={`../../../public/producto${i.toString()}.png`}
@@ -33,9 +34,9 @@ export const Producto = ({ i }) => {
           />
         </Box>
 
-        <CardContent sx={{ p:'5px 5px 0 5px', }}>
-          <Typography textAlign={"center"} gutterBottom fontSize={'.9rem'} lineHeight={'1.2'} m={0} fontWeight='400'>
-          adaptador wifi febsmart n600
+        <CardContent sx={{ p:'7px 5px 0 5px', }}>
+          <Typography textAlign={"center"} gutterBottom fontSize={'1rem'} lineHeight={'1.2'} m={0} fontWeight='400'>
+          {name}
           </Typography>
         </CardContent>
       </CardActionArea>

@@ -40,7 +40,8 @@ export const Verification = () => {
         icon: 'success',
         title: 'Registro Exitoso !!!',
         showConfirmButton: false,
-        timer: 1500
+        timer: 1500,
+        //customClass: 'swal'
       })
       return;
     }

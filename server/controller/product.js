@@ -1,8 +1,12 @@
 import { response } from "express";
+import { cloudinaryHelper } from "../helpers/cloudinaryHelper.js";
+//import { cloudinary } from "../helpers/cloudinary.js";
 import { autocalcularAlmacen, autocalcularAlmacenAdmin, autocalcularToolsCafeteria, imagemin_sharp } from "../helpers/index.js";
 import { Product } from "../models/index.js";
 
+
 const newProduct = async (req, res = response) => {
+
   try {
     const {
       name,
@@ -14,6 +18,7 @@ const newProduct = async (req, res = response) => {
       numero,
       color,
       tipo,
+      fondo
     } = req.body;
     const product = new Product({
       name,
@@ -25,31 +30,33 @@ const newProduct = async (req, res = response) => {
       numero,
       color,
       tipo,
-    });
+    });  
 
     if (!req.file) {
       return res.status(400).json({
         msg: "La Imagen es obligatoria",
       });
     }
-    const { path, destination, filename } = req.file;
 
-    await imagemin_sharp(path, destination, filename, product.img).then(
-      (result) => {
-        product.img = result;
-      }
-    );
+    // ver si quiero elegir entre fondo o no ///////////////////////////////////////////////
+    const pathFile = await cloudinaryHelper( req.file.path, '', fondo );
+
+    if( !pathFile ){
+      return res.status(400).json({
+        msg: "Ocurrio un error al guardar la imagen. Vulva a intentarlo ",
+      }); 
+    }
 
     autocalcularAlmacen( product );
 
     // Guardar en DB
-    product.img = filename;
+    product.img = pathFile;
     await product.save();
 
     res.status(201).json({
       product,
       msg: "Producto creado con !Exito",
-    });
+    }); 
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -58,20 +65,26 @@ const newProduct = async (req, res = response) => {
   }
 }; 
 
+
 const editAdmin = async (req, res = response) => {
   try {
-    const data = req.body;
+    const { fondo , ...data } = req.body;
     const { id } = req.params;
     const lastProduct = await Product.findById(id);
 
     if (req.file) {
-      const { path, destination, filename } = req.file;
 
-      await imagemin_sharp(path, destination, filename, lastProduct.img).then(
-        (result) => {
-          data.img = result;
-        }
-      );
+      const pathFile = await cloudinaryHelper( req.file.path, lastProduct.img, fondo );
+
+      if( !pathFile ){
+        return res.status(400).json({
+          msg: "Ocurrio un error al guardar la imagen. Vulva a intentarlo ",
+        }); 
+      }
+
+      data.img = pathFile;
+      console.log(data.img)
+
     }
 
     await autocalcularAlmacenAdmin( data, lastProduct )

@@ -5,3 +5,32 @@ body{
   background-color:#fafff4 !important;
 }
 
+.swal {
+  width: 350px;
+  padding-bottom: 5px;  
+}
+
+.swal .swal2-icon {
+  margin: 5px auto;
+  width: 3em;
+  height: 3.2em;
+  border-color: #56f733;
+  color: #5bee3f;
+}
+
+.swal .swal2-title{
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 0;
+}
+
+.swal .swal2-actions{
+  margin: 0;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  object-position: 50% 50%;
+}

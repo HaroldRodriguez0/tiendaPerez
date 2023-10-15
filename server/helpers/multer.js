@@ -3,9 +3,6 @@ import multer from "multer";
 
 /* File Storage ( guardar archivos ) */
 const storage = multer.diskStorage({
-  destination: function( req, file, cb ){
-    cb(null, 'public/assets' );
-  },
   filename: function( req, file, cb ){
     cb( null, file.originalname );
   },
@@ -16,7 +13,7 @@ const storage = multer.diskStorage({
 
 })
 const upload = multer({ 
-  storage,
+  storage, useTempFiles: true, tempFileDir: '/tmp/', 
   fileFilter: function (req, file, cb) {
     // Comprobar si el tipo MIME del archivo coincide con jpg o png
     if (!file.mimetype.match(/\/(jpeg|png)$/)) {

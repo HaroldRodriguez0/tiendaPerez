@@ -24,9 +24,10 @@ router.post('/new',
   check('categoria','La categoria es obligatoria').not().isEmpty(),
   check('categoria').custom( categorialValida),
   check('cantAlmacen','La cantidad en Almacen es obligatoria').isFloat({min: 0}) ,
-  check('cantTienda','La cantidad en Tienda es obligatoria').isFloat({min: 0}) , 
+  check('cantTienda','La cantidad en Tienda es obligatoria').isFloat({min: 0}) ,  
   validarCampo, 
-], upload.single('picture'), newProduct );
+], upload.single('picture'),  newProduct );
+
 
 router.put('/editAdmin/:id',
 [// middlewares
@@ -35,7 +36,7 @@ router.put('/editAdmin/:id',
   check('id', 'No es un id de Mongo ').isMongoId(),
   check('id').custom( existeProductoxID ),
   check('categoria').custom( categorialValida),
-  validarCampo,
+  validarCampo, 
 ], upload.single('picture'), editAdmin );
 
 router.put('/edit/:id',
