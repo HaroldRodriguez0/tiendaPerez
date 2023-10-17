@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { keepLogin } from "../actions/auth";
 import { PublicRouter } from "./PublicRouter";
+import { NewProducto } from "../components/producto/NewProducto";
 
 
 export const AppRouter = () => {
@@ -33,7 +34,9 @@ export const AppRouter = () => {
 
                 <LoginScreen />
 
-              </PublicRouter>}/>
+              </PublicRouter>}/>newProduct
+
+          <Route path="/newProduct" element={<NewProducto />} />
 
           <Route path="/verification/*" element={<Verification />} />
           <Route path="/*" element={<HomeScreen />} />

@@ -225,7 +225,7 @@ export const LoginScreen = () => {
                   {loading ? (
                     <CircularProgress color="inherit" size={24} />
                   ) : (
-                    "Save"
+                    "Enviar"
                   )}
                 </Button>
                 <Typography

@@ -20,6 +20,7 @@ import FastfoodOutlinedIcon from "@mui/icons-material/FastfoodOutlined";
 import PersonOffOutlinedIcon from '@mui/icons-material/PersonOffOutlined';
 import ZapatoIcon from "../icons/ZapatoIcon";
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
+import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
 import { Button, Container, Typography, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -114,7 +115,7 @@ export const NavBar = () => {
           navigate("/login"), handleMobileMenuClose();
         }}
       >
-        <IconButton size="large" aria-label="Inventario" color="inherit">
+        <IconButton size="large" aria-label="Login" color="inherit">
           <PersonOutlineOutlinedIcon />
         </IconButton>
         <p>Login / Registro</p>
@@ -127,13 +128,13 @@ export const NavBar = () => {
           dispatch(authLogout()), navigate("/login"), handleMobileMenuClose();
         }}
       >
-        <IconButton size="large" aria-label="Inventario" color="inherit">
+        <IconButton size="large" aria-label="CerrarSesión" color="inherit">
           <PersonOffOutlinedIcon />
         </IconButton>
         <p>Cerrar Sesión</p>
       </MenuItem>
       <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }}>
-        <IconButton size="large" aria-label="Inventario" color="inherit">
+        <IconButton size="large" aria-label="Usuarios" color="inherit">
           <PeopleAltOutlinedIcon />
         </IconButton>
         <p>Usuarios</p>
@@ -159,22 +160,28 @@ export const NavBar = () => {
         <p>Inventario</p>
       </MenuItem>
       <MenuItem sx={{ display: { md: "none" } }}>
-        <IconButton size="large" aria-label="Inventario" color="inherit">
+        <IconButton size="large" aria-label="Cafeteria" color="inherit">
           <FastfoodOutlinedIcon />
         </IconButton>
         <p>Cafeteria</p>
       </MenuItem>
       <MenuItem sx={{ display: { md: "none" } }}>
-        <IconButton size="large" aria-label="Inventario" color="inherit">
+        <IconButton size="large" aria-label="Utiles" color="inherit">
           <HandymanOutlinedIcon />
         </IconButton>
         <p>Utiles</p>
       </MenuItem>
       <MenuItem sx={{ display: { md: "none" } }}>
-        <IconButton size="large" aria-label="Inventario" color="inherit">
+        <IconButton size="large" aria-label="Calzado" color="inherit">
           <ZapatoIcon />
         </IconButton>
         <p>Calzado</p>
+      </MenuItem>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate('/newProduct'), handleMobileMenuClose() }}>
+        <IconButton size="large" aria-label="NevoProducto" color="inherit">
+          <PlaylistAddOutlinedIcon />
+        </IconButton>
+        <p>Nevo Producto</p>
       </MenuItem>
     </Menu>
   );
