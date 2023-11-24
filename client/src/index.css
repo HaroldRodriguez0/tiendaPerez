@@ -6,6 +6,7 @@ body{
 }
 
 .swal {
+  margin-top: 60px;
   width: 350px;
   padding-bottom: 5px;  
 }
@@ -14,7 +15,7 @@ body{
   margin: 5px auto;
   width: 3em;
   height: 3.2em;
-  border-color: #56f733;
+  border-color: #5fd441;
   color: #5bee3f;
 }
 

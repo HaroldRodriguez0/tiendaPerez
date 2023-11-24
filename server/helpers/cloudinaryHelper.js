@@ -11,6 +11,15 @@ cloudinary.config({
   api_secret: "bxevAajSzilFCFpZbPa17JNPDY8",
 });
 
+export const cloudinaryDeleteImg = async ( img ) => {
+  const nombreArr = img.split("/");
+  const nombre = nombreArr[nombreArr.length - 1];
+  const [public_id] = nombre.split(".");
+
+  //console.log(public_id);
+  cloudinary.uploader.destroy(public_id);
+}
+
 export const cloudinaryHelper = async (pathFile, oldPathFile = "", fondo) => {
 
   /////////////////////////////////////////////////////////// COMPROBAR ////////////////////////////
@@ -37,12 +46,11 @@ export const cloudinaryHelper = async (pathFile, oldPathFile = "", fondo) => {
     path.basename(pathFile)
   );
 
-  if (fondo) {
-
+  if (fondo === 'false') {
     await cloudinary.uploader.upload(
       pathFile,
       {
-        height: 400,
+        height: 300,
         width: 300,
         crop: "fill",
       },
@@ -56,7 +64,6 @@ export const cloudinaryHelper = async (pathFile, oldPathFile = "", fondo) => {
     );
 
   } else {
-
     await axios({
       method: "post",
       url: "https://api.remove.bg/v1.0/removebg",
@@ -64,12 +71,13 @@ export const cloudinaryHelper = async (pathFile, oldPathFile = "", fondo) => {
       responseType: "arraybuffer",
       headers: {
         ...formData.getHeaders(), // crear .env
-        "X-Api-Key": "Nt2ALaQoHSx98ZruDsbC62vg",
+        "X-Api-Key": "qKHRJcDqg3HSPPjcEv1jadFm",
       },
       encoding: null,
     })
       .then(async (response) => {
         img = Buffer.from(response.data, "base64");
+        
         //fs.writeFileSync("no-bg.png", response.data);
         // Mostrar img en la res
         //console.log(response.data)
@@ -80,7 +88,7 @@ export const cloudinaryHelper = async (pathFile, oldPathFile = "", fondo) => {
         pathFinal = await new Promise((resolve, reject) => {
           let cld_upload_stream = cloudinary.uploader.upload_stream(
             {
-              height: 400,
+              height: 300,
               width: 300,
               crop: "fill",
             },
@@ -100,7 +108,7 @@ export const cloudinaryHelper = async (pathFile, oldPathFile = "", fondo) => {
         await cloudinary.uploader.upload(
           pathFile,
           {
-            height: 400,
+            height: 300,
             width: 300,
             crop: "fill",
           },

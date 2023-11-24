@@ -1,11 +1,19 @@
 import { response } from "express";
-import { cloudinaryHelper } from "../helpers/cloudinaryHelper.js";
+import {
+  cloudinaryDeleteImg,
+  cloudinaryHelper,
+} from "../helpers/cloudinaryHelper.js";
 //import { cloudinary } from "../helpers/cloudinary.js";
-import { autocalcularAlmacen, autocalcularAlmacenAdmin, autocalcularToolsCafeteria, imagemin_sharp } from "../helpers/index.js";
+import {
+  autocalcularAlmacen,
+  autocalcularAlmacenAdmin,
+  autocalcularToolsCafeteria,
+  imagemin_sharp,
+} from "../helpers/index.js";
 import { Product } from "../models/index.js";
 
-
 const newProduct = async (req, res = response) => {
+  let pathFileDesc = "";
 
   try {
     const {
@@ -15,11 +23,18 @@ const newProduct = async (req, res = response) => {
       cantAlmacen,
       cantTienda,
       modelo,
-      numero,
-      color,
-      tipo,
-      fondo
+      numero: numeroReq,
+      color: colorReq,
+      tipo: tipoReq,
+      fondoImgProduct,
+      fondoImgDesc,
+      desc,
     } = req.body;
+
+    const numero = numeroReq && JSON.parse(numeroReq);
+    const color = colorReq && JSON.parse(colorReq);
+    const tipo = tipoReq && JSON.parse(tipoReq);
+
     const product = new Product({
       name,
       precio,
@@ -30,79 +45,106 @@ const newProduct = async (req, res = response) => {
       numero,
       color,
       tipo,
-    });  
+      desc,
+    });
 
-    if (!req.file) {
+    const file = req.files.picture[0].path;
+    const fileDesc = req.files.picture[1]?.path;
+
+    const pathFile = await cloudinaryHelper(file, "", fondoImgProduct);
+    fileDesc &&
+      (pathFileDesc = await cloudinaryHelper(fileDesc, "", fondoImgDesc));
+
+    if (!pathFile || (fileDesc && !pathFileDesc)) {
       return res.status(400).json({
-        msg: "La Imagen es obligatoria",
+        msg: "Ocurrio un error al guardar la imagen. Vulva a intentarlo ",
       });
     }
 
-    // ver si quiero elegir entre fondo o no ///////////////////////////////////////////////
-    const pathFile = await cloudinaryHelper( req.file.path, '', fondo );
-
-    if( !pathFile ){
-      return res.status(400).json({
-        msg: "Ocurrio un error al guardar la imagen. Vulva a intentarlo ",
-      }); 
-    }
-
-    autocalcularAlmacen( product );
+    autocalcularAlmacen(product);
 
     // Guardar en DB
     product.img = pathFile;
+    product.imgDesc = pathFileDesc;
     await product.save();
 
     res.status(201).json({
-      product,
       msg: "Producto creado con !Exito",
-    }); 
+    });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
       msg: "Please talk to the administrator",
     });
   }
-}; 
-
+};
 
 const editAdmin = async (req, res = response) => {
   try {
-    const { fondo , ...data } = req.body;
+    const {
+      fondoImgProduct,
+      fondoImgDesc,
+      imgarr,
+      numero: numeroReq,
+      color: colorReq,
+      tipo: tipoReq,
+      ...data
+    } = req.body;
+    const numero = numeroReq && JSON.parse(numeroReq);
+    const color = colorReq && JSON.parse(colorReq);
+    const tipo = tipoReq && JSON.parse(tipoReq);
     const { id } = req.params;
+    const { _doc } = await new Product({ numero, color, tipo, ...data });
+    const { _id, ...product } = _doc;
     const lastProduct = await Product.findById(id);
 
-    if (req.file) {
-
-      const pathFile = await cloudinaryHelper( req.file.path, lastProduct.img, fondo );
-
-      if( !pathFile ){
-        return res.status(400).json({
-          msg: "Ocurrio un error al guardar la imagen. Vulva a intentarlo ",
-        }); 
-      }
-
-      data.img = pathFile;
-      console.log(data.img)
-
+    if (req.files.picture?.length === 2) {
+      const file = req.files.picture[0].path;
+      const fileDesc = req.files.picture[1]?.path;
+      product.img = await cloudinaryHelper(
+        file,
+        lastProduct.img,
+        fondoImgProduct
+      );
+      product.imgDesc = await cloudinaryHelper(
+        fileDesc,
+        lastProduct.imgDesc,
+        fondoImgDesc
+      );
     }
 
-    await autocalcularAlmacenAdmin( data, lastProduct )
-    .then( async ()=> {
-      const product = await Product.findByIdAndUpdate(id, data, { new: true });
+    if (req.files.picture?.length === 1) {
+      if (imgarr === "imgDesc") {
+        const fileDesc = req.files.picture[0]?.path;
+        product.imgDesc = await cloudinaryHelper(
+          fileDesc,
+          lastProduct.imgDesc,
+          fondoImgDesc
+        );
+      } else {
+        const file = req.files.picture[0].path;
+        product.img = await cloudinaryHelper(
+          file,
+          lastProduct.img,
+          fondoImgProduct
+        );
+      }
+    }
 
-      return res.status(200).json({
-        product,
-        msg: "Producto actualizado con !Exito",
-      });
-    })
-    .catch(error => {
-      console.error(error);
-      return res.status(400).json({
-        msg: error.message
-      });
-    });
+    await autocalcularAlmacenAdmin(product, lastProduct)
+      .then(async () => {
+        await Product.findByIdAndUpdate(id, product);
 
+        return res.status(200).json({
+          msg: "Producto actualizado con !Exito",
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        return res.status(400).json({
+          msg: error.message,
+        });
+      });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -114,13 +156,13 @@ const editAdmin = async (req, res = response) => {
 const edit = async (req, res = response) => {
   try {
     const { cantTienda, numero, color, tipo } = req.body;
-    const data = { cantTienda, numero, color, tipo } ;
+    const data = { cantTienda, numero, color, tipo };
     const { id } = req.params;
-    const lastProduct = await Product.findById(req.params.id);
+    const lastProduct = await Product.findById(id);
 
-    const autocalcular = autocalcularToolsCafeteria( data, lastProduct, res );
+    const autocalcular = autocalcularToolsCafeteria(data, lastProduct, res);
 
-    if(!autocalcular ) {
+    if (!autocalcular) {
       const product = await Product.findByIdAndUpdate(id, data, { new: true });
 
       return res.status(200).json({
@@ -128,7 +170,6 @@ const edit = async (req, res = response) => {
         msg: "Producto actualizado con !Exito",
       });
     }
-
   } catch (error) {
     console.log(error.message);
     return res.status(500).json({
@@ -137,10 +178,15 @@ const edit = async (req, res = response) => {
   }
 };
 
-
 const deleteProduct = async (req, res = response) => {
   try {
-    await Product.findByIdAndDelete(req.params.id);
+
+    await Product.findByIdAndRemove(req.params.id)
+      .then((deletedProduct) => {
+        // Aquí puedes usar el producto eliminado
+        cloudinaryDeleteImg(deletedProduct.img)
+        deletedProduct.imgDesc && cloudinaryDeleteImg(deletedProduct.imgDesc)
+    });
 
     res.status(200).json({
       msg: "Producto eliminado con !Exito",
@@ -155,11 +201,14 @@ const deleteProduct = async (req, res = response) => {
 
 const getProduct = async (req, res = response) => {
   try {
-    const { limite = 8, desde = 0 } = req.query;
+    const { limite = 120, desde = 0 } = req.query;
 
     const [total, product] = await Promise.all([
       Product.countDocuments(),
-      Product.find().skip(Number(desde)).limit(Number(limite)),
+      Product.find()
+        .skip(Number(desde))
+        .limit(Number(limite))
+        .populate({ path: "tipo numero" }),
     ]);
 
     res.status(200).json({
@@ -174,6 +223,74 @@ const getProduct = async (req, res = response) => {
   }
 };
 
+const getProductUtiles = async (req, res = response) => {
+  try {
+    const { limite = 12, desde = 0 } = req.query;
+
+    const [total, product] = await Promise.all([
+      Product.countDocuments(),
+      Product.find({ categoria: "UTILES" })
+        .skip(Number(desde))
+        .limit(Number(limite)),
+    ]);
+
+    res.status(200).json({
+      total,
+      product,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
+const getProductCafeteria = async (req, res = response) => {
+  try {
+    const { limite = 12, desde = 0 } = req.query;
+
+    const [total, product] = await Promise.all([
+      Product.countDocuments(),
+      Product.find({ categoria: "CAFETERIA" })
+        .skip(Number(desde))
+        .limit(Number(limite)),
+    ]);
+
+    res.status(200).json({
+      total,
+      product,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
+const getProductCalzado = async (req, res = response) => {
+  try {
+    const { limite = 12, desde = 0 } = req.query;
+
+    const [total, product] = await Promise.all([
+      Product.countDocuments(),
+      Product.find({ categoria: "CALZADO" })
+        .skip(Number(desde))
+        .limit(Number(limite)),
+    ]);
+
+    res.status(200).json({
+      total,
+      product,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
 
 const getProductName = async (req, res = response) => {
   try {
@@ -208,4 +325,7 @@ export {
   deleteProduct,
   getProduct,
   getProductName,
+  getProductUtiles,
+  getProductCafeteria,
+  getProductCalzado,
 };

@@ -19,52 +19,45 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import FastfoodOutlinedIcon from "@mui/icons-material/FastfoodOutlined";
 import PersonOffOutlinedIcon from '@mui/icons-material/PersonOffOutlined';
 import ZapatoIcon from "../icons/ZapatoIcon";
+import DisabledByDefaultOutlinedIcon from '@mui/icons-material/DisabledByDefaultOutlined';
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
 import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
 import { Button, Container, Typography, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authLogout } from "../../reducer/authReducer";
+import { productSearch } from '../../reducer/productReducer'
+import { stockShow } from "../../reducer/stockReducer";
 
 const noAmin = ['USER_ROLE', 'CAFETERIA_ROLE', 'TOOLS_ROLE' ];
 
 const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+  display: "flex",
+  borderRadius: '.6rem',
+  width: "auto",
+  ".MuiInputBase-root": {
+    width: "100%",
   },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
+  "&:hover": {
+    transition: "all .5s ease-in",
+    backgroundColor: "rgb(200, 255, 177, 25%)",
   },
 }));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
+  padding: theme.spacing(0, 1, 0, 1),
   height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
   display: "flex",
   alignItems: "center",
-  justifyContent: "center",
+  justifyContent: "flex-end",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
   "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+    padding: theme.spacing(1, 0, 1, 0),
     transition: theme.transitions.create("width"),
     width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
   },
 }));
 
@@ -72,8 +65,10 @@ export const NavBar = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const dispatch = useDispatch();
   const { rol } = useSelector((state) => state.auth);
+  const { name: cantProduts } = useSelector((state) => state.stock);
   const navigate = useNavigate();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
+  const [valueSearch, setValueSearch] = React.useState("");
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -83,6 +78,16 @@ export const NavBar = () => {
 
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
+  };
+
+  const handleChangeSearch = (event) => {
+    setValueSearch(event.target.value);
+  };
+
+  const handleSearch = () => {
+    dispatch( productSearch({ search: valueSearch }));
+    setValueSearch('');
+    navigate('/product/search')
   };
 
   const mobileMenuId = "primary-search-account-menu-mobile";
@@ -133,15 +138,15 @@ export const NavBar = () => {
         </IconButton>
         <p>Cerrar Sesión</p>
       </MenuItem>
-      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }}>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate("/users"), handleMobileMenuClose()}}> 
         <IconButton size="large" aria-label="Usuarios" color="inherit">
           <PeopleAltOutlinedIcon />
         </IconButton>
         <p>Usuarios</p>
       </MenuItem>
-      <MenuItem  sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }}>
+      <MenuItem  sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }} onClick={() => dispatch(stockShow())}>
         <IconButton size="large" aria-label="venta" color="inherit">
-          <Badge badgeContent={1} color="success">
+          <Badge badgeContent={cantProduts ?cantProduts.length :0} color="success">
             <CalculateOutlinedIcon />
           </Badge>
         </IconButton>
@@ -159,25 +164,31 @@ export const NavBar = () => {
         </IconButton>
         <p>Inventario</p>
       </MenuItem>
-      <MenuItem sx={{ display: { md: "none" } }}>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }}>
+        <IconButton size="large" aria-label="Inventario" color="inherit">
+          <DisabledByDefaultOutlinedIcon />
+        </IconButton>
+        <p>Agotados</p>
+      </MenuItem>
+      <MenuItem sx={{ display: { md: "none" } }} onClick={() =>{ navigate("/product/cafeteria"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Cafeteria" color="inherit">
           <FastfoodOutlinedIcon />
         </IconButton>
         <p>Cafeteria</p>
       </MenuItem>
-      <MenuItem sx={{ display: { md: "none" } }}>
+      <MenuItem sx={{ display: { md: "none" } }} onClick={() =>{ navigate("/product/utiles"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Utiles" color="inherit">
           <HandymanOutlinedIcon />
         </IconButton>
         <p>Utiles</p>
       </MenuItem>
-      <MenuItem sx={{ display: { md: "none" } }}>
+      <MenuItem sx={{ display: { md: "none" } }} onClick={() =>{ navigate("/product/calzado"), handleMobileMenuClose() }}>
         <IconButton size="large" aria-label="Calzado" color="inherit">
           <ZapatoIcon />
         </IconButton>
         <p>Calzado</p>
       </MenuItem>
-      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate('/newProduct'), handleMobileMenuClose() }}>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate('/product/new'), handleMobileMenuClose() }}>
         <IconButton size="large" aria-label="NevoProducto" color="inherit">
           <PlaylistAddOutlinedIcon />
         </IconButton>
@@ -189,12 +200,13 @@ export const NavBar = () => {
   return (
     <Box
       sx={{
+        marginBottom: 10,
         flexGrow: 1,
         "& .css-1aschtf:hover": { backgroundColor: "rgb(200 255 177 / 25%)" },
         "& .css-1oqqzyl-MuiContainer-root": { padding: 0 },
       }}
     >
-      <AppBar position="static" color="primary" enableColorOnDark>
+      <AppBar position="fixed" color="primary" enableColorOnDark>
         <Container>
           <Toolbar sx={{ px: 0 }}>
             <IconButton
@@ -214,15 +226,20 @@ export const NavBar = () => {
                 alt="logo"
               />
             </IconButton>
-            <Search sx={{ m: 0 }}>
-              <SearchIconWrapper>
+            <Search
+          >
+            <SearchIconWrapper>
+              <IconButton onClick={handleSearch} sx={{px:0}}>
                 <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Buscar producto…"
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Search>
+              </IconButton>
+            </SearchIconWrapper>
+            <StyledInputBase
+              value={valueSearch} 
+              onChange={handleChangeSearch} 
+              placeholder="Buscar producto…"
+              inputProps={{ "aria-label": "search" }}
+            />
+          </Search>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <Button
@@ -244,7 +261,8 @@ export const NavBar = () => {
                   Compra
                 </Typography>
               </Button>
-              <Button
+              <Button 
+                onClick={() => navigate("/product/cafeteria")}
                 size="large"
                 aria-label="Inventario"
                 color="inherit"
@@ -262,6 +280,7 @@ export const NavBar = () => {
                 </Typography>
               </Button>
               <Button
+                onClick={() => navigate("/product/utiles")}
                 size="large"
                 aria-label="Inventario"
                 color="inherit"
@@ -279,6 +298,7 @@ export const NavBar = () => {
                 </Typography>
               </Button>
               <Button
+                onClick={() => navigate("/product/calzado")}
                 size="large"
                 aria-label="Inventario"
                 color="inherit"

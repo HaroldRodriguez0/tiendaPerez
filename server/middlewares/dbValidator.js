@@ -107,7 +107,7 @@ const modeloValido = async (name, data) => {
       );
     }
   } else {
-    const modeloDuplicado = await Product.findOne({ modelo });
+    const modeloDuplicado = await Product.findOne({ name, modelo });
     if (modeloDuplicado) {
       throw new Error(`El modelo ya existe`);
     }

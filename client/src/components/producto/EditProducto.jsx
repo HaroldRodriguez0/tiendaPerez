@@ -18,36 +18,75 @@ import {
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NewProductoVariable } from "./NewProductoVariable";
 import { useForm } from "../../hooks/useForm";
-import { useEffect } from "react";
 import Dropzone from "react-dropzone";
-import FlexBetween from "../../../../../../Sociopedia Fullstack/client/src/components/FlexBetween";
+
 import { api } from "../../api/myApi";
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
+import FlexBetween from "../FlexBetween";
+import { useNavigate } from "react-router-dom";
 
-export const NewProducto = () => {
-  const [i, seti] = useState(0);
+export const EditProducto = () => {
+
+  const navigate = useNavigate();
+  const { numero, color, tipo, ...data } = useSelector((state) => state.product);
+
+  let tipoModelokeys = [''],
+    tipoModeloName = "",
+    tipoModeloTienda = [""],
+    tipoModeloAlmacen = [""],
+    array = [""],
+    length = 0;
+
+  numero &&
+    ((tipoModelokeys = Object.keys(numero)),
+    (tipoModeloTienda = Object.values(numero)),
+    (tipoModeloAlmacen = Object.values(numero)),
+    (tipoModeloName = "Numero"));
+  color &&
+    ((tipoModelokeys = Object.keys(color)),
+    (tipoModeloTienda = Object.values(color)),
+    (tipoModeloAlmacen = Object.values(color)),
+    (tipoModeloName = "Color"));
+  tipo &&
+    ((tipoModelokeys = Object.keys(tipo)),
+    (tipoModeloTienda = Object.values(tipo)),
+    (tipoModeloAlmacen = Object.values(tipo)),
+    (tipoModeloName = "Tipo"));
+
+  tipoModelokeys &&
+    ((array = new Array(tipoModelokeys.length).fill("")),
+    (tipoModeloTienda = tipoModeloTienda.map((value) => value.tienda)),
+    (tipoModeloAlmacen = tipoModeloAlmacen.map((value) => value.almacen)),
+    (length = tipoModelokeys.length - 1));
+
+  const [i, seti] = useState(length);
   const [loading, setLoading] = useState(false);
-  const [categoria, setCategoria] = useState("");
-  const [tipoModelo, setModelo] = useState("");
-  const [tipoModeloVariable, setModeloVariable] = useState([""]);
-  const [cantAlmacenVariable, setcantAlmacenVariable] = useState([""]);
-  const [cantTiendaVariable, setcantTiendaVariable] = useState([""]);
-  const [productos, setProductos] = useState([]);
+  const [categoria, setCategoria] = useState(data.categoria);
+  const [tipoModelo, setModelo] = useState(tipoModeloName);
+  const [tipoModeloVariable, setModeloVariable] = useState(tipoModelokeys);
+  const [cantAlmacenVariable, setcantAlmacenVariable] =
+    useState(tipoModeloAlmacen);
+  const [cantTiendaVariable, setcantTiendaVariable] =
+    useState(tipoModeloTienda);
+  const [productos, setProductos] = useState(array);
   const [imgProduct, setimgProduct] = useState("");
   const [imgDesc, setimgDesc1] = useState("");
   const [errorModelo, setErrorModelo] = useState("");
   const [errorImg, setErrorImg] = useState(false);
   const [checkedImg, setCheckedImg] = useState(false);
   const [checkedImgDesc, setCheckedImgDesc] = useState(false);
+  const [imgarr, setImgarr] = useState([]);
 
   const handleCheckedImg = (event) => {
     setCheckedImg(event.target.checked);
   };
 
   const handleCheckedImgDesc = (event) => {
+    imgDesc &&
     setCheckedImgDesc(event.target.checked);
   };
 
@@ -68,12 +107,12 @@ export const NewProducto = () => {
   };
 
   const [newProduct, handlenewProduct, newProductReset] = useForm({
-    name: "",
-    precio: "",
-    cantAlmacen: "",
-    cantTienda: "",
-    modelo: "",
-    desc: "",
+    name: data.name,
+    precio: data.precio,
+    cantAlmacen: data.cantAlmacen,
+    cantTienda: data.cantTienda,
+    modelo: data.modelo,
+    desc: data.desc,
   });
 
   const { name, precio, cantAlmacen, cantTienda, modelo, desc } = newProduct;
@@ -81,7 +120,6 @@ export const NewProducto = () => {
   const handleChangeCategoria = (event) => {
     setCategoria(event.target.value);
   };
-  
   const handleChangeModelo = (event) => {
     seti(0);
     setProductos([]);
@@ -107,35 +145,38 @@ export const NewProducto = () => {
     seti(i + 1);
   };
 
-  const handleReset = () => {
-    newProductReset();
-    setimgProduct("");
-    setimgDesc1("");
-    setCategoria("");
-    setModelo("");
-    setErrorModelo("");
-  };
-
   const handleSubmite = async (e) => {
     e.preventDefault();
     setLoading(true);
     let value = true;
-    setErrorImg('');
+    setErrorImg("");
     setErrorModelo("");
 
-    if(!imgProduct) {setErrorImg(true); value=false;}
+    if (!imgProduct && !data.img) {
+      setErrorImg(true);
+      value = false;
+    }
 
-    if ( value ) {
-    
+    if (value) {
       newProduct.categoria = categoria;
       newProduct.fondoImgProduct = checkedImg;
       newProduct.fondoImgDesc = checkedImgDesc;
+      newProduct.imgarr = imgarr;
 
       const formData = new FormData();
       for (let key in newProduct) {
         formData.append(key, newProduct[key]);
       }
-      formData.append("picture", imgProduct);
+      imgProduct
+        ? formData.append("picture", imgProduct)
+        : checkedImg &&
+          fetch(data.img)
+            .then((response) => response.blob())
+            .then((imageBlob) => {
+              console.log(imageBlob)
+              formData.append("picture", imageBlob);
+            });
+
       imgDesc && formData.append("picture", imgDesc);
 
       if (tipoModelo) {
@@ -158,13 +199,13 @@ export const NewProducto = () => {
       }
 
       await api
-        .post("/product/new", formData, {
+        .put(`/product/editAdmin/${data.uid}`, formData, {
           headers: {
             "x-token": localStorage.getItem("token"),
           },
         })
         .then(({ data }) => {
-          handleReset();
+          navigate('/');
           Swal.fire("", data.msg, "success");
         })
         .catch(({ response }) => {
@@ -198,53 +239,65 @@ export const NewProducto = () => {
               color={"black"}
               sx={{ mb: 1 }}
             >
-              Agregar Nuevo Producto
+              Editar Producto {}
             </Typography>
             <CardContent sx={{ py: 0 }}>
               <form onSubmit={handleSubmite}>
-                <Box display={"flex"} flexDirection={"column"} gap={0.8}>
-                  <FlexBetween>
-                    <Dropzone
+                <Box display={"flex"} flexDirection={"column"} gap={0.8} >
+                  <Grid container spacing={2}>
+                    <Grid item xs={7} sm={4}>
+                      <Dropzone
                       acceptedFiles=".jpg,.jpeg,.png"
                       multiple={false}
                       onDrop={(acceptedFiles) => {
                         setimgProduct(acceptedFiles[0]);
+                        !imgarr.includes("img") &&
+                          setImgarr((prev) => [...prev, "img"]);
                       }}
                     >
                       {({ getRootProps, getInputProps }) => (
                         <Box
                           {...getRootProps()}
-                          border={`2px dashed ${errorImg ?'red' :'rgb(173, 207, 158)'}`}
+                          border={`2px dashed ${
+                            errorImg ? "red" : "rgb(173, 207, 158)"
+                          }`}
                           p=".5rem"
                           sx={{
-                            width: "80%",
+                            //width: "80%",
+                            //maxWidth: '150px',
                             "&:hover": { cursor: "pointer" },
                             p: 0.5,
                           }}
                         >
                           <input {...getInputProps()} />
-                          <FlexBetween>
-                            <Typography
-                              textAlign={"center"}
-                              color={"dimgray"}
-                              sx={{
-                                fontSize: ".9rem",
-                                overflow: "auto",
-                              }}
-                            >
-                              {!imgProduct
-                                ? "Imagen del producto"
-                                : imgProduct.name}
-                            </Typography>
-                            <EditOutlinedIcon />
-                          </FlexBetween>
+
+                          {imgProduct ? (
+                            <FlexBetween>
+                              <Typography
+                                textAlign={"center"}
+                                color={"dimgray"}
+                                sx={{
+                                  fontSize: ".9rem",
+                                  overflow: "auto",
+                                }}
+                              >
+                                {imgProduct.name}
+                              </Typography>
+                              <EditOutlinedIcon />
+                            </FlexBetween>
+                          ) : (
+                            <img src={data.img} alt="img Producto" />
+                          )}
                         </Box>
                       )}
-                    </Dropzone>
+                      </Dropzone>
+                    </Grid>
+                    <Grid item xs={5} sm={2} >
                     <FormControlLabel
                       sx={{
+                        display: 'flex',
+                        alignItems: 'center',
                         m: 0,
-                        ml: 0.7,
                         "& .MuiFormControlLabel-label": { fontSize: ".8rem" },
                       }}
                       value="top"
@@ -260,52 +313,60 @@ export const NewProducto = () => {
                       label="Fondo"
                       labelPlacement="top"
                     />
-                  </FlexBetween>
-                  <FlexBetween>
-                    <Dropzone
-                      disabled={!imgProduct && true}
+                    </Grid>
+                    <Grid item xs={7} sm={4} >
+                      <Dropzone
+                      disabled={!imgProduct && !data.img && true}
                       acceptedFiles=".jpg,.jpeg,.png"
                       multiple={false}
                       onDrop={(acceptedFiles) => {
                         setimgDesc1(acceptedFiles[0]);
+                        !imgarr.includes("imgDesc") &&
+                          setImgarr((prev) => [...prev, "imgDesc"]);
                       }}
                     >
                       {({ getRootProps, getInputProps }) => (
                         <Box
                           {...getRootProps()}
                           border={
-                            imgProduct
+                            imgProduct || data.img
                               ? `2px dashed  rgb(173, 207, 158)`
                               : "2px dashed  gainsboro"
                           }
                           p=".5rem"
                           sx={{
-                            width: "80%",
+                            //width: "80%",
                             "&:hover": { cursor: "pointer" },
                             p: 0.5,
                           }}
                         >
                           <input {...getInputProps()} />
-                          <FlexBetween>
-                            <Typography
-                              textAlign={"center"}
-                              color={"dimgray"}
-                              sx={{
-                                fontSize: ".9rem",
-                                overflow: "auto",
-                              }}
-                            >
-                              {!imgDesc ? "Imagen Descripción" : imgDesc.name}
-                            </Typography>
-                            <EditOutlinedIcon />
-                          </FlexBetween>
+                          {imgDesc ? (
+                            <FlexBetween>
+                              <Typography
+                                textAlign={"center"}
+                                color={"dimgray"}
+                                sx={{
+                                  fontSize: ".9rem",
+                                  overflow: "auto",
+                                }}
+                              >
+                                {imgDesc.name}
+                              </Typography>
+                              <EditOutlinedIcon />
+                            </FlexBetween>
+                          ) : (
+                            <img src={data.imgDesc} alt="imagen Descripción" />
+                          )}
                         </Box>
                       )}
-                    </Dropzone>
+                    </Dropzone></Grid>
+                    <Grid item xs={5} sm={2} >
                     <FormControlLabel
                       sx={{
                         m: 0,
-                        ml: 0.5,
+                        display: 'flex',
+                        alignItems: 'center',
                         "& .MuiFormControlLabel-label": { fontSize: ".8rem" },
                       }}
                       value="top"
@@ -321,7 +382,8 @@ export const NewProducto = () => {
                       label="Fondo"
                       labelPlacement="top"
                     />
-                  </FlexBetween>
+                    </Grid>
+                  </Grid>
                   <FormControl variant="standard" required>
                     <InputLabel id="demo-simple-select-standard-label">
                       Categoria ...
@@ -441,7 +503,7 @@ export const NewProducto = () => {
                     </IconButton>
                   </Box>
 
-                  {
+                  {( tipoModelokeys[0] == '' ) && (
                     <NewProductoVariable
                       key={i}
                       i={i}
@@ -453,7 +515,7 @@ export const NewProducto = () => {
                       cantAlmacenVariable={cantAlmacenVariable[i]}
                       cantTiendaVariable={cantTiendaVariable[i]}
                     />
-                  }
+                  )}
 
                   {productos.map((producto, i) => (
                     <NewProductoVariable
@@ -470,27 +532,28 @@ export const NewProducto = () => {
                   ))}
                 </Box>
                 <FlexBetween marginTop={4}>
-                <Button
-                  sx={{mr:2}}
-                  variant="contained"
-                  type="submit"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <CircularProgress color="inherit" size={24} />
-                  ) : (
-                    "Enviar"
-                  )}
-                </Button>
-                <Box textAlign='center' display={!loading && 'none'} marginX='auto'>
-                <Typography fontSize='.8rem'>
-                  Espere...
-                </Typography>
-                <Typography fontSize='.8rem'>
-                    Podrá tardar unos segundos.
-                  </Typography>
-                </Box>
-                
+                  <Button
+                    sx={{ mr: 2 }}
+                    variant="contained"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <CircularProgress color="inherit" size={24} />
+                    ) : (
+                      "Enviar"
+                    )}
+                  </Button>
+                  <Box
+                    textAlign="center"
+                    display={!loading && "none"}
+                    marginX="auto"
+                  >
+                    <Typography fontSize=".8rem">Espere...</Typography>
+                    <Typography fontSize=".8rem">
+                      Podrá tardar unos segundos.
+                    </Typography>
+                  </Box>
                 </FlexBetween>
               </form>
             </CardContent>

@@ -9,7 +9,14 @@ import { useEffect } from "react";
 import { keepLogin } from "../actions/auth";
 import { PublicRouter } from "./PublicRouter";
 import { NewProducto } from "../components/producto/NewProducto";
-
+import { ProductoCafeteria } from "../components/producto/ProductoCafeteria";
+import { EditProducto } from "../components/producto/EditProducto";
+import { ProductoUtileria } from "../components/producto/ProductoUtileria";
+import { ProductoCalzado } from "../components/producto/ProductoCalzado";
+import { ProductoDesc } from "../components/producto/ProductoDesc";
+import { Usuarios } from "../components/users/Usuarios";
+import { ProductoSearch } from "../components/producto/ProductoSearch";
+import { Venta } from "../components/inventario/Venta";
 
 export const AppRouter = () => {
   const dispatch = useDispatch();
@@ -28,20 +35,31 @@ export const AppRouter = () => {
       <NavBar />
       <Container>
         <Routes>
-
-          <Route path="/login" element={
-              <PublicRouter >
-
+          <Route
+            path="/login"
+            element={
+              <PublicRouter>
                 <LoginScreen />
+              </PublicRouter>
+            }
+          />
 
-              </PublicRouter>}/>newProduct
+          <Route path="/product/*" >
+            <Route path="new" element={<NewProducto />} />
+            <Route path="edit" element={<EditProducto />} />
+            <Route path="cafeteria" element={<ProductoCafeteria />} />
+            <Route path="utiles" element={<ProductoUtileria />} />
+            <Route path="calzado" element={<ProductoCalzado />} />
+            <Route path="search" element={<ProductoSearch />} />
+          </Route>
 
-          <Route path="/newProduct" element={<NewProducto />} />
+          <Route path="/users" element={<Usuarios />} />
 
           <Route path="/verification/*" element={<Verification />} />
           <Route path="/*" element={<HomeScreen />} />
-
         </Routes>
+        <ProductoDesc />
+        <Venta />
       </Container>
     </BrowserRouter>
   );

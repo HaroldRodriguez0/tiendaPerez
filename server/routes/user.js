@@ -4,7 +4,7 @@ host + /api/users/...
 
 import { Router } from 'express';
 import { check } from 'express-validator';
-import { users, usersBanned, usersEdit, usersPorNameEmail, usersxId } from '../controller/users.js';
+import { enabled, users, usersBanned, usersEdit, usersPorNameEmail, usersxId } from '../controller/users.js';
 import { esRolValido, existeUsuarioxID, movilValido } from '../middlewares/dbValidator.js';
 import { esAdminRole, validarCampo, validarJWT } from '../middlewares/index.js';
 
@@ -15,13 +15,15 @@ const router = Router();
 
 router.get( '/',[ validarJWT, esAdminRole ], users );
 
-router.get( '/:id',
+router.get( '/enabled',[ validarJWT, esAdminRole ], enabled );
+
+router.get( '/banned',[ validarJWT, esAdminRole ], usersBanned );
+
+/* router.get( '/:id',
 [ // middlewares
   check('id', 'No es un ID valido').isMongoId(),
   check('id').custom( existeUsuarioxID ), 
-], usersxId );
-
-router.get( '/banned',[ validarJWT, esAdminRole ], usersBanned );
+], usersxId ); */
 
 router.get( '/:name_email',[ validarJWT, esAdminRole ], usersPorNameEmail );
 

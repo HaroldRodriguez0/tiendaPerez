@@ -29,6 +29,14 @@ const ProductSchema = Schema({
     min: 0
   },
 
+  desc: {
+    type: String,
+  },
+
+  imgDesc: {
+    type: String,
+  },
+
   img: {
     type: String,
   },
@@ -65,6 +73,9 @@ const ProductSchema = Schema({
 
 ProductSchema.methods.toJSON = function () {
   const { __v, ...data } = this.toObject();
+  data.tipo && (data.tipo = Object.fromEntries(data.tipo));
+  data.numero && (data.numero = Object.fromEntries(data.numero));
+  data.color && (data.color = Object.fromEntries(data.color));
   return data;
 };
 
