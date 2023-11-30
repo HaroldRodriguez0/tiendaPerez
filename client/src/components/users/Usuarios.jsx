@@ -31,6 +31,7 @@ import {
 } from "@mui/material";
 import Swal from "sweetalert2";
 import { styled } from "@mui/material/styles";
+import { useUsers } from "../../hooks/useUsers";
 
 // eslint-disable-next-line react/prop-types
 const Row = ({ user, filter }) => {
@@ -65,8 +66,6 @@ const Row = ({ user, filter }) => {
     filter === "vetados" && user.estado === true && (resp = "none");
     return resp;
   };
-
-  handleFilter();
 
   return (
     <Fragment>
@@ -237,41 +236,15 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export const Usuarios = () => {
-  const [data, setData] = useState();
+
   const [filter, setFilter] = useState("");
   const [value, setValue] = useState("");
 
-  const dataUser = async () => {
-    const { data } = await api.get("/users/", {
-      headers: {
-        "x-token": localStorage.getItem("token"),
-      },
-    });
-    const { total, users } = data;
-    setData(users);
-  };
-
-  useEffect(() => {
-    dataUser();
-  }, []);
+  const users = useUsers( value );
+  console.log(users.data)
 
   const handleChange = (event) => {
     setValue(event.target.value);
-  };
-
-  const handleSearch = () => {
-    api
-      .get(`/users/${value}`, {
-        headers: {
-          "x-token": localStorage.getItem("token"),
-        },
-      })
-      .then(({ data }) => {
-        setData(data.results)
-      })
-      .catch(({ response }) => {
-        console.log(response);
-      });
   };
 
   return (
@@ -281,7 +254,7 @@ export const Usuarios = () => {
           <Search
           >
             <SearchIconWrapper>
-              <IconButton onClick={handleSearch}>
+              <IconButton >
                 <SearchIcon />
               </IconButton>
             </SearchIconWrapper>
@@ -294,7 +267,7 @@ export const Usuarios = () => {
           </Search>
         </Grid>
         <Grid item order={{xs:2, sm:4}} xs={2} sm={2} display="flex" justifyContent="center">
-            <IconButton onClick={dataUser} sx={{
+            <IconButton onClick={() => setFilter('')} sx={{
               "&:hover": {
                 transition: "all .5s ease-in",
                 backgroundColor: "rgb(200, 255, 177, 25%)",
@@ -363,8 +336,8 @@ export const Usuarios = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data &&
-              data.map((user, i) => (
+            {users.data &&
+              users.data.users.map((user, i) => (
                 <Row key={i} user={user} filter={filter} />
               ))}
           </TableBody>

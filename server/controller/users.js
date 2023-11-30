@@ -105,7 +105,6 @@ const usersPorNameEmail = async (req, res = response) => {
   try {
     
     const { name_email } = req.params;
-    console.log(name_email)
     const { limite = 15, desde = 0 } = req.query;
     const regex = new RegExp( name_email, 'i' ); // busqueda insensible
     const query = { 
@@ -121,7 +120,7 @@ const usersPorNameEmail = async (req, res = response) => {
   
     res.status(200).json({
       total,
-      results: users 
+      users 
     })
 
   } catch (error) {

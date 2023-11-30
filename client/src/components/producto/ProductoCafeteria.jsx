@@ -7,6 +7,7 @@ import { Producto } from "./Producto";
 
 export const ProductoCafeteria = () => {
   const [products, setProducts] = useState();
+  
 
   useEffect(() => {
     const functiom = async () => {

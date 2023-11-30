@@ -1,23 +1,21 @@
 import { Box, Grid, LinearProgress } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
-import { api } from "../../api/myApi";
+import { useProduts } from "../../hooks/useProduts";
 import { Producto } from "./Producto";
 
 export const AllProductos = () => {
-  const [products, setProducts] = useState();
+
+  const products = useProduts();
+
   const {rol} = useSelector( state => state.auth );
   const vistaRol = (rol !== 'ADMIN_ROLE') && true;
 
-  useEffect(() => {
-    const functiom = async () => {
-      const { data } = await api.get("/product");
-      setProducts(data.product);
-    };
-    functiom();
-  }, [setProducts]);
+/*   const productsQuery = useQuery();
 
-  if (!products) {
+  productsQuery.refetch */
+
+  if (products.isLoading) {
     return (
       <Box sx={{ width: '100%' }}>
       <LinearProgress color='success' />
@@ -29,7 +27,7 @@ export const AllProductos = () => {
     <>
       <Box flexGrow={1} my={5}>
         <Grid container spacing={{ xs: 1, sm: 2 }}>
-          {products.map(
+          {products.data?.product.map(
             (product, i) => (
               (
                 <Grid
