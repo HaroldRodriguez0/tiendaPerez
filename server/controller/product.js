@@ -201,7 +201,7 @@ const deleteProduct = async (req, res = response) => {
 
 const getProduct = async (req, res = response) => {
   try {
-    const { limite = 120, desde = 0 } = req.query;
+    const { limite = 12, page = 1, desde = (page - 1) * limite } = req.query;
 
     const [total, product] = await Promise.all([
       Product.countDocuments(),
@@ -211,10 +211,18 @@ const getProduct = async (req, res = response) => {
         .populate({ path: "tipo numero" }),
     ]);
 
-    res.status(200).json({
-      total,
-      product,
-    });
+/*     const nextCursor = () => {
+      // Calcular el número de documentos obtenidos hasta el momento
+      const docsObtenidos = desde + product.length;
+      // Si el número de documentos obtenidos es menor que el total, devolver el cursor para la siguiente página
+      if (docsObtenidos < total) {
+        return (+page + 1);
+      }
+      // Si no, devolver null
+      return null;
+    }; */
+
+    res.status(200).json( product );
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -234,10 +242,9 @@ const getProductUtiles = async (req, res = response) => {
         .limit(Number(limite)),
     ]);
 
-    res.status(200).json({
-      total,
-      product,
-    });
+    res.status(200).json(
+      product
+    );
   } catch (error) {
     console.log(error.message);
     res.status(500).json({

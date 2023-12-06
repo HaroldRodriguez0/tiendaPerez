@@ -15,7 +15,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DensitySmallOutlinedIcon from '@mui/icons-material/DensitySmallOutlined';
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { api } from "../../api/myApi";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useState } from "react";
 import PersonRemoveOutlinedIcon from "@mui/icons-material/PersonRemoveOutlined";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
@@ -33,14 +33,15 @@ import Swal from "sweetalert2";
 import { styled } from "@mui/material/styles";
 import { useUsers } from "../../hooks/useUsers";
 
+
 // eslint-disable-next-line react/prop-types
-const Row = ({ user, filter }) => {
+const Row = ({ user, filter, users }) => {
   const [open, setOpen] = useState(false);
   const [movil, setMovil] = useState(user.movil);
   const [permiso, setPermiso] = useState(user.rol);
 
-  const handleApi = (value) => {
-    api
+  const handleApi = async (value) => {
+    await api
       .put(`/users/edit/${user.uid}`, value, {
         headers: {
           "x-token": localStorage.getItem("token"),
@@ -48,6 +49,7 @@ const Row = ({ user, filter }) => {
       })
       .then(({ data }) => {
         Swal.fire("", data.msg, "success");
+        users.refetch();
       })
       .catch(({ response }) => {
         console.log(response);
@@ -66,6 +68,20 @@ const Row = ({ user, filter }) => {
     filter === "vetados" && user.estado === true && (resp = "none");
     return resp;
   };
+
+  const handleClickEstado = () => {
+    Swal.fire({
+      text: user.estado === false ?"Estás seguro de habilitar este usuario." :'Estás seguro de vetar este usuario.',
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#26a430",
+      cancelButtonColor: "#d33",
+      confirmButtonText: user.estado === false ?"Si, Habilitar !" :'Si, Vetar !',
+      cancelButtonText: "Cancelar",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        handleApi({ estado: !user.estado })}})
+  }
 
   return (
     <Fragment>
@@ -132,7 +148,7 @@ const Row = ({ user, filter }) => {
           )}
           <IconButton
             disabled={user.rol === "ADMIN_ROLE" && true}
-            onClick={() => handleApi({ estado: !user.estado })}
+            onClick={() => handleClickEstado() }
             sx={{
               "&:hover": {
                 transition: "all .8s ease-in",
@@ -241,7 +257,6 @@ export const Usuarios = () => {
   const [value, setValue] = useState("");
 
   const users = useUsers( value );
-  console.log(users.data)
 
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -338,7 +353,7 @@ export const Usuarios = () => {
           <TableBody>
             {users.data &&
               users.data.users.map((user, i) => (
-                <Row key={i} user={user} filter={filter} />
+                <Row key={i} user={user} filter={filter} users={users}/>
               ))}
           </TableBody>
         </Table>
