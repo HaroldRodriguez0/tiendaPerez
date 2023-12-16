@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
-import { useEffect, useState } from "react";
 import { NewProductoVariable } from "./NewProductoVariable";
 import { useForm } from "../../hooks/useForm";
 import Dropzone from "react-dropzone";
@@ -28,10 +27,14 @@ import Swal from "sweetalert2";
 import { useSelector } from "react-redux";
 import FlexBetween from "../FlexBetween";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { turnCategoria } from "../../helpers/turnCategoria";
 
 export const EditProducto = () => {
 
   const navigate = useNavigate();
+  const quueryClient = useQueryClient();
   const { numero, color, tipo, ...data } = useSelector((state) => state.product);
 
   let tipoModelokeys = [''],
@@ -205,7 +208,10 @@ export const EditProducto = () => {
           },
         })
         .then(({ data }) => {
-          navigate('/');
+          navigate(-1);
+          quueryClient.invalidateQueries([
+            "products", turnCategoria(categoria),
+          ]);
           Swal.fire("", data.msg, "success");
         })
         .catch(({ response }) => {

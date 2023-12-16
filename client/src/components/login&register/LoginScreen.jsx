@@ -27,7 +27,7 @@ import { authLogin } from "../../reducer/authReducer";
 import { useNavigate } from "react-router-dom";
 
 export const LoginScreen = () => {
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [login, setfirst] = useState(true);
@@ -43,7 +43,7 @@ export const LoginScreen = () => {
     password: "",
   });
 
-  const [registerForm, handleregisterForm, registeReset] = useForm({
+  const [registerForm, handleregisterForm, /* registeReset */] = useForm({
     name: "",
     email: "",
     movil: "",
@@ -81,7 +81,6 @@ export const LoginScreen = () => {
 
   const handleRegister = async () => {
     registerForm.movil = "+" + codigoPais.phone + movil;
-    console.log(registerForm);
     await api
       .post("/auth/register", { ...registerForm })
       .then(({ data }) => {

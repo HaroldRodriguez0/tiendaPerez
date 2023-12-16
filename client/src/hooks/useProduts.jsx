@@ -1,18 +1,18 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { api } from "../api/myApi";
 import { sleep } from "./sleep";
 
-const getProducts = async ({ pageParam = 1 }) => {
-  await sleep(5);
-
-  const { data } = await api.get(`/product/?page=${pageParam.toString()}`);
+const getProducts = async ({ pageParam = 1, queryKey }) => {
+  const [,categoria] = queryKey;
+  //await sleep(4);
+  const { data } = await api.get(`/product/${categoria}/?page=${pageParam.toString()}`);
   return data;
 };
 
-export const useProduts = () => {
+export const useProduts = (categoria) => {
 
   const productsQuery = useInfiniteQuery(
-    ['produts'], 
+    ["products", categoria], 
     getProducts, 
     {
 
@@ -26,7 +26,7 @@ export const useProduts = () => {
     },
 
     // mientras carga la data muestra la informacion
-    placeholderData: {
+/*     placeholderData: {
       pages: [
         {
           _id: "65452044e0441f771043969f",
@@ -51,7 +51,7 @@ export const useProduts = () => {
           img: "https://res.cloudinary.com/ddsfbz6wq/image/upload/v1699029120/jgzw9qvlcddulgos3aor.jpg",
         },
       ],
-    }, 
+    },  */
   });
 
   return productsQuery;

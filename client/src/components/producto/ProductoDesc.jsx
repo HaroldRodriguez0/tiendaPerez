@@ -10,14 +10,19 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
+import Swal from "sweetalert2";
+import { api } from "../../api/myApi";
+import { turnCategoria } from "../../helpers/turnCategoria";
 import { productDescHide } from "../../reducer/productReducer";
 import { ProductDescCant } from "./ProductDescCant";
 
 export const ProductoDesc = () => {
   
+  const product = useSelector((state) => state.product);
   const {
     show,
     name,
@@ -27,7 +32,9 @@ export const ProductoDesc = () => {
     numero,
     color,
     tipo,
-  } = useSelector((state) => state.product);
+    categoria
+  } = product;
+  const quueryClient = useQueryClient();
   const {rol} = useSelector( state => state.auth );
   const dispatch = useDispatch();
   const [num, setNum] = useState([]);
@@ -47,6 +54,46 @@ export const ProductoDesc = () => {
   const handleClose = () => {
     dispatch(productDescHide());
     setArr([])
+    setNum([])
+  }
+
+  const handleValidateRol = () => {
+    let resultado = true;
+    rol === "ADMIN_ROLE" && (resultado = false);
+    rol === "CAFETERIA_ROLE" &&
+      categoria === "CAFETERIA" &&
+      (resultado = false);
+    rol === "TOOLS_ROLE" &&
+      (categoria === "UTILES" || categoria === "CALZADO") &&
+      (resultado = false);
+    return resultado;
+  };
+
+  const handleVender = () => {
+    arr.map( async (tipo,i) => {
+      await api
+      .put(
+        `/inventario/editNewCopie`,
+        numero 
+        ? { ...product, numero: tipo, cantidad: num[i] }
+        : tipo
+          ? { ...product, numero: tipo, cantidad: num[i] }
+          : { ...product, numero: tipo, cantidad: num[i] },
+        {headers: {
+            "x-token": localStorage.getItem("token"),
+          },}
+      )
+      .then(() => {
+        quueryClient.invalidateQueries(["products", turnCategoria(categoria)]);
+        dispatch(productDescHide());
+        setArr([])
+        setNum([]) 
+      })
+      .catch(({ response }) => {
+        console.log(response);
+        Swal.fire("", response.data.msg, "error");
+      }); 
+    })
   }
 
   numero && (numeros = Object.keys(numero));
@@ -79,8 +126,8 @@ export const ProductoDesc = () => {
             >
               {numeros &&
                 numeros.map((num, i) => (
+                  <Box key={i} display='flex'>
                   <Box
-                    key={i}
                     textAlign="center"
                     width="42px"
                     border={"solid 1px greenyellow"}
@@ -94,14 +141,19 @@ export const ProductoDesc = () => {
                       },
                     }}
                     onClick={() =>{ handleOnClick(num)}}
-                    
                   >
                     {num}
                   </Box>
+                  <Box ml={2} display={rol !== "ADMIN_ROLE" && 'none'}>
+                  <Typography>tienda: {numero[num].tienda}</Typography>
+                  <Typography>Almacen: {numero[num].almacen}</Typography>
+                  </Box>
+                  </Box>
                 ))}
               {tipos &&
-                tipos.map((tipo, i) => (
-                  <Box
+                tipos.map((tip, i) => (
+                  <Box key={i} display='flex'>
+                    <Box
                     key={i}
                     textAlign="center"
                     border={"solid 1px greenyellow"}
@@ -114,14 +166,20 @@ export const ProductoDesc = () => {
                         backgroundColor: "#d3ffca",
                       },
                     }}
-                    onClick={() =>{ handleOnClick(tipo)}}
+                    onClick={() =>{ handleOnClick(tip)}}
                   >
-                    {tipo}
+                    {tip}
+                  </Box>
+                  <Box ml={2} display={rol !== "ADMIN_ROLE" && 'none'}>
+                  <Typography>tienda: {tipo[tip].tienda}</Typography>
+                  <Typography>Almacen: {tipo[tip].almacen}</Typography>
+                  </Box>
                   </Box>
                 ))}
               {colores &&
-                colores.map((color, i) => (
-                  <Box
+                colores.map((col, i) => (
+                  <Box key={i} display='flex'>
+                    <Box
                     key={i}
                     textAlign="center"
                     border={"solid 1px greenyellow"}
@@ -134,15 +192,20 @@ export const ProductoDesc = () => {
                         backgroundColor: "#d3ffca",
                       },
                     }}
-                    onClick={() =>{ handleOnClick(color)}}
+                    onClick={() =>{ handleOnClick(col)}}
                   >
-                    {color}
+                    {col}
+                  </Box>
+                  <Box ml={2} display={rol !== "ADMIN_ROLE" && 'none'}>
+                  <Typography>tienda: {color[col].tienda}</Typography>
+                  <Typography>Almacen: {color[col].almacen}</Typography>
+                  </Box>
                   </Box>
                 ))}
             </Box>
             <Container sx={{ pt: 1, display:( !rol || arr.length === 0 ) && 'none' }} maxWidth="xs">
               <Typography textAlign="center"> Cantidad</Typography>
-              <Grid container justifyContent={{ xs:'center', sm:'left'}}>
+              <Grid spacing={4} container justifyContent={{ xs:'center', sm:'left'}}>
                   {(arr.length !== 0 && rol) &&
                 arr.map((obj,i) => (
                   <ProductDescCant key={i} i={i} obj={obj} num={num} setNum={setNum} />
@@ -153,6 +216,7 @@ export const ProductoDesc = () => {
             </Container>
           </DialogContent>
           <DialogActions>
+          <Button onClick={handleVender} color="info" sx={{ display: handleValidateRol() && "none" }} >Vender</Button>
             <Button  onClick={() => console.log(arr+' '+num)}  color="success" sx={{display: !rol && 'none' }}>Comprar</Button>
             <Button
               onClick={() => handleClose() }

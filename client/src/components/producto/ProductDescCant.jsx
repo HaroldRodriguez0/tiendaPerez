@@ -36,7 +36,7 @@ export const ProductDescCant = ({obj, i, num, setNum}) => {
   };
 
   return (
-    <Grid item xs={10} sm={6}>
+    <Grid item xs={10} sm={6} sx={{'& .MuiInput-root': {width: '90px'}}}>
     <Box display="flex" justifyContent="space-evenly" marginBottom={.7}>
       <Typography
         paddingX={0.6}
@@ -49,13 +49,13 @@ export const ProductDescCant = ({obj, i, num, setNum}) => {
         {obj}
       </Typography>
       <TextField
-        sx={{ pl: "3px", maxWidth: "90px" }}
         variant="standard"
         type="number"
         color="success"
         name="number"
         value={num[i]}
         onChange={handleChange}
+        sx={{ pl: "3px", maxWidth: "90px" }}
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">

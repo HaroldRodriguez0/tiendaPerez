@@ -29,9 +29,7 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
   }
 
   if (cont) {
-
     dataValor.forEach(async function (valor, clave) {
-      
       // Comprobar si el segundo objeto Map tiene la misma clave
       if (lastProValor.has(clave)) {
         // Obtener el valor asociado a la clave del lastProValor
@@ -49,10 +47,10 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
               elemento[tipoProd] === clave &&
               elemento.precio === data.precio
           );
-          if (
-            data.name !== lastProduct.name ||
+          if (productEncontrado &&
+            (data.name !== lastProduct.name ||
             data.precio !== lastProduct.precio ||
-            data.modelo !== lastProduct.modelo
+            data.modelo !== lastProduct.modelo)
           ) {
             throw new Error(
               `En estos momentos no puede realizar estos cambios`
@@ -61,7 +59,7 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
             console.log(1);
             await CopieInventario.updateOne(
               { _id: id },
-              { $inc: { "products.$[elem].cantidad": diferencia } },
+              { $inc: { "products.$[elem].cantidadTienda": diferencia } },
               {
                 // Usa arrayFilters para especificar las condiciones del producto
                 arrayFilters: [
@@ -74,7 +72,7 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
                 ],
               }
             );
-          } else {
+          }/*  else {
             //console.log(2);
             await CopieInventario.updateOne(
               { _id: id },
@@ -91,18 +89,16 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
                 },
               }
             );
-          }     
+          } */
         }
       }
-      
     });
 
     dataValor.forEach(async function (valor, clave) {
-      console.log(valor.almacen+'  '+valor.tienda)
+      console.log(valor.almacen + "  " + valor.tienda);
       cantidadTienda += valor.tienda;
       cantidadAlmacen += valor.almacen;
-
-    })
+    });
 
     data.cantAlmacen = cantidadAlmacen;
     data.cantTienda = cantidadTienda;
@@ -122,7 +118,7 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
     default:
       // solo editar la cantTienda-cantAlmacen si no viene ningun valor
       // si la cantidad en tienda a editar es mayor a la actual autocalcular cantidad en almacen
-      
+
       if (
         data.cantTienda > lastProduct.cantTienda &&
         data.cantAlmacen === lastProduct.cantAlmacen
@@ -132,15 +128,15 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
           (elemento) =>
             elemento.name === data.name && elemento.precio === data.precio
         );
-        if (
-          data.name !== lastProduct.name ||
-          data.precio !== lastProduct.precio
+        if ( productEncontrado &&
+          (data.name !== lastProduct.name ||
+          data.precio !== lastProduct.precio)
         ) {
           throw new Error(`En estos momentos no puede realizar estos cambios`);
         } else if (productEncontrado) {
           await CopieInventario.updateOne(
             { _id: id },
-            { $inc: { "products.$[elem].cantidad": diferencia } },
+            { $inc: { "products.$[elem].cantidadTienda": diferencia } },
             {
               // Usa arrayFilters para especificar las condiciones del producto
               arrayFilters: [
@@ -151,8 +147,8 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
               ],
             }
           );
-        } else {
-          console.log(1)
+        }/*  else {
+          console.log(1);
           await CopieInventario.updateOne(
             { _id: id },
             {
@@ -166,7 +162,7 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
               },
             }
           );
-        }
+        } */
         data.cantAlmacen = Math.max(data.cantAlmacen - diferencia, 0);
       }
   }

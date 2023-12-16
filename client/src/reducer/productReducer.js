@@ -88,12 +88,9 @@ export const productSlice = createSlice({
       state.show = false;
     },
 
-    productSearch: (state, action) => {
-      state.search = action.payload.search;
-    },
   },
 });
 
-export const { productEdit, productDescShow, productDescHide, productSearch } = productSlice.actions;
+export const { productEdit, productDescShow, productDescHide } = productSlice.actions;
 
 export default productSlice.reducer;

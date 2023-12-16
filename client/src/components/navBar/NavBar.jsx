@@ -1,5 +1,5 @@
 import * as React from "react";
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -26,11 +26,11 @@ import { Button, Container, Typography, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authLogout } from "../../reducer/authReducer";
-import { productSearch } from '../../reducer/productReducer'
 import { stockShow } from "../../reducer/stockReducer";
 
 const noAmin = ['USER_ROLE', 'CAFETERIA_ROLE', 'TOOLS_ROLE' ];
 
+// eslint-disable-next-line no-unused-vars
 const Search = styled("div")(({ theme }) => ({
   display: "flex",
   borderRadius: '.6rem',
@@ -65,6 +65,7 @@ export const NavBar = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const dispatch = useDispatch();
   const { rol } = useSelector((state) => state.auth);
+  const { name } = useSelector((state) => state.stock);
   const { name: cantProduts } = useSelector((state) => state.stock);
   const navigate = useNavigate();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -85,9 +86,8 @@ export const NavBar = () => {
   };
 
   const handleSearch = () => {
-    dispatch( productSearch({ search: valueSearch }));
     setValueSearch('');
-    navigate('/product/search')
+    navigate(`/product/${valueSearch}`)
   };
 
   const mobileMenuId = "primary-search-account-menu-mobile";
@@ -144,7 +144,7 @@ export const NavBar = () => {
         </IconButton>
         <p>Usuarios</p>
       </MenuItem>
-      <MenuItem  sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }} onClick={() => dispatch(stockShow())}>
+      <MenuItem  sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }} onClick={() => name.length > 0 && dispatch(stockShow())}>
         <IconButton size="large" aria-label="venta" color="inherit">
           <Badge badgeContent={cantProduts ?cantProduts.length :0} color="success">
             <CalculateOutlinedIcon />
@@ -152,19 +152,19 @@ export const NavBar = () => {
         </IconButton>
         <p>Venta</p>
       </MenuItem>
-      <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }}>
+      <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }} onClick={() =>{ navigate("/inventario/diario"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <InventoryOutlinedIcon />
         </IconButton>
-        <p>Inventario diario</p>
+        <p>Venta del día</p>
       </MenuItem>
-      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }}>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate("/inventario/todos"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <Inventory2OutlinedIcon />
         </IconButton>
-        <p>Inventario</p>
+        <p>Ventas</p>
       </MenuItem>
-      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }}>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate("/product/agotado"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <DisabledByDefaultOutlinedIcon />
         </IconButton>

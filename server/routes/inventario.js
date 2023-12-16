@@ -8,11 +8,12 @@ import {
   editCopieInventario,
   editInventario,
   editNewCopie,
-  getCopieInventario, getInventario, /* newCopieInventario */
+  getCopieInventario, 
+  getInventario, 
   newInventario,
 } from "../controller/inventario.js";
 import { categorialValida, inventarioExiste, nameNoExiste } from "../middlewares/dbValidator.js";
-import { tieneRole, validarCampo, validarJWT } from "../middlewares/index.js";
+import { esAdminRole, tieneRole, validarCampo, validarJWT } from "../middlewares/index.js";
 
 const router = Router();
 
@@ -91,6 +92,11 @@ router.put(
   editInventario
 );
 
-router.get("/get", getInventario );
+router.get("/get",[ 
+  validarJWT,
+  esAdminRole, 
+  validarCampo, 
+],
+getInventario );
 
 export default router;

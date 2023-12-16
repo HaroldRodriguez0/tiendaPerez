@@ -9,14 +9,14 @@ import { useEffect } from "react";
 import { keepLogin } from "../actions/auth";
 import { PublicRouter } from "./PublicRouter";
 import { NewProducto } from "../components/producto/NewProducto";
-import { ProductoCafeteria } from "../components/producto/ProductoCafeteria";
+
 import { EditProducto } from "../components/producto/EditProducto";
-import { ProductoUtileria } from "../components/producto/ProductoUtileria";
-import { ProductoCalzado } from "../components/producto/ProductoCalzado";
 import { ProductoDesc } from "../components/producto/ProductoDesc";
 import { Usuarios } from "../components/users/Usuarios";
-import { ProductoSearch } from "../components/producto/ProductoSearch";
 import { Venta } from "../components/inventario/Venta";
+import { ProductoCategoria } from "../components/producto/ProductoCategoria";
+import { InventarioDiario } from "../components/inventario/InventarioDiario";
+import { Inventarios } from "../components/inventario/Inventarios";
 
 export const AppRouter = () => {
   const dispatch = useDispatch();
@@ -47,10 +47,12 @@ export const AppRouter = () => {
           <Route path="/product/*" >
             <Route path="new" element={<NewProducto />} />
             <Route path="edit" element={<EditProducto />} />
-            <Route path="cafeteria" element={<ProductoCafeteria />} />
-            <Route path="utiles" element={<ProductoUtileria />} />
-            <Route path="calzado" element={<ProductoCalzado />} />
-            <Route path="search" element={<ProductoSearch />} />
+            <Route path=":categoria" element={<ProductoCategoria />} />
+          </Route>
+
+          <Route path="/inventario/*" >
+            <Route path="diario" element={<InventarioDiario />} />
+            <Route path="todos" element={<Inventarios />} />
           </Route>
 
           <Route path="/users" element={<Usuarios />} />
@@ -58,8 +60,10 @@ export const AppRouter = () => {
           <Route path="/verification/*" element={<Verification />} />
           <Route path="/*" element={<HomeScreen />} />
         </Routes>
+
         <ProductoDesc />
         <Venta />
+
       </Container>
     </BrowserRouter>
   );

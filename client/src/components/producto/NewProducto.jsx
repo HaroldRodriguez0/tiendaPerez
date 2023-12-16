@@ -21,13 +21,15 @@ import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
 import { useState } from "react";
 import { NewProductoVariable } from "./NewProductoVariable";
 import { useForm } from "../../hooks/useForm";
-import { useEffect } from "react";
 import Dropzone from "react-dropzone";
 import FlexBetween from "../../../../../../Sociopedia Fullstack/client/src/components/FlexBetween";
 import { api } from "../../api/myApi";
 import Swal from "sweetalert2";
+import { useQueryClient } from "@tanstack/react-query";
+import { turnCategoria } from "../../helpers/turnCategoria";
 
 export const NewProducto = () => {
+  const quueryClient = useQueryClient();
   const [i, seti] = useState(0);
   const [loading, setLoading] = useState(false);
   const [categoria, setCategoria] = useState("");
@@ -81,7 +83,7 @@ export const NewProducto = () => {
   const handleChangeCategoria = (event) => {
     setCategoria(event.target.value);
   };
-  
+
   const handleChangeModelo = (event) => {
     seti(0);
     setProductos([]);
@@ -120,13 +122,15 @@ export const NewProducto = () => {
     e.preventDefault();
     setLoading(true);
     let value = true;
-    setErrorImg('');
+    setErrorImg("");
     setErrorModelo("");
 
-    if(!imgProduct) {setErrorImg(true); value=false;}
+    if (!imgProduct) {
+      setErrorImg(true);
+      value = false;
+    }
 
-    if ( value ) {
-    
+    if (value) {
       newProduct.categoria = categoria;
       newProduct.fondoImgProduct = checkedImg;
       newProduct.fondoImgDesc = checkedImgDesc;
@@ -164,6 +168,9 @@ export const NewProducto = () => {
           },
         })
         .then(({ data }) => {
+          quueryClient.invalidateQueries([
+            "products", turnCategoria(categoria),
+          ]);
           handleReset();
           Swal.fire("", data.msg, "success");
         })
@@ -172,7 +179,7 @@ export const NewProducto = () => {
           response.data?.msg
             ? Swal.fire("", response.data.msg, "error")
             : setErrorModelo(response.data.errors.name.msg);
-        });
+        }); 
     }
 
     setLoading(false);
@@ -214,7 +221,9 @@ export const NewProducto = () => {
                       {({ getRootProps, getInputProps }) => (
                         <Box
                           {...getRootProps()}
-                          border={`2px dashed ${errorImg ?'red' :'rgb(173, 207, 158)'}`}
+                          border={`2px dashed ${
+                            errorImg ? "red" : "rgb(173, 207, 158)"
+                          }`}
                           p=".5rem"
                           sx={{
                             width: "80%",
@@ -470,27 +479,28 @@ export const NewProducto = () => {
                   ))}
                 </Box>
                 <FlexBetween marginTop={4}>
-                <Button
-                  sx={{mr:2}}
-                  variant="contained"
-                  type="submit"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <CircularProgress color="inherit" size={24} />
-                  ) : (
-                    "Enviar"
-                  )}
-                </Button>
-                <Box textAlign='center' display={!loading && 'none'} marginX='auto'>
-                <Typography fontSize='.8rem'>
-                  Espere...
-                </Typography>
-                <Typography fontSize='.8rem'>
-                    Podrá tardar unos segundos.
-                  </Typography>
-                </Box>
-                
+                  <Button
+                    sx={{ mr: 2 }}
+                    variant="contained"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <CircularProgress color="inherit" size={24} />
+                    ) : (
+                      "Enviar"
+                    )}
+                  </Button>
+                  <Box
+                    textAlign="center"
+                    display={!loading && "none"}
+                    marginX="auto"
+                  >
+                    <Typography fontSize=".8rem">Espere...</Typography>
+                    <Typography fontSize=".8rem">
+                      Podrá tardar unos segundos.
+                    </Typography>
+                  </Box>
                 </FlexBetween>
               </form>
             </CardContent>

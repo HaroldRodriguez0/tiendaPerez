@@ -8,7 +8,6 @@ import {
   autocalcularAlmacen,
   autocalcularAlmacenAdmin,
   autocalcularToolsCafeteria,
-  imagemin_sharp,
 } from "../helpers/index.js";
 import { Product } from "../models/index.js";
 
@@ -66,13 +65,14 @@ const newProduct = async (req, res = response) => {
     // Guardar en DB
     product.img = pathFile;
     product.imgDesc = pathFileDesc;
+    console.log(product)
     await product.save();
 
     res.status(201).json({
       msg: "Producto creado con !Exito",
     });
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     res.status(500).json({
       msg: "Please talk to the administrator",
     });
@@ -166,7 +166,6 @@ const edit = async (req, res = response) => {
       const product = await Product.findByIdAndUpdate(id, data, { new: true });
 
       return res.status(200).json({
-        product,
         msg: "Producto actualizado con !Exito",
       });
     }
@@ -223,6 +222,7 @@ const getProduct = async (req, res = response) => {
     }; */
 
     res.status(200).json( product );
+
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -233,7 +233,7 @@ const getProduct = async (req, res = response) => {
 
 const getProductUtiles = async (req, res = response) => {
   try {
-    const { limite = 12, desde = 0 } = req.query;
+    const { limite = 12, page = 1, desde = (page - 1) * limite } = req.query;
 
     const [total, product] = await Promise.all([
       Product.countDocuments(),
@@ -255,7 +255,7 @@ const getProductUtiles = async (req, res = response) => {
 
 const getProductCafeteria = async (req, res = response) => {
   try {
-    const { limite = 12, desde = 0 } = req.query;
+    const { limite = 12, page = 1, desde = (page - 1) * limite } = req.query;
 
     const [total, product] = await Promise.all([
       Product.countDocuments(),
@@ -264,10 +264,10 @@ const getProductCafeteria = async (req, res = response) => {
         .limit(Number(limite)),
     ]);
 
-    res.status(200).json({
-      total,
-      product,
-    });
+    res.status(200).json(
+      product
+    );
+
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -278,7 +278,7 @@ const getProductCafeteria = async (req, res = response) => {
 
 const getProductCalzado = async (req, res = response) => {
   try {
-    const { limite = 12, desde = 0 } = req.query;
+    const { limite = 12, page = 1, desde = (page - 1) * limite } = req.query;
 
     const [total, product] = await Promise.all([
       Product.countDocuments(),
@@ -287,10 +287,33 @@ const getProductCalzado = async (req, res = response) => {
         .limit(Number(limite)),
     ]);
 
-    res.status(200).json({
-      total,
-      product,
+    res.status(200).json(
+      product
+    );
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
     });
+  }
+};
+
+const getProductAgotado = async (req, res = response) => {
+  try {
+    const { limite = 12, page = 1, desde = (page - 1) * limite } = req.query;
+
+    const [total, product] = await Promise.all([
+      Product.countDocuments(),
+      Product.find({ cantTienda: { $lt: 5 } })
+        .skip(Number(desde))
+        .limit(Number(limite)),
+    ]);
+
+    res.status(200).json(
+      product
+    );
+
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -302,7 +325,7 @@ const getProductCalzado = async (req, res = response) => {
 const getProductName = async (req, res = response) => {
   try {
     const { name } = req.params;
-    const { limite = 10, desde = 0 } = req.query;
+    const { limite = 12, page = 1, desde = (page - 1) * limite } = req.query;
     const regex = new RegExp(name, "i"); // busqueda insensible
     const query = {
       $or: [{ name: regex }],
@@ -313,10 +336,9 @@ const getProductName = async (req, res = response) => {
       Product.find(query).skip(Number(desde)).limit(Number(limite)),
     ]);
 
-    res.status(200).json({
-      total,
+    res.status(200).json(
       product,
-    });
+    );
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -335,4 +357,5 @@ export {
   getProductUtiles,
   getProductCafeteria,
   getProductCalzado,
+  getProductAgotado
 };

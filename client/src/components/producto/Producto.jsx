@@ -16,8 +16,6 @@ import {
 import AddShoppingCartOutlinedIcon from "@mui/icons-material/AddShoppingCartOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import Fade from "@mui/material/Fade";
-import { useEffect, useRef, useState } from "react";
-import { useElementHeight } from "../../hooks/useElementHeight";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
@@ -29,17 +27,18 @@ import FlexBetween from "../FlexBetween";
 import Swal from "sweetalert2";
 import { api } from "../../api/myApi";
 import { stockNow } from "../../reducer/stockReducer";
+import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { turnCategoria } from "../../helpers/turnCategoria";
 
 // eslint-disable-next-line react/prop-types
 export const Producto = (data) => {
+  const quueryClient = useQueryClient();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { name, img, cantAlmacen, cantTienda, precio, categoria } = data;
   const [number, setNumber] = useState(1);
   const { rol } = useSelector((state) => state.auth);
-  let role;
-
-  data.vistaRol ? (role = "") : (role = rol);
 
   const handleChange = (event) => {
     const newValue = Number(event.target.value);
@@ -60,11 +59,11 @@ export const Producto = (data) => {
 
   const handleValidateRol = () => {
     let resultado = true;
-    role === "ADMIN_ROLE" && (resultado = false);
-    role === "CAFETERIA_ROLE" &&
+    rol === "ADMIN_ROLE" && (resultado = false);
+    rol === "CAFETERIA_ROLE" &&
       categoria === "CAFETERIA" &&
       (resultado = false);
-    role === "TOOLS_ROLE" &&
+    rol === "TOOLS_ROLE" &&
       (categoria === "UTILES" || categoria === "CALZADO") &&
       (resultado = false);
     return resultado;
@@ -88,6 +87,11 @@ export const Producto = (data) => {
             },
           })
           .then(() => {
+            //const value = ;
+            quueryClient.invalidateQueries([
+              "products",
+              turnCategoria(categoria),
+            ]);
             Swal.fire({
               title: "Eliminado !",
               text: "El producto se ha Eliminado de forma exitosa",
@@ -103,39 +107,49 @@ export const Producto = (data) => {
   };
 
   const handleAddShopping = () => {
-    if(data.numero || data.tipo || data.color)  {
+    if (data.numero || data.tipo || data.color) {
+      dispatch(productDescShow(data));
+    } else {
+      console.log(data.precio);
+    }
+  };
+
+  const AddTask = async () => {
+
+    if (data.numero || data.tipo || data.color) {
       dispatch(productDescShow(data));
     }
     else{
-      console.log(data.precio)
+      dispatch(
+        stockNow({ name: data.name, precio: data.precio, cantidad: number })
+      );
+  
+      await api
+        .put(
+          `/inventario/editNewCopie`,
+          { ...data, cantidad: number },
+          {headers: {
+              "x-token": localStorage.getItem("token"),
+            },}
+        )
+        .then(() => {
+          quueryClient.invalidateQueries(["products", turnCategoria(categoria)]);
+        })
+        .catch(({ response }) => {
+          console.log(response);
+          Swal.fire("", response.data.msg, "error");
+        });
     }
-  }
-
-  const AddTask = () => {
-    if(data.numero || data.tipo || data.color)  {
-      //dispatch(productDescShow(data));
-    }
-    else{
-      dispatch( stockNow({ name: data.name, precio: data.precio, cant: number }))
-    }
-  }
+  };
 
   const isMobile = useMediaQuery("(max-width:600px)");
-  const [pb, setPb] = useState(false);
-  const nameRef = useRef(null);
-  // Obtenemos la altura del elemento usando el hook personalizado
-  const nameHeight = useElementHeight(nameRef);
-
-  useEffect(() => {
-    nameHeight < 38 ? setPb(true) : setPb(false);
-  }, [nameHeight]);
 
   return (
     <>
       <Card elevation={3}>
         <FlexBetween
           sx={{
-            display: role !== "ADMIN_ROLE" ? "none" : "flex",
+            display: rol !== "ADMIN_ROLE" ? "none" : "flex",
           }}
         >
           <IconButton
@@ -198,9 +212,8 @@ export const Producto = (data) => {
               textAlign="center"
               lineHeight="1.2"
               fontWeight="400"
-              ref={nameRef}
               sx={{
-                pb: { xs: pb && "1rem" },
+                pb: { xs: name.length < 17 && "1rem" },
                 fontSize: { xs: "1rem", sm: "1.2rem" },
               }}
             >
@@ -219,29 +232,28 @@ export const Producto = (data) => {
           >
             <span style={{ display: "inline-flex" }}>
               <IconButton
-              disabled={cantTienda === 0 && true}
-              onClick={handleAddShopping}
-              aria-label="Carro"
-              color={"success"}
-              sx={{ width: "100%", justifyContent: "space-around" }}
-            >
-              <Typography
-                color={cantTienda === 0 && "#00000050"}
-                textAlign={"center"}
-                fontSize={".9rem"}
-                lineHeight={"1.2"}
-                fontWeight="400"
-                sx={{
-                  m: 0,
-                  fontSize: { xs: "1rem", sm: "1.1rem", md: "1.3rem" },
-                }}
+                disabled={cantTienda === 0 && true}
+                onClick={handleAddShopping}
+                aria-label="Carro"
+                color={"success"}
+                sx={{ width: "100%", justifyContent: "space-around" }}
               >
-                {precio} cup
-              </Typography>
-              <AddShoppingCartOutlinedIcon sx={{ fontSize: "1.8rem" }} />
-            </IconButton>
+                <Typography
+                  color={cantTienda === 0 && "#00000050"}
+                  textAlign={"center"}
+                  fontSize={".9rem"}
+                  lineHeight={"1.2"}
+                  fontWeight="400"
+                  sx={{
+                    m: 0,
+                    fontSize: { xs: "1rem", sm: "1.1rem", md: "1.3rem" },
+                  }}
+                >
+                  {precio} cup
+                </Typography>
+                <AddShoppingCartOutlinedIcon sx={{ fontSize: "1.8rem" }} />
+              </IconButton>
             </span>
-            
           </Tooltip>
           <Grid
             container
@@ -317,7 +329,7 @@ export const Producto = (data) => {
               sx={{
                 fontSize: { xs: ".9rem" },
                 mr: "5px",
-                display: role === "ADMIN_ROLE" && "none",
+                display: rol === "ADMIN_ROLE" && "none",
               }}
             >
               {isMobile ? "Cant Almacén" : "Cantidad Almacén"} :{" "}
@@ -329,7 +341,7 @@ export const Producto = (data) => {
               sx={{
                 fontSize: { xs: ".83rem", sm: ".9rem" },
                 mr: "5px",
-                display: role !== "ADMIN_ROLE" && "none",
+                display: rol !== "ADMIN_ROLE" && "none",
               }}
             >
               {isMobile ? "Cant Almacén" : "Cantidad Almacén"} :{" "}

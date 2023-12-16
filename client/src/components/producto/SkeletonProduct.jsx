@@ -6,7 +6,7 @@ import {
   Skeleton,
 } from "@mui/material";
 
-export const SkeletonLoading = () => {
+export const SkeletonProduct = () => {
   return (
     <>
       <Card elevation={3}>

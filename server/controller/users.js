@@ -6,8 +6,8 @@ import { User } from "../models/index.js";
 const users = async (req, res = response) => {
   try {
 
-    const { limite = 15, desde = 0 } = req.query;
-    const query = { name: {$ne: "developer"} }
+    const { limite = 20, page = 1, desde = (page - 1) * limite } = req.query;
+    const query = { name: {$ne: "developer"}, estado: {$exists: true} }
   
     const [ total, users ] = await Promise.all([
       User.countDocuments( query ),
@@ -16,10 +16,9 @@ const users = async (req, res = response) => {
         .limit(Number( limite ))
     ])
     
-    res.status(200).json({
-      total, 
+    res.status(200).json(
       users
-    });
+    );
 
   } catch (error) {
     console.log(error.message);
@@ -28,87 +27,16 @@ const users = async (req, res = response) => {
     });
   }
 };
-
-
-const enabled = async (req, res = response) => {
-  try {
-
-    const { limite = 15, desde = 0 } = req.query;
-    const query = { estado: true, name: {$ne: "developer"} }
-  
-    const [ total, users ] = await Promise.all([
-      User.countDocuments( query ),
-      User.find( query )
-        .skip( Number( desde ))
-        .limit(Number( limite ))
-    ])
-    
-    res.status(200).json({
-      total, 
-      users
-    });
-
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      msg: "Please talk to the administrator",
-    });
-  }
-};
-
-const usersxId = async (req, res = response) => {
-  try {
-
-    const user = await User.findById( req.params.id )
-
-    res.status(200).json({
-      user
-    })
-    
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      msg: "Please talk to the administrator",
-    });
-  }
-}
-
-const usersBanned = async (req, res = response) => {
-  try {
-
-    const { limite = 15, desde = 0 } = req.query;
-    const query = { estado: false, name: {$ne: "developer"} }
-  
-    const [ total, users ] = await Promise.all([
-      User.countDocuments( query ),
-      User.find( query )
-        .skip( Number( desde ))
-        .limit(Number( limite ))
-    ])
-    
-    res.status(200).json({
-      total, 
-      users
-    });
-
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      msg: "Please talk to the administrator",
-    });
-  }
-};
-
 
 
 const usersPorNameEmail = async (req, res = response) => {
   try {
     
     const { name_email } = req.params;
-    const { limite = 15, desde = 0 } = req.query;
+    const { limite = 20, page = 1, desde = (page - 1) * limite } = req.query;
     const regex = new RegExp( name_email, 'i' ); // busqueda insensible
     const query = { 
-      $or: [{ name: regex }, { email: regex }], $and: [{ name : {$ne: "developer"} }]
+      $or: [{ name: regex }, { email: regex }], $and: [{ name : {$ne: "developer"}, estado: {$exists: true} }]
      }
   
      const [ total, users ] = await Promise.all([
@@ -118,10 +46,9 @@ const usersPorNameEmail = async (req, res = response) => {
          .limit(Number( limite ))
      ])
   
-    res.status(200).json({
-      total,
+    res.status(200).json(
       users 
-    })
+    )
 
   } catch (error) {
     console.log(error.message);
@@ -178,9 +105,6 @@ const usersEdit = async (req, res = response) => {
 
 export {
   users,
-  usersxId,
-  usersBanned,
   usersPorNameEmail,
   usersEdit,
-  enabled
 }

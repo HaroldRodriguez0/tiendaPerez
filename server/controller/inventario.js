@@ -217,6 +217,7 @@ const editCopieInventario = async (req, res = response) => {
 
       // se guarda el producto a editar con todas sus propiedades para hacer las respectivas modificaciones
       const lastProduct = modelo ?? false ? await Product.find({ name, modelo }) : await Product.find({ name });
+      console.log(cantidadTienda, cantidad, lastProduct[0].cantTienda, cantinventario, )
 
       if (lastProduct) {
 
@@ -238,19 +239,23 @@ const editCopieInventario = async (req, res = response) => {
           valor = tipo;
           lastProValor = lastProduct[0].tipo;
         }
-        if ( cantidadTienda >= cantidad) {
+        if ( cantidadTienda >= cantidad ) {
+
+          cantTienda = lastProduct[0].cantTienda - ( cantidad - cantinventario ) ;
 
           if (cont) {
             // cantidad Productos en tienda = cantidad total de productos que existian en tienda desde que se vendio el 1er producto - cantidad de procutos vendidos
             cantidadProd = cantidadTienda - cantidad ;
             // cancant total de productos en Tienda = lastProduct[0].cantTienda - ( la cantidad que he vendido - la cantidad vendida en el inventario )
-            cantTienda = lastProduct[0].cantTienda - ( cantidad - cantinventario ) ;
             const cambios = { $set: { [`${tipoProd}.${valor}.tienda`]: cantidadProd, cantTienda } };
 
-            await CopieInventario.updateOne( { _id: id } , update );
             await Product.updateOne( { _id: lastProduct[0].id } , cambios );
-          
           }
+          else{
+            await Product.updateOne( { _id: lastProduct[0].id } , { $set: { cantTienda } } );
+          }
+
+          await CopieInventario.updateOne( { _id: id } , update );
 
         } else {
           return res.status(400).json({
@@ -293,9 +298,10 @@ const getCopieInventario = async (req, res = response) => {
         }
       }
     ])
+    const {products} = copieInventario[0];
 
     res.status(200).json({
-      copieInventario
+      products
     });
   } catch (error) {
     console.log(error.message);
@@ -304,6 +310,7 @@ const getCopieInventario = async (req, res = response) => {
     });
   }
 };
+
 
 const newInventario = async (req, res = response) => {
   try {
@@ -389,24 +396,30 @@ const editInventario = async (req, res = response) => {
   }
 }
 
-// extraer el ultimo inventario creado
+
 const getInventario = async (req, res = response) => {
   try {
 
     let inventario;
-    //req.body.date = new Date(2023, 8, 27);
-    const { date } = req.body;
+    const { year, month, day } = req.query;
 
-    if( date ){
-      inventario = await Inventario.findOne({ date });
+    if(day){
+      inventario = await Inventario.findOne({ date: new Date(year, month, day) });
     }
-    else{
-      inventario = await Inventario.findOne();
+    else if(month){
+      const startDate = new Date(year, month, 1);
+      const endDate = month === 11 ?new Date(year + 1, 0, 1) :new Date(year, month + 1, 0);
+      inventario = await Inventario.find({ date: { $gte: startDate, $lt: endDate } });
+    }
+    else if(year){
+      const startDate = new Date(Date.UTC(year, 0, 1));
+      const endDate = new Date(Date.UTC(year + 1, 0, 1));
+      inventario = await Inventario.find({ date: { $gte: startDate, $lt: endDate } });
     }
 
-    return res.status(200).json({
-      inventario 
-    });
+    return res.status(200).json(
+      inventario
+    );
     
   } catch (error) {
     console.log(error.message);
@@ -416,4 +429,4 @@ const getInventario = async (req, res = response) => {
   }
 }
 
-export { /* newCopieInventario, */ editCopieInventario, editNewCopie, getCopieInventario, newInventario, editInventario, getInventario };
+export { /* newCopieInventario, */ editCopieInventario, editNewCopie, getCopieInventario, newInventario, editInventario, getInventario, };

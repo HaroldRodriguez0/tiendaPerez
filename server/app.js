@@ -6,6 +6,8 @@ import path from 'path';
 import { authRoutes, inventarioRouters, productRouters, usersRoutes, }  from './routes/index.js'
 import { fileURLToPath } from "url";
 import { dbConnection } from "./db/config.js";
+import cron from 'node-cron';
+import axios from "axios";
 
 /* Configurations */
 // --> ( solo para  "type": "module"  )
@@ -36,6 +38,16 @@ app.use('/api/users', usersRoutes );
 app.use('/api/product', productRouters );
 app.use('/api/inventario', inventarioRouters );
 
+// Usar cron.schedule para crear una tarea
+/* cron.schedule('59 23 * * *', async () => {
+  try {
+    const response = await axios.post('http://localhost:4000/api/inventario/newInventario/aut');
+  } catch ({data}) {
+    console.error(data.msg);
+  }
+}, {
+  timeZone: 'America/Havana'
+}); */
 
 // Escuchar peticiones
 app.listen( process.env.PORT, () => {

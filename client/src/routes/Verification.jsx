@@ -6,8 +6,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { authLogin } from "../reducer/authReducer";
 import { api } from "../api/myApi";
+import { useQueryClient } from "@tanstack/react-query";
 
 export const Verification = () => {
+  const quueryClient = useQueryClient();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [data, setData] = useState(null);
@@ -32,6 +34,9 @@ export const Verification = () => {
 
   useEffect(() => {
     if (data) {
+      quueryClient.invalidateQueries([
+        "users", "",
+      ]);
       dispatch(authLogin(data));
       localStorage.setItem( 'token', data.token );
       navigate("/");

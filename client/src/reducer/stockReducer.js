@@ -3,7 +3,7 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
   name: [],
-  cant: [],
+  cantidad: [],
   precio: [],
   show: '',
 }
@@ -14,15 +14,15 @@ export const stockSlice = createSlice({
   reducers: {
 
     stockNow: ( state, action ) => {
-      const { precio, name, cant } = action.payload;
+      const { precio, name, cantidad } = action.payload;
       let index = state.name.indexOf(name);
       if(index === -1){
         state.name = [...state.name, name];
-        state.cant = [...state.cant, cant];
+        state.cantidad = [...state.cantidad, cantidad];
         state.precio = [...state.precio, precio];
       }
       else{
-        state.cant[index] = state.cant[index] + cant;
+        state.cantidad[index] = state.cantidad[index] + cantidad;
       }
     },
 
@@ -32,7 +32,7 @@ export const stockSlice = createSlice({
 
     stockClear: ( state ) => {
       state.name = [];
-      state.cant = [];
+      state.cantidad = [];
       state.precio = [];
       state.show = false;
     },

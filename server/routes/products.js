@@ -10,6 +10,7 @@ import {
   edit,
   editAdmin,
   getProduct,
+  getProductAgotado,
   getProductCafeteria,
   getProductCalzado,
   getProductName,
@@ -103,6 +104,8 @@ router.get("/utiles", getProductUtiles);
 router.get("/cafeteria", getProductCafeteria);
 
 router.get("/calzado", getProductCalzado);
+
+router.get("/agotado", getProductAgotado);
 
 router.get("/:name", getProductName);
 

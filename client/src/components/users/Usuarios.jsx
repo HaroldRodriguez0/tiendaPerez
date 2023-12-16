@@ -1,232 +1,37 @@
-
-import Box from "@mui/material/Box";
-import Collapse from "@mui/material/Collapse";
-import IconButton from "@mui/material/IconButton";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
 import SearchIcon from "@mui/icons-material/Search";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import DensitySmallOutlinedIcon from '@mui/icons-material/DensitySmallOutlined';
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
-import { api } from "../../api/myApi";
-import { Fragment, useState } from "react";
+import DensitySmallOutlinedIcon from "@mui/icons-material/DensitySmallOutlined";
+import { useEffect, useState } from "react";
 import PersonRemoveOutlinedIcon from "@mui/icons-material/PersonRemoveOutlined";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
-import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import DoneOutlinedIcon from "@mui/icons-material/DoneOutlined";
 import {
   Button,
-  FormControl,
   Grid,
+  IconButton,
   InputBase,
-  NativeSelect,
-  TextField,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   Typography,
 } from "@mui/material";
-import Swal from "sweetalert2";
 import { styled } from "@mui/material/styles";
 import { useUsers } from "../../hooks/useUsers";
+import { User } from "./User";
+import { SkeletonUser } from "./SkeletonUser";
 
-
-// eslint-disable-next-line react/prop-types
-const Row = ({ user, filter, users }) => {
-  const [open, setOpen] = useState(false);
-  const [movil, setMovil] = useState(user.movil);
-  const [permiso, setPermiso] = useState(user.rol);
-
-  const handleApi = async (value) => {
-    await api
-      .put(`/users/edit/${user.uid}`, value, {
-        headers: {
-          "x-token": localStorage.getItem("token"),
-        },
-      })
-      .then(({ data }) => {
-        Swal.fire("", data.msg, "success");
-        users.refetch();
-      })
-      .catch(({ response }) => {
-        console.log(response);
-        let valores = Object.values (response.data.errors).map (obj => obj.msg);
-        valores && Swal.fire("", valores[0], "error");
-      });
-  };  
-
-  const handleChangeMovil = (event) => {
-    setMovil(event.target.value);
-  };
-
-  const handleFilter = () => {
-    let resp;
-    filter === "activos" && user.estado === false && (resp = "none");
-    filter === "vetados" && user.estado === true && (resp = "none");
-    return resp;
-  };
-
-  const handleClickEstado = () => {
-    Swal.fire({
-      text: user.estado === false ?"Estás seguro de habilitar este usuario." :'Estás seguro de vetar este usuario.',
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#26a430",
-      cancelButtonColor: "#d33",
-      confirmButtonText: user.estado === false ?"Si, Habilitar !" :'Si, Vetar !',
-      cancelButtonText: "Cancelar",
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        handleApi({ estado: !user.estado })}})
-  }
-
-  return (
-    <Fragment>
-      <TableRow
-        sx={{ "& > *": { borderBottom: "unset" }, display: handleFilter() }}>
-        <TableCell sx={{ p: 0 }}>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell component="th" scope="row">
-          {user.name}
-        </TableCell>
-        <TableCell>
-          <FormControl
-            disabled={user.rol === "ADMIN_ROLE" && true}
-            variant="standard"
-            sx={{
-              minWidth: "80px",
-              "& .css-1ebtsa1-MuiInputBase-root-MuiInput-root:before": {
-                borderBottom: "none",
-              },
-            }}
-          >
-            <NativeSelect
-              sx={{ fontSize: "14px" }}
-              value={permiso}
-              onChange={(e) => {
-                handleApi({ rol: e.target.value }), setPermiso(e.target.value);
-              }}
-              inputProps={{
-                name: "age",
-                id: "uncontrolled-native",
-              }}
-            >
-              <option disabled={true} value={"ADMIN_ROLE"}>
-                ADMIN
-              </option>
-              <option value={"CAFETERIA_ROLE"}>Cafeteria</option>
-              <option value={"TOOLS_ROLE"}>Utileria</option>
-              <option value={"USER_ROLE"}>User</option>
-            </NativeSelect>
-          </FormControl>
-        </TableCell>
-        <TableCell
-          sx={{
-            minHeight: "45.5px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          {user.estado === true ? (
-            <Typography display="flex" alignItems="center" fontSize="14px">
-              ok
-            </Typography>
-          ) : (
-            <Typography display="flex" alignItems="center" fontSize="14px">
-              Vetado
-            </Typography>
-          )}
-          <IconButton
-            disabled={user.rol === "ADMIN_ROLE" && true}
-            onClick={() => handleClickEstado() }
-            sx={{
-              "&:hover": {
-                transition: "all .8s ease-in",
-                backgroundColor: user.estado === true ? "#ff8b8b" : "#c2feb6",
-              },
-            }}
-            size="small"
-            aria-label="Eliminar"
-            color="inherit"
-          >
-            {user.estado === true ? (
-              <CloseOutlinedIcon sx={{ fontSize: "1.2rem" }} />
-            ) : (
-              <DoneOutlinedIcon sx={{ fontSize: "1.2rem" }} />
-            )}
-          </IconButton>
-        </TableCell>
-      </TableRow>
-      <TableRow sx={{ display: handleFilter() }}>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ margin: 0 }}>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ width: "200px" }}>Movil</TableCell>
-                    <TableCell>Email</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <tr>
-                    <TableCell
-                      component="th"
-                      scope="row"
-                      sx={{ display: "flex" }}
-                    >
-                      <TextField
-                        sx={{ width: "100px" }}
-                        inputProps={{ style: { fontSize: "14px" } }}
-                        required
-                        name="movil"
-                        variant="standard"
-                        color="success"
-                        size="small"
-                        value={movil}
-                        onChange={handleChangeMovil}
-                      />
-                      <Button
-                        onClick={() => handleApi({ movil })}
-                        size="small"
-                        aria-label="Eliminar"
-                        color="inherit"
-                        sx={{ p: 0 }}
-                      >
-                        <EditOutlinedIcon sx={{ fontSize: "1.2rem" }} />
-                      </Button>
-                    </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                  </tr>
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </Fragment>
-  );
-};
-
+// eslint-disable-next-line no-unused-vars
 const Search = styled("div")(({ theme }) => ({
   display: "flex",
-  borderRadius: '.6rem',
+  borderRadius: ".6rem",
   border: "1px solid #5bee3f",
   width: "auto",
   ".MuiInputBase-root": {
     width: "100%",
   },
-  marginLeft: '1rem',
+  marginLeft: "1rem",
   "&:hover": {
     transition: "all .5s ease-in",
     backgroundColor: "rgb(200, 255, 177, 25%)",
@@ -252,46 +57,90 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export const Usuarios = () => {
-
   const [filter, setFilter] = useState("");
   const [value, setValue] = useState("");
 
-  const users = useUsers( value );
+  const users = useUsers(value);
 
   const handleChange = (event) => {
     setValue(event.target.value);
   };
 
+  const skeletons = [...Array(8)].fill("");
+
+  const threshold = 300;
+
+
+  const onScroll = () => {
+    let scrollPosition = window.scrollY;
+    let pageHeight = document.body.offsetHeight;
+    let windowHeight = window.innerHeight;
+    let difference = pageHeight - scrollPosition - windowHeight;
+    if (difference < threshold) {
+      ( users.hasNextPage && !users.isFetching ) && ( users.fetchNextPage() ); 
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [users.hasNextPage, users.isFetching]); 
+
   return (
     <>
       <Grid container marginBottom="8px">
-        <Grid item order={{xs:1}} xs={10} sm={4} display="flex" justifyContent="center">
-          <Search
-          >
+        <Grid
+          item
+          order={{ xs: 1 }}
+          xs={10}
+          sm={4}
+          display="flex"
+          justifyContent="center"
+        >
+          <Search>
             <SearchIconWrapper>
-              <IconButton >
+              <IconButton>
                 <SearchIcon />
               </IconButton>
             </SearchIconWrapper>
             <StyledInputBase
-              value={value} 
-              onChange={handleChange} 
+              value={value}
+              onChange={handleChange}
               placeholder="Buscar usuario…"
               inputProps={{ "aria-label": "search" }}
             />
           </Search>
         </Grid>
-        <Grid item order={{xs:2, sm:4}} xs={2} sm={2} display="flex" justifyContent="center">
-            <IconButton onClick={() => setFilter('')} sx={{
+        <Grid
+          item
+          order={{ xs: 2, sm: 4 }}
+          xs={2}
+          sm={2}
+          display="flex"
+          justifyContent="center"
+        >
+          <IconButton
+            onClick={() => setFilter("")}
+            sx={{
               "&:hover": {
                 transition: "all .5s ease-in",
                 backgroundColor: "rgb(200, 255, 177, 25%)",
               },
-            }}>
-              <DensitySmallOutlinedIcon />
-            </IconButton>
-          </Grid>
-        <Grid item order={{xs:3, sm:2}} xs={6} sm={3} display="flex" justifyContent="center">
+            }}
+          >
+            <DensitySmallOutlinedIcon />
+          </IconButton>
+        </Grid>
+        <Grid
+          item
+          order={{ xs: 3, sm: 2 }}
+          xs={6}
+          sm={3}
+          display="flex"
+          justifyContent="center"
+        >
           <Button
             onClick={() => setFilter("activos")}
             size="large"
@@ -315,7 +164,14 @@ export const Usuarios = () => {
             </Typography>
           </Button>
         </Grid>
-        <Grid item order={{xs:4, sm:3}} xs={6} sm={3} display="flex" justifyContent="center">
+        <Grid
+          item
+          order={{ xs: 4, sm: 3 }}
+          xs={6}
+          sm={3}
+          display="flex"
+          justifyContent="center"
+        >
           <Button
             onClick={() => setFilter("vetados")}
             size="large"
@@ -351,10 +207,14 @@ export const Usuarios = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.data &&
-              users.data.users.map((user, i) => (
-                <Row key={i} user={user} filter={filter} users={users}/>
-              ))}
+            {users.isSuccess &&
+              users.data.pages
+                .flat()
+                .map((user, i) => (
+                  <User key={i} user={user} filter={filter} users={users} />
+                ))}
+            {users.isFetching &&
+              skeletons.map((skeleton, i) => <SkeletonUser key={i} />)}
           </TableBody>
         </Table>
       </TableContainer>
