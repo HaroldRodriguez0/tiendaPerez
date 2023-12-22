@@ -13,12 +13,15 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^5.0.8",
+    "@material-ui/icons": "^4.11.3",
     "@mui/icons-material": "^5.14.11",
     "@mui/material": "^5.14.11",
+    "@mui/x-date-pickers": "^6.18.5",
     "@reduxjs/toolkit": "^1.9.6",
     "@tanstack/react-query": "^4.32.0",
     "@tanstack/react-query-devtools": "^4.32.0",
     "axios": "^1.5.1",
+    "dayjs": "^1.11.10",
     "dotenv": "^16.3.1",
     "formik": "^2.4.5",
     "react": "^18.2.0",
@@ -26,6 +29,7 @@
     "react-dropzone": "^14.2.3",
     "react-redux": "^8.1.2",
     "react-router-dom": "^6.16.0",
+    "styled-components": "^6.1.1",
     "sweetalert2": "^11.7.31"
   },
   "devDependencies": {

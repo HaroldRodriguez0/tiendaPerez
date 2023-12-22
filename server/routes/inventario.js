@@ -80,13 +80,11 @@ router.post(
 router.post( "/newInventario/aut", newInventario );
 
 router.put(
-  "/editInventario/:id",
+  "/editInventario",
   [
     // middlewares
     validarJWT,
     tieneRole( "ADMIN_ROLE" ),
-    check('id', 'No es un id de Mongo ').isMongoId(),
-    check('id').custom( inventarioExiste ),
     validarCampo,
   ],
   editInventario

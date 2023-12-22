@@ -69,6 +69,10 @@ const ProductSchema = Schema({
     },
   },
 
+  marked: {
+    type: Boolean,
+  },
+
 });
 
 ProductSchema.methods.toJSON = function () {

@@ -1,6 +1,12 @@
 
+  @import url('https://fonts.googleapis.com/css2?family=Mina:wght@400;700&display=swap');
+
+h1,h2,h3,h4,h5,h6,p,span{
+  font-family: 'Mina', sans-serif !important;
+}
 
 body{
+  font-family: 'Mina', sans-serif !important;
   margin: 0%;
   background-color:#fafff4 !important;
 }
@@ -30,8 +36,17 @@ body{
 }
 
 img {
-  width: 100%;
+  max-width: 100%;
   height: auto;
-  object-fit: cover;
-  object-position: 50% 50%;
+  display: block;
 }
+
+.bg {
+  /* background-color: rgb(196, 228, 179); */
+  background-image: url('../public/logoB.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  opacity: .4;
+}
+

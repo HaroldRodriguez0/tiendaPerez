@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   CircularProgress,
   Container,
   FormControl,
@@ -21,6 +22,7 @@ import PostAddOutlinedIcon from "@mui/icons-material/PostAddOutlined";
 import { useState } from "react";
 import { NewProductoVariable } from "./NewProductoVariable";
 import { useForm } from "../../hooks/useForm";
+
 import Dropzone from "react-dropzone";
 import FlexBetween from "../../../../../../Sociopedia Fullstack/client/src/components/FlexBetween";
 import { api } from "../../api/myApi";
@@ -29,6 +31,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { turnCategoria } from "../../helpers/turnCategoria";
 
 export const NewProducto = () => {
+  const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
   const quueryClient = useQueryClient();
   const [i, seti] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -44,6 +47,11 @@ export const NewProducto = () => {
   const [errorImg, setErrorImg] = useState(false);
   const [checkedImg, setCheckedImg] = useState(false);
   const [checkedImgDesc, setCheckedImgDesc] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  const handleChange = (event) => {
+    setChecked(event.target.checked); 
+  };
 
   const handleCheckedImg = (event) => {
     setCheckedImg(event.target.checked);
@@ -116,6 +124,7 @@ export const NewProducto = () => {
     setCategoria("");
     setModelo("");
     setErrorModelo("");
+    setChecked(false);
   };
 
   const handleSubmite = async (e) => {
@@ -134,6 +143,7 @@ export const NewProducto = () => {
       newProduct.categoria = categoria;
       newProduct.fondoImgProduct = checkedImg;
       newProduct.fondoImgDesc = checkedImgDesc;
+      newProduct.marked = checked;
 
       const formData = new FormData();
       for (let key in newProduct) {
@@ -491,6 +501,7 @@ export const NewProducto = () => {
                       "Enviar"
                     )}
                   </Button>
+                  <Checkbox {...label} checked={checked} onChange={handleChange} color="success" />
                   <Box
                     textAlign="center"
                     display={!loading && "none"}

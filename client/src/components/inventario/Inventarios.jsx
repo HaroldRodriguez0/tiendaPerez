@@ -1,265 +1,239 @@
-import { useEffect, useRef, useState } from "react";
-import EventAvailableOutlinedIcon from "@mui/icons-material/EventAvailableOutlined";
-import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
-import ArrowForwardIosOutlinedIcon from "@mui/icons-material/ArrowForwardIosOutlined";
+import { useEffect, useState } from "react";
 import "../../styles/style.css";
 import { Box, Button, Container, Typography } from "@mui/material";
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { useInventarie } from "../../hooks/useInventarie";
-import { InventarioDay } from "./InventarioDay";
+import { AccordionDay } from "./AccordionDay";
+import { AccordionMonth } from "./AccordionMonth";
+import { AccordionYear } from "./AccordionYear";
 
 export const Inventarios = () => {
-  const daysContainer = useRef(null);
-  const nextBtn = useRef(null);
-  const prevBtn = useRef(null);
-  const month = useRef(null);
-  const todayBtn = useRef(null);
-  const months = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ];
-  const date = new Date();
-  let currentMonth = date.getMonth();
-  let currentYear = date.getFullYear();
-  const [markedMonth, setMonth] = useState(currentMonth);
-  const [markedYear, setYear] = useState(currentYear);
-  const [markedToday, setToday] = useState();
-  const [markedDay, setDay] = useState([]);
+  dayjs.locale("es");
   const [days, setDays] = useState([]);
-  const [cont, setcont] = useState(0);
+  const [value, setValue] = useState(dayjs());
+  const [day, setDay] = useState(value.date());
+  const [month, setMonth] = useState(value.month());
+  const [markedDay, setMmarkedDay] = useState([value.date()]);
+  const inventarie = useInventarie(value.year(), month, day);
+  const [showMonth, setShowMonth] = useState(true);
+  const [showYear, setShowYear] = useState(true);
+  const [totalMonth, setTotalMonth] = useState(0);
+  const [dataByMonth, setDataByMonth] = useState({});
 
-  const addClickEvent = () => {
-    const days = document.querySelectorAll(".day");
-    days.forEach((day) => {
-      if (!day.classList.contains("prev") && !day.classList.contains("next")) {
-        day.addEventListener("click", () => {
-          //console.log(markedDay)
-          //setDay([...markedDay ,day.textContent]);
-
-          day.classList.toggle("today");
-          days.forEach((other) => {
-            if (other !== day) {
-              other.classList.remove("day.today");
-            }
-          });
-          const dayNumber = parseInt(day.textContent);
-          setToday(dayNumber);
-          setDay((prevState) => {
-            // Comprueba si el día ya está en el arreglo
-            if (prevState.includes(dayNumber)) {
-               setcont((cont) => cont + 1);
-              // Si está, lo quita del arreglo usando el método filter
-              return prevState.filter((d) => d !== dayNumber);
-            } else {
-              // Si no está, lo agrega al arreglo usando el operador spread
-              return [...prevState, dayNumber];
-            }
-          });
-          
-        });
-      }
-    });
+  const handleOnChangeDay = (newValue) => {
+    setShowMonth(true);
+    setShowYear(true);
+    setValue(newValue);
+    markedDay.find((d) => d === newValue.date())
+      ? setMmarkedDay(markedDay.filter((d) => d !== newValue.date()))
+      : setMmarkedDay([...markedDay, newValue.date()]);
   };
 
-  function renderCalendar() {
-    date.setDate(1);
-    const firstDay = new Date(currentYear, currentMonth, 1);
-    const lastDay = new Date(currentYear, currentMonth + 1, 0);
-    const lastDayIndex = lastDay.getDay();
-    const lastDayDate = lastDay.getDate();
-    const prevLastDay = new Date(currentYear, currentMonth, 0);
-    const prevLastDayDate = prevLastDay.getDate();
-    const nextDays = 7 - lastDayIndex - 1;
-    month.current.innerHTML = `${months[currentMonth]} ${currentYear}`;
-    let days = "";
-    for (let x = firstDay.getDay(); x > 0; x--) {
-      days += `<div class="day prev">${prevLastDayDate - x + 1}</div>`;
-    }
-    for (let i = 1; i <= lastDayDate; i++) {
-      if (
-        i === new Date().getDate() &&
-        currentMonth === new Date().getMonth() &&
-        currentYear === new Date().getFullYear()
-      ) {
-        days += `<div class="day today">${i}</div>`;
-      } else {
-        days += `<div class="day ">${i}</div>`;
+  const handleOnChangeMonth = (month) => {
+    setShowMonth(true);
+    setShowYear(true);
+    setValue(month);
+    setDays([]);
+    setMmarkedDay([]);
+  };
+
+  const handleClickMonth = () => {
+    setDay();
+    setShowMonth(false);
+    setDays([]);
+    setMmarkedDay([]);
+  };
+
+  const handleClickYear = () => {
+    setShowMonth(true);
+    setShowYear(false);
+    setMonth();
+    setDay();
+    setDays([]);
+    setMmarkedDay([]);
+  };
+
+  const calcularTotal = (data) => {
+    if (!showMonth || !showYear)
+      return data.reduce((acum, inv) => {
+        const total = inv.products.reduce(
+          (acum, item) => acum + item.precio * item.cantidad,
+          0
+        );
+        return acum + total;
+      }, 0);
+  };
+
+  const  handleDataByMonth = () => {
+    if (!showYear){
+    const dataByMonth = inventarie.data.reduce((acc, inv) => {
+      // Obtener el mes del inventario
+      const month = new Date(Date.parse(inv.date)).getUTCMonth();
+      // Si el mes no existe en el objeto, crear un arreglo vacío
+      if (!acc[month]) {
+        acc[month] = [];
       }
-    }
-    for (let j = 1; j <= nextDays; j++) {
-      days += `<div class="day next">${j}</div>`;
-    }
-    hideTodayBtn();
-    daysContainer.current.innerHTML = days;
-
-    if (document.querySelector(".day.today")?.textContent) {
-      setDay([
-        ...markedDay,
-        parseInt(document.querySelector(".day.today")?.textContent),
-      ]);
-      setToday(parseInt(document.querySelector(".day.today")?.textContent));
-      //setcont(cont + 1);
-    } else {
-      setToday();
-      setDay([]);
-      setDays([]);
-      //setcont(cont + 1);
-    }
-
-    addClickEvent();
+      // Agregar el inventario al arreglo correspondiente al mes
+      acc[month].push(inv);
+      // Devolver el objeto acumulado
+      return acc;
+    }, {});
+    // Actualizar el estado con el nuevo objeto
+    setDataByMonth(dataByMonth);
   }
+};
 
   useEffect(() => {
-    renderCalendar();
-    nextBtn.current.addEventListener("click", () => {
-      currentMonth++;
-      if (currentMonth > 11) {
-        currentMonth = 0;
-        currentYear++;
-      }
-      renderCalendar();
-      setMonth(currentMonth);
-      setYear(currentYear);
-    });
-    prevBtn.current.addEventListener("click", () => {
-      currentMonth--;
-      if (currentMonth < 0) {
-        currentMonth = 11;
-        currentYear--;
-      }
-      renderCalendar();
-      setMonth(currentMonth);
-      setYear(currentYear);
-    });
-    todayBtn.current.addEventListener("click", () => {
-      currentMonth = date.getMonth();
-      currentYear = date.getFullYear();
-      renderCalendar();
-      setMonth(currentMonth);
-      setYear(currentYear);
-    });
-  }, [currentMonth]);
-
-  function hideTodayBtn() {
-    if (
-      currentMonth === new Date().getMonth() &&
-      currentYear === new Date().getFullYear()
-    ) {
-      todayBtn.current.style.display = "none";
-    } else {
-      todayBtn.current.style.display = "flex";
-    }
-  }
-
-  const handleClick = (inv) => {
-    console.log(inv)
-  }
-
-  const inventarie = useInventarie(markedYear, markedMonth, markedToday);
+    setDay(value.date());
+    setMonth(value.month());
+  }, [value]);
 
   useEffect(() => {
-    
-    if (markedToday) {
-      if (markedDay.length > days.length ) {
-        setDays([...days,{ d: markedToday, inventarie: inventarie.data?.products }]);
+    if (value) {
+      if (markedDay.length > days.length) {
+        setDays([
+          ...days,
+          { d: value.date(), inventarie: inventarie.data?.products },
+        ]);
       } else {
-        if(markedDay.length === days.length){
+        if (markedDay.length === days.length) {
           const d = days;
-          d[days.length-1] = { d: markedToday, inventarie: inventarie.data?.products }
+          d[days.length - 1] = {
+            d: value.date(),
+            inventarie: inventarie.data?.products,
+          };
           setDays(d);
-        }
-        else{
+        } else {
           setDays(days.filter((obj) => markedDay.some((num) => num === obj.d)));
         }
-        
       }
     }
-  }, [cont, inventarie.data]);
+
+    if (inventarie.isSuccess) {
+      setTotalMonth(calcularTotal(inventarie.data));
+      handleDataByMonth();
+    }
+
+  }, [inventarie.data, markedDay]);
+
+  let dataByMonthArray = Object.entries(dataByMonth);
 
   return (
     <Container>
       <Box
         sx={{
           display: "flex",
-          flexDirection: { xs: "column", lg: "row" },
+          flexDirection: { xs: "column", md: "row" },
           justifyContent: "space-around",
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "center" }}>
-          <div className="calendar">
-            <div className="header">
-              <div className="month" ref={month}></div>
-              <div className="btns">
-                <div className="btn today-btn" ref={todayBtn}>
-                  <EventAvailableOutlinedIcon />
-                </div>
-                <div className="btn prev-btn" ref={prevBtn}>
-                  <ArrowBackIosNewOutlinedIcon />
-                </div>
-                <div className="btn next-btn" ref={nextBtn}>
-                  <ArrowForwardIosOutlinedIcon />
-                </div>
-              </div>
-            </div>
-            <div className="weekdays">
-              <div className="day">Dom</div>
-              <div className="day">Lun</div>
-              <div className="day">Mar</div>
-              <div className="day">Mie</div>
-              <div className="day">Jue</div>
-              <div className="day">Vie</div>
-              <div className="day">Sab</div>
-            </div>
-            <div className="days " ref={daysContainer}></div>
-          </div>
+          <LocalizationProvider dateAdapter={AdapterDayjs} locale="es">
+            <DateCalendar
+              sx={{ maxHeight: "none", m: 0 }}
+              value={value}
+              onChange={(newValue) => handleOnChangeDay(newValue)}
+              onMonthChange={(month) => handleOnChangeMonth(month)}
+              onYearChange={(year) => handleOnChangeMonth(year)}
+              slotProps={{
+                day: (day) => ({
+                  className: markedDay.find((d) => d === day.day.date())
+                    ? "selected"
+                    : "",
+                  sx: {
+                    fontSize: "1rem",
+                    "&.selected": {
+                      backgroundColor: "#2fca3c !important",
+                      color: "white !important",
+                      fontWeight: "600 !important",
+                    },
+                    "&.Mui-selected": {
+                      backgroundColor: "transparent",
+                    },
+                    "&.Mui-selected:focus": {
+                      backgroundColor: "transparent",
+                      fontWeight: 400,
+                    },
+                  },
+                }),
+              }}
+            />
+          </LocalizationProvider>
         </Box>
-
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "row", lg: "column" },
+            flexDirection: { xs: "row", md: "column" },
             justifyContent: "center",
             my: 2,
           }}
         >
           <Button
+            onClick={handleClickYear}
             size="large"
             variant="outlined"
             color="success"
-            sx={{ mx: 0.5, my: { lg: 8 } }}
+            sx={{ mx: 0.5, my: { md: 5 } }}
           >
             Mostrar Ventas del Año
           </Button>
           <Button
+            onClick={handleClickMonth}
             size="large"
             variant="outlined"
             color="success"
-            sx={{ mx: 0.5, my: { lg: 8 } }}
+            sx={{ mx: 0.5, my: { md: 5 } }}
           >
             Mostrar Ventas del Mes
           </Button>
         </Box>
       </Box>
-      {days.map((inv, i) => {
-        const total = inv.inventarie?.reduce((acum, item) => acum + item.precio * item.cantidad, 0);
-        return (
-        <Box key={i}>
-          <Button onClick={() => handleClick(inv.inventarie)} size="large" variant="outlined" color="success" sx={{width:'100%', mb: 2, justifyContent: 'space-between'}}>
-            <Typography>Dia {inv.d}</Typography> 
-            <Typography textTransform='none'>Importe de Venta: { total ? total :' -------' }</Typography>  
-          </Button>
-          <InventarioDay inventario={inv.inventarie} />
+      <Box sx={{ mt: { md: 2 } }}>
+        {days.map((inv, i) => {
+          const total = inv.inventarie?.reduce(
+            (acum, item) => acum + item.precio * item.cantidad,
+            0
+          );
+          return <AccordionDay key={i} total={total} inv={inv} />;
+        })}
+
+        <Box display={showMonth && "none"}>
+          <Typography textAlign="center" fontSize="1.4rem">
+            Importe de venta del Mes <b>{totalMonth}</b>
+          </Typography>
+          {!showMonth &&
+            inventarie.isSuccess &&
+            inventarie.data.map((inv, i) => {
+              const total = inv.products.reduce(
+                (acum, item) => acum + item.precio * item.cantidad,
+                0
+              );
+              return (
+                <AccordionMonth
+                  key={i}
+                  total={total}
+                  date={inv.date}
+                  pro={inv.products}
+                />
+              );
+            })}
         </Box>
-      )})}
+
+        <Box display={showYear && "none"}>
+          <Typography textAlign="center" fontSize="1.4rem">
+            Importe de venta del Año <b>{totalMonth}</b>
+          </Typography>
+          {!showYear &&
+            inventarie.isSuccess &&
+            dataByMonthArray.map(([month, inventories], i) => {
+              return <AccordionYear key={i} inv={inventories} month={month} />;
+            })}
+        </Box>
+      </Box>
     </Container>
   );
 };

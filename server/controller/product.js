@@ -28,6 +28,7 @@ const newProduct = async (req, res = response) => {
       fondoImgProduct,
       fondoImgDesc,
       desc,
+      marked
     } = req.body;
 
     const numero = numeroReq && JSON.parse(numeroReq);
@@ -45,6 +46,7 @@ const newProduct = async (req, res = response) => {
       color,
       tipo,
       desc,
+      marked
     });
 
     const file = req.files.picture[0].path;
@@ -65,7 +67,6 @@ const newProduct = async (req, res = response) => {
     // Guardar en DB
     product.img = pathFile;
     product.imgDesc = pathFileDesc;
-    console.log(product)
     await product.save();
 
     res.status(201).json({
@@ -322,6 +323,23 @@ const getProductAgotado = async (req, res = response) => {
   }
 };
 
+const getProductMarked = async (req, res = response) => {
+  try {
+
+    const product = await Product.find({ marked: true })
+
+    res.status(200).json(
+      product
+    );
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
 const getProductName = async (req, res = response) => {
   try {
     const { name } = req.params;
@@ -357,5 +375,6 @@ export {
   getProductUtiles,
   getProductCafeteria,
   getProductCalzado,
+  getProductMarked,
   getProductAgotado
 };

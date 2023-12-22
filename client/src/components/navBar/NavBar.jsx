@@ -150,7 +150,7 @@ export const NavBar = () => {
             <CalculateOutlinedIcon />
           </Badge>
         </IconButton>
-        <p>Venta</p>
+        <p>Calcular</p>
       </MenuItem>
       <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }} onClick={() =>{ navigate("/inventario/diario"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
@@ -200,7 +200,7 @@ export const NavBar = () => {
   return (
     <Box
       sx={{
-        marginBottom: 10,
+        marginBottom: 8.5,
         flexGrow: 1,
         "& .css-1aschtf:hover": { backgroundColor: "rgb(200 255 177 / 25%)" },
         "& .css-1oqqzyl-MuiContainer-root": { padding: 0 },

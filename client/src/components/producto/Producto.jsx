@@ -8,6 +8,7 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  Skeleton,
   TextField,
   Tooltip,
   Typography,
@@ -30,6 +31,7 @@ import { stockNow } from "../../reducer/stockReducer";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { turnCategoria } from "../../helpers/turnCategoria";
+import Image from "../Image";
 
 // eslint-disable-next-line react/prop-types
 export const Producto = (data) => {
@@ -191,9 +193,8 @@ export const Producto = (data) => {
           }}
         >
           <Box overflow={"hidden"}>
-            <CardMedia
-              component="img"
-              sx={{
+            <CardMedia>
+              <Image sx={{
                 transition: "1s",
                 "&:hover": {
                   transform: "scale(1.12)",
@@ -203,9 +204,12 @@ export const Producto = (data) => {
               }}
               width="100%"
               height="auto"
-              image={img}
-              alt="green iguana"
-            />
+              alt="produucts"
+              src={ img }
+      />
+              </CardMedia>
+            
+            
           </Box>
           <CardContent sx={{ p: "7px 5px 0 5px" }}>
             <Typography
@@ -213,7 +217,7 @@ export const Producto = (data) => {
               lineHeight="1.2"
               fontWeight="400"
               sx={{
-                pb: { xs: name.length < 17 && "1rem" },
+                pb: { xs: name.length < 20 && "1rem" },
                 fontSize: { xs: "1rem", sm: "1.2rem" },
               }}
             >

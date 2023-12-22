@@ -19,6 +19,7 @@ const InventarioSchema = Schema({
       name: { type: String, required: [true ,  "el name es obligatorio"] },
       cantidad: { type: Number, required: [true ,  "la cantidad es obligatorio"], min: 0 },
       precio: { type: Number, required: [true, "el precio es obligatorio"], min: 0 },
+      categoria: { type: String, required: [true ,  "La categoria es obligatoria"] },
       modelo: { type: String },
       numero: { type: String },
       color: { type: String },

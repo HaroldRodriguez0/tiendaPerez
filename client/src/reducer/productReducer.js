@@ -15,7 +15,8 @@ const initialState = {
   color: "",
   tipo: "",
   show: "",
-  search: ""
+  search: "",
+  marked:"",
 };
 
 export const productSlice = createSlice({
@@ -38,6 +39,7 @@ export const productSlice = createSlice({
         numero,
         color,
         tipo,
+        marked,
       } = action.payload;
       state.uid = _id;
       state.name = name;
@@ -52,6 +54,7 @@ export const productSlice = createSlice({
       state.imgDesc = imgDesc;
       state.color = color;
       state.tipo = tipo;
+      state.marked = marked
     },
 
     productDescShow: (state, action) => {

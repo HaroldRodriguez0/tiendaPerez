@@ -131,6 +131,7 @@ const editNewCopie = async (req, res = response) => {
                 "elem.precio": precio,
                 "elem.name": name,
                 "elem.modelo": modelo,
+                "elem.categoria": categoria,
                 [`elem.${tipoProd}`]: valor
               }
             ]
@@ -170,6 +171,7 @@ const editNewCopie = async (req, res = response) => {
               {
                 "elem.precio": precio,
                 "elem.name": name,
+                "elem.categoria": categoria,
               }
             ]
           }
@@ -217,7 +219,7 @@ const editCopieInventario = async (req, res = response) => {
 
       // se guarda el producto a editar con todas sus propiedades para hacer las respectivas modificaciones
       const lastProduct = modelo ?? false ? await Product.find({ name, modelo }) : await Product.find({ name });
-      console.log(cantidadTienda, cantidad, lastProduct[0].cantTienda, cantinventario, )
+      
 
       if (lastProduct) {
 
@@ -284,7 +286,6 @@ const editCopieInventario = async (req, res = response) => {
 
 const getCopieInventario = async (req, res = response) => {
   try {
-
     const copieInventario = await CopieInventario.aggregate([
       {
         $project: {
@@ -353,36 +354,11 @@ const newInventario = async (req, res = response) => {
 
 const editInventario = async (req, res = response) => {
   try {
-    let tipoProd , valor , update;
 
-    const { index, name, cantidad, precio, modelo, numero, color, tipo } = req.body;
-    //const { id, products } = await Inventario.findById(req.params.id);
-    // Validar que el id exista
+    const { id, index, cantidad, } = req.body;
 
-    if( modelo ){
-      numero && ( tipoProd = 'numero', valor = numero );
-      color && ( tipoProd = 'color', valor = color );
-      tipo && ( tipoProd = 'tipo', valor = tipo );
-
-      update = { $set: { 
-        [`products.${index}.name`]: name, 
-        [`products.${index}.cantidad`]: cantidad, 
-        [`products.${index}.precio`]:  precio, 
-        [`products.${index}.modelo`]: modelo, 
-        [`products.${index}.${tipoProd}`]: valor
-       } 
-      };
-    }
-    else{
-      update = { $set: { 
-        [`products.${index}.name`]: name, 
-        [`products.${index}.cantidad`]: cantidad, 
-        [`products.${index}.precio`]:  precio, 
-       } 
-      };
-    }
-    
-    await Inventario.updateOne( { _id: req.params.id } , update );
+    await Inventario.updateOne({products: {$elemMatch: { _id: id }}}, { $set: { 
+      [`products.${index}.cantidad`]: cantidad, } })
 
     return res.status(200).json({
       msg: "Inventario actualizado con exito",
@@ -404,17 +380,21 @@ const getInventario = async (req, res = response) => {
     const { year, month, day } = req.query;
 
     if(day){
+      const startDate = new Date(year, month, day, 0, 0, 0, 0)
+      const endDate = new Date(year, month, day + 1, 0, 0, 0, 0);
+      //inventario = await Inventario.find({ date: { $gt: startDate, $lt: endDate } });
       inventario = await Inventario.findOne({ date: new Date(year, month, day) });
     }
     else if(month){
-      const startDate = new Date(year, month, 1);
-      const endDate = month === 11 ?new Date(year + 1, 0, 1) :new Date(year, month + 1, 0);
-      inventario = await Inventario.find({ date: { $gte: startDate, $lt: endDate } });
+      const startDate = new Date(year, month, 1, 0, 0, 0, 0);
+      const endDate = new Date(year, month, 31);
+      inventario = await Inventario.find({ date: { $gte: startDate, $lte: endDate } }); 
+           
     }
     else if(year){
-      const startDate = new Date(Date.UTC(year, 0, 1));
-      const endDate = new Date(Date.UTC(year + 1, 0, 1));
-      inventario = await Inventario.find({ date: { $gte: startDate, $lt: endDate } });
+      const startDate = new Date(Date.UTC(year, 0, 1, 0, 0, 0, 0));
+      const endDate = new Date(Date.UTC(year, 12, 31));
+      inventario = await Inventario.find({ date: { $gte: startDate, $lte: endDate } });
     }
 
     return res.status(200).json(

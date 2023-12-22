@@ -10,7 +10,7 @@ export const Productos = ({products}) => {
   const skeletons = [...Array(8)].fill('');
 
   return (
-    <Box flexGrow={1} my={5}>
+    <Box flexGrow={1} >
     <Grid container spacing={{ xs: 1, sm: 2 }}>
       {products.data?.pages.flat().map(
         (product, i) => (

@@ -16,7 +16,7 @@ const upload = multer({
   storage, useTempFiles: true, tempFileDir: '/tmp/', 
   fileFilter: function (req, file, cb) {
     // Comprobar si el tipo MIME del archivo coincide con jpg o png
-    if (!file.mimetype.match(/\/(jpeg|png)$/)) {
+    if (!file.mimetype.match(/\/(jpeg|png|webp)$/)) {
       // Rechazar el archivo
       cb(null , false);
     } else {

@@ -33,7 +33,6 @@ export const AppRouter = () => {
   return (
     <BrowserRouter>
       <NavBar />
-      <Container>
         <Routes>
           <Route
             path="/login"
@@ -43,7 +42,6 @@ export const AppRouter = () => {
               </PublicRouter>
             }
           />
-
           <Route path="/product/*" >
             <Route path="new" element={<NewProducto />} />
             <Route path="edit" element={<EditProducto />} />
@@ -64,7 +62,6 @@ export const AppRouter = () => {
         <ProductoDesc />
         <Venta />
 
-      </Container>
     </BrowserRouter>
   );
 };

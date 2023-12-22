@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   CardContent,
+  Checkbox,
   CircularProgress,
   Container,
   FormControl,
@@ -33,6 +34,7 @@ import { turnCategoria } from "../../helpers/turnCategoria";
 
 export const EditProducto = () => {
 
+  const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
   const navigate = useNavigate();
   const quueryClient = useQueryClient();
   const { numero, color, tipo, ...data } = useSelector((state) => state.product);
@@ -66,6 +68,7 @@ export const EditProducto = () => {
     (tipoModeloAlmacen = tipoModeloAlmacen.map((value) => value.almacen)),
     (length = tipoModelokeys.length - 1));
 
+  const [checked, setChecked] = useState(data.marked ?data.marked :false);
   const [i, seti] = useState(length);
   const [loading, setLoading] = useState(false);
   const [categoria, setCategoria] = useState(data.categoria);
@@ -83,6 +86,10 @@ export const EditProducto = () => {
   const [checkedImg, setCheckedImg] = useState(false);
   const [checkedImgDesc, setCheckedImgDesc] = useState(false);
   const [imgarr, setImgarr] = useState([]);
+
+  const handleChange = (event) => {
+    setChecked(event.target.checked); 
+  };
 
   const handleCheckedImg = (event) => {
     setCheckedImg(event.target.checked);
@@ -165,6 +172,7 @@ export const EditProducto = () => {
       newProduct.fondoImgProduct = checkedImg;
       newProduct.fondoImgDesc = checkedImgDesc;
       newProduct.imgarr = imgarr;
+      newProduct.marked = checked;
 
       const formData = new FormData();
       for (let key in newProduct) {
@@ -550,6 +558,7 @@ export const EditProducto = () => {
                       "Enviar"
                     )}
                   </Button>
+                  <Checkbox {...label} checked={checked} onChange={handleChange} color="success" />
                   <Box
                     textAlign="center"
                     display={!loading && "none"}

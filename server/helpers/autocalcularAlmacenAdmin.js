@@ -56,7 +56,6 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
               `En estos momentos no puede realizar estos cambios`
             );
           } else if (productEncontrado) {
-            console.log(1);
             await CopieInventario.updateOne(
               { _id: id },
               { $inc: { "products.$[elem].cantidadTienda": diferencia } },
@@ -95,7 +94,6 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
     });
 
     dataValor.forEach(async function (valor, clave) {
-      console.log(valor.almacen + "  " + valor.tienda);
       cantidadTienda += valor.tienda;
       cantidadAlmacen += valor.almacen;
     });
@@ -107,7 +105,6 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
   switch (cont) {
     case 1:
       data.numero = dataValor;
-      console.log(data);
       break;
     case 2:
       data.color = dataValor;

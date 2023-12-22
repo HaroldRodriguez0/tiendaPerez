@@ -5,6 +5,7 @@ import PersonRemoveOutlinedIcon from "@mui/icons-material/PersonRemoveOutlined";
 import PersonAddAltOutlinedIcon from "@mui/icons-material/PersonAddAltOutlined";
 import {
   Button,
+  Container,
   Grid,
   IconButton,
   InputBase,
@@ -89,7 +90,7 @@ export const Usuarios = () => {
   }, [users.hasNextPage, users.isFetching]); 
 
   return (
-    <>
+    <Container sx={{pt:2}}>
       <Grid container marginBottom="8px">
         <Grid
           item
@@ -218,6 +219,6 @@ export const Usuarios = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </>
+    </Container>
   );
 };

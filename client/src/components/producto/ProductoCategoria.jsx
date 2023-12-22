@@ -1,4 +1,5 @@
 
+import { Container } from "@mui/material";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useProduts } from "../../hooks/useProduts";
@@ -43,10 +44,10 @@ export const ProductoCategoria = () => {
 
 
   return (
-    <>
+    <Container sx={{pt:3}}>
       <Productos products={products} />
 
       <Outlet />
-    </>
+    </Container>
   ); 
 };

@@ -13,6 +13,7 @@ import {
   getProductAgotado,
   getProductCafeteria,
   getProductCalzado,
+  getProductMarked,
   getProductName,
   getProductUtiles,
   newProduct,
@@ -106,6 +107,8 @@ router.get("/cafeteria", getProductCafeteria);
 router.get("/calzado", getProductCalzado);
 
 router.get("/agotado", getProductAgotado);
+
+router.get("/marked", getProductMarked);
 
 router.get("/:name", getProductName);
 

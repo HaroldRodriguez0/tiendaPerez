@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
 import {
   Box,
+  IconButton,
   Paper,
   Table,
   TableBody,
@@ -12,16 +13,18 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { Fragment, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   inventarieEdite,
   inventarieNew,
 } from "../../reducer/inventarieReducer";
+import Swal from "sweetalert2";
+import { api } from "../../api/myApi.js";
 
 
-const Row = ({ product, index }) => {
-  console.log(product)
+const Row =  ({ product, index, id }) => {
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.inventarie);
   let value;
@@ -34,6 +37,23 @@ const Row = ({ product, index }) => {
   const handleChange = (event) => {
     setNumber(event.target.value);
   };
+
+  const handleClickEdit = async () => {
+    await api
+      .put(`/inventario/editInventario`, {id, index, cantidad: number}, {
+        headers: {
+          "x-token": localStorage.getItem("token"),
+        },
+      })
+      .then(({ data }) => {
+        Swal.fire("", data.msg, "success");
+
+      })
+      .catch(({ response }) => {
+        console.log(response);
+        Swal.fire("", response.data.msg, "error");
+      });
+  }
 
   useEffect(() => {
     setNumber(cantidad);
@@ -71,6 +91,11 @@ const Row = ({ product, index }) => {
           />
         </TableCell>
         <TableCell align="center">{precio}</TableCell>
+        <TableCell align="right">
+          <IconButton sx={{p:0}} onClick={ handleClickEdit }>
+            <EditOutlinedIcon sx={{ fontSize: "1.2rem" }} />
+          </IconButton>
+        </TableCell>
       </TableRow>
     </Fragment>
   );
@@ -79,29 +104,24 @@ const Row = ({ product, index }) => {
 // eslint-disable-next-line no-unused-vars
 export const InventarioDay = ({inventario}) => {
 
-  console.log(inventario)
+  
 
-  let total = 0,
-    totalUti = 0,
-    totalCaf = 0;
+    let totalUti = 0, totalCaf = 0;
+    
+    if(inventario)
+    for (const i of inventario) {
+      i.categoria === "CAFETERIA" && (totalCaf += i.precio * i.cantidad);
+      (i.categoria === "UTILES" || i.categoria === "CALZADO") &&
+        (totalUti += i.precio * i.cantidad);
+    }
 
   const isMobile = useMediaQuery("(max-width:500px)");
 
   return (
-    <Box sx={{ display: !inventario && 'none', mx: { md: 20 } }}>
-
-      <Typography
-        textAlign="center"
-        py={1}
-        fontSize="1.2rem"
-      >
-        Importe Total: <b>{total}</b>
-      </Typography>
-
+    <Box sx={{ display: !inventario && 'none', mx: { md: 20 }, mb:3 }}>
       <Box >
         <Typography
           textAlign="center"
-          pt={1}
         >
           Importe Cafeteria: <b>{totalCaf}</b>
         </Typography>
@@ -116,6 +136,7 @@ export const InventarioDay = ({inventario}) => {
                   {isMobile ? "Cant" : "Cantidad"}
                 </TableCell>
                 <TableCell align="center">Precio</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -123,7 +144,7 @@ export const InventarioDay = ({inventario}) => {
                 inventario.map(
                   (product, i) =>
                     product.categoria === "CAFETERIA" && (
-                      <Row key={i} product={product} index={i} />
+                      <Row id={product._id} key={i} product={product} index={i} />
                     )
                 )}
             </TableBody>
@@ -146,6 +167,7 @@ export const InventarioDay = ({inventario}) => {
                   {isMobile ? "Cant" : "Cantidad"}
                 </TableCell>
                 <TableCell align="center">Precio</TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -154,7 +176,7 @@ export const InventarioDay = ({inventario}) => {
                   (product, i) =>
                     (product.categoria === "UTILES" ||
                       product.categoria === "CALZADO") && (
-                      <Row key={i} product={product} index={i} />
+                      <Row id={product._id} key={i} product={product} index={i} />
                     )
                 )}
             </TableBody>
