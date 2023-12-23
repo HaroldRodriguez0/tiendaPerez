@@ -113,7 +113,7 @@ export const LoginScreen = () => {
   };
 
   return (
-    <Container maxWidth={"md"}>
+    <Container maxWidth={"md"} sx={{mt:10}}>
       <Grid
         sx={{
           mt: 5,
@@ -232,7 +232,7 @@ export const LoginScreen = () => {
                     setfirst(!login);
                   }}
                   sx={{
-                    fontSize: { xs: ".8rem", md: "1rem" },
+                    fontSize: { xs: "1rem", md: "1.2rem" },
                     mt: 3,
                     textDecoration: "underline",
                     color: "#26a430",
@@ -243,8 +243,8 @@ export const LoginScreen = () => {
                   }}
                 >
                   {login
-                    ? "¿No tienes una cuenta? Regístrate aquí."
-                    : "Ya tiene una cuenta? Inicie Sesión aquí."}
+                    ? "Regístrate aquí."
+                    : "Inicie Sesión aquí."}
                 </Typography>
               </form>
             </CardContent>

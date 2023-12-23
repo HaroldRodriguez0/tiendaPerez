@@ -2,7 +2,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { HomeScreen } from "../components/HomeScreen";
 import { Verification } from "./Verification";
 import { NavBar } from "../components/navBar/NavBar";
-import { Container } from "@mui/system";
 import { LoginScreen } from "../components/login&register/LoginScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
@@ -17,6 +16,8 @@ import { Venta } from "../components/inventario/Venta";
 import { ProductoCategoria } from "../components/producto/ProductoCategoria";
 import { InventarioDiario } from "../components/inventario/InventarioDiario";
 import { Inventarios } from "../components/inventario/Inventarios";
+import { Whatsapp } from "../components/Whatsapp";
+import { Foother } from "../components/foother/Foother";
 
 export const AppRouter = () => {
   const dispatch = useDispatch();
@@ -32,6 +33,7 @@ export const AppRouter = () => {
 
   return (
     <BrowserRouter>
+      <Whatsapp />
       <NavBar />
         <Routes>
           <Route
@@ -61,6 +63,7 @@ export const AppRouter = () => {
 
         <ProductoDesc />
         <Venta />
+        <Foother />
 
     </BrowserRouter>
   );

@@ -1,17 +1,17 @@
-
-import { Container } from "@mui/material";
+import { Container, Typography } from "@mui/material";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useProduts } from "../../hooks/useProduts";
 import { Productos } from "./Productos";
 
-
 export const ProductoCategoria = () => {
   let variable;
   const { categoria, value } = useParams();
-  
-  categoria ?variable = categoria :variable = value;
-  
+
+  console.log(categoria)
+
+  categoria ? (variable = categoria) : (variable = value);
+
   const products = useProduts(variable);
 
   const threshold = 300;
@@ -28,9 +28,9 @@ export const ProductoCategoria = () => {
     let difference = pageHeight - scrollPosition - windowHeight;
     // Si la diferencia es menor que el umbral, mostrar un mensaje
     if (difference < threshold) {
-      ( products.hasNextPage && !products.isFetching ) && ( products.fetchNextPage() ); 
+      products.hasNextPage && !products.isFetching && products.fetchNextPage();
     }
-  }
+  };
 
   // Efecto para agregar y remover el listener del evento scroll
   useEffect(() => {
@@ -40,14 +40,39 @@ export const ProductoCategoria = () => {
     return () => {
       window.removeEventListener("scroll", onScroll);
     };
-  }, [products.hasNextPage, products.isFetching]); 
-
+  }, [products.hasNextPage, products.isFetching]);
 
   return (
-    <Container sx={{pt:3}}>
+    <Container sx={{ pt: 3 }}>
+      <Typography
+        variant="h2"
+        sx={{
+          fontSize: {
+            xs: "2rem",
+            sm: "2.2rem",
+            md: "2.4rem",
+            lg: "2.7rem",
+            xl: "3rem",
+          },
+          mb: 1,
+          textAlign: "center",
+          color: "green",
+        }}
+      >
+        { 
+          categoria === 'cafeteria' 
+            ? 'Productos Cafeteía'
+            : categoria === 'utiles' 
+              ? 'Productos Utileía'
+              : categoria === 'calzado'
+                ? 'Productos Calzado'
+                : 'Productos Buscados'
+        }
+      </Typography>
+
       <Productos products={products} />
 
       <Outlet />
     </Container>
-  ); 
+  );
 };

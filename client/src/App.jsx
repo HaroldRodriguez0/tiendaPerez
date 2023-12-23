@@ -1,5 +1,4 @@
-import { ThemeProvider } from "@emotion/react";
-import { createTheme } from "@mui/material";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { Provider } from "react-redux";
 import { AppRouter } from "./routes/AppRouter";
 import { store } from "./store/store";

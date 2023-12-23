@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "../../styles/style.css";
 import { Box, Button, Container, Typography } from "@mui/material";
 import dayjs from "dayjs";
 import "dayjs/locale/es";

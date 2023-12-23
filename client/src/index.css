@@ -41,12 +41,67 @@ img {
   display: block;
 }
 
-.bg {
-  /* background-color: rgb(196, 228, 179); */
-  background-image: url('../public/logoB.png');
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  opacity: .4;
+.map {
+  max-width: 100%;
+  min-height: 30vh;
+  height: auto;
+  display: block;
 }
 
+.whatsapp{
+  z-index: 2000;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  cursor: pointer;
+  transition: all .7s ease-in-out;
+  animation-name: pulse;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+}
+
+.svgWhatsapp{
+  width: 40px;
+  height: auto;
+  fill: greenyellow;
+}
+
+.enlace {
+  text-decoration: none;
+  color: #008000;
+  font-size: 1.2rem;
+}
+
+.svg{
+  cursor: pointer;
+  color: #008000;
+  width: 25px;
+  height: auto;
+}
+
+.svg:hover{
+  color: #76e447;
+  transition: all .5s ease-in-out;
+}
+
+.contributors {
+  text-decoration: none;
+  font-size: .7rem;
+  color: black;
+}
+
+@media (min-width: 600px) { 
+  
+  .map {
+    min-height: 40vh;
+  }
+
+ }
+
+@media (min-width: 1200px) { 
+  
+  .enlace {
+    font-size: 1.4rem;
+  }
+
+ }
