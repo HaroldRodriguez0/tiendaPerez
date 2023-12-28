@@ -86,7 +86,7 @@ export const HomeScreen = () => {
           }}
         >
           <Box sx={{ mx: { xl: 20, lg: 15, md: 8, sm: 4 } }}>
-            <Image alt="icono" src="../../public/logoO.png" />
+            <Image alt="icono" src="../../public/logoP.png" />
           </Box>
         </Grid>
       </Grid>
@@ -110,7 +110,7 @@ export const HomeScreen = () => {
             }}
           >
             <Box border={1} borderColor="greenyellow" mb={1}>
-              <Image src="../../public/5991203.jpg" alt="Cafeteria" />
+              <Image src="../../public/cafeteria.jpg" alt="Cafeteria" />
             </Box>
             <Button
               onClick={() => navigate("/product/cafeteria")}
@@ -131,7 +131,7 @@ export const HomeScreen = () => {
             }}
           >
             <Box border={1} borderColor="greenyellow" mb={1}>
-              <Image src="../../public/18327.jpg" alt="Utileria" />
+              <Image src="../../public/utileria.jpg" alt="Utileria" />
             </Box>
             <Button
               onClick={() => navigate("/product/utiles")}
@@ -157,7 +157,7 @@ export const HomeScreen = () => {
               mb={1}
               sx={{ background: "white" }}
             >
-              <Image src="../../public/163.png" alt="Calzado" />
+              <Image src="../../public/calzado.png" alt="Calzado" />
             </Box>
             <Button
               onClick={() => navigate("/product/calzado")}
@@ -224,7 +224,7 @@ export const HomeScreen = () => {
             pb={{ xs: 2, md: 0 }}
           >
             <Grid item xs={10} sm={8} md={6}>
-              <Image alt="icono" src="../../public/6511570.jpg" />
+              <Image alt="icono" src="../../public/nosotros.jpg" />
             </Grid>
             <Grid item md={6}>
               <Typography

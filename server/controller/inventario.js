@@ -10,20 +10,20 @@ import { edit } from "./product.js";
     // se guarda el producto a editar con todas sus propiedades para hacer las respectivas modificaciones
     const lastProduct = modelo ?? false ? await Product.find({ name, modelo }) : await Product.find({ name });
     
-    if (lastProduct[0].numero) {
+    if (lastProduct.numero) {
       cont = 1;
       valor = numero;
-      lastProValor = lastProduct[0].numero;
+      lastProValor = lastProduct.numero;
     }
-    if (lastProduct[0].color) {
+    if (lastProduct.color) {
       cont = 2;
       valor = color;
-      lastProValor = lastProduct[0].color;
+      lastProValor = lastProduct.color;
     }
-    if (lastProduct[0].tipo) {
+    if (lastProduct.tipo) {
       cont = 3;
       valor = tipo;
-      lastProValor = lastProduct[0].tipo;
+      lastProValor = lastProduct.tipo;
     }
     if (cont) {
       cantidadTienda = lastProValor.get( valor ).tienda;
@@ -59,13 +59,13 @@ import { edit } from "./product.js";
     if( cont ){
       // pasarle al req.body.numero (para que funcione el edit) el lastProValor.get( valor ).tienda - cantidad pero este objeto es un map y hay q convertirlo a un objeto de objetos
       lastProValor.get( valor ).tienda -= cantidad;
-      req.params.id = lastProduct[0]._id ;
+      req.params.id = lastProduct._id ;
       req.body.numero = Object.fromEntries(lastProValor) ;
       edit( req, res );
     }
     else{
-      req.params.id = lastProduct[0]._id ;
-      req.body.cantTienda = lastProduct[0].cantTienda - cantidad;
+      req.params.id = lastProduct._id ;
+      req.body.cantTienda = lastProduct.cantTienda - cantidad;
       edit( req, res );
     }
     
@@ -83,32 +83,32 @@ const editNewCopie = async (req, res = response) => {
     let lastProValor = null, cont = null, cantidadTienda = null, valor = null, tipoProd = null ;
     const { name, precio, categoria, cantidad, modelo, numero, color, tipo } = req.body;
     // se guarda el producto a editar con todas sus propiedades para hacer las respectivas modificaciones
-    const lastProduct = modelo ?? false ? await Product.find({ name, modelo }) : await Product.find({ name });
+    const lastProduct = modelo ?? false ? await Product.findOne({ name, modelo }) : await Product.findOne({ name });
     const { id, products } = await CopieInventario.findOne();
     
-    if (lastProduct[0].numero) {
+    if (lastProduct.numero) {
       tipoProd = 'numero',
       cont = 1;
       valor = numero;
-      lastProValor = lastProduct[0].numero;
+      lastProValor = lastProduct.numero;
     }
-    if (lastProduct[0].color) {
+    if (lastProduct.color) {
       tipoProd = 'color',
       cont = 2;
       valor = color;
-      lastProValor = lastProduct[0].color;
+      lastProValor = lastProduct.color;
     }
-    if (lastProduct[0].tipo) {
+    if (lastProduct.tipo) {
       tipoProd = 'tipo',
       cont = 3;
       valor = tipo;
-      lastProValor = lastProduct[0].tipo;
+      lastProValor = lastProduct.tipo;
     }
     if (cont) {
       cantidadTienda = lastProValor.get( valor ).tienda;
     }
     else{
-      cantidadTienda = lastProduct[0].cantTienda;
+      cantidadTienda = lastProduct.cantTienda;
     }
 
     if( cantidadTienda < cantidad ){
@@ -155,8 +155,10 @@ const editNewCopie = async (req, res = response) => {
       // Hacer la modificacion en PRODUCT
       // pasarle al req.body.numero (para que funcione el edit) el lastProValor.get( valor ).tienda - cantidad pero este objeto es un map y hay q convertirlo a un objeto de objetos
       lastProValor.get( valor ).tienda -= cantidad;
-      req.params.id = lastProduct[0]._id ;
-      req.body.numero = Object.fromEntries(lastProValor) ;
+      req.params.id = lastProduct._id ;
+      numero && ( req.body.numero = Object.fromEntries(lastProValor) );
+      color && ( req.body.color = Object.fromEntries(lastProValor) );
+      tipo && ( req.body.tipo = Object.fromEntries(lastProValor) );
       edit( req, res );
     }
     else{
@@ -191,8 +193,8 @@ const editNewCopie = async (req, res = response) => {
         )
       }
       // Hacer la modificacion en PRODUCT
-      req.params.id = lastProduct[0]._id ;
-      req.body.cantTienda = lastProduct[0].cantTienda - cantidad;
+      req.params.id = lastProduct._id ;
+      req.body.cantTienda = lastProduct.cantTienda - cantidad;
       edit( req, res );
     }
     
@@ -218,43 +220,43 @@ const editCopieInventario = async (req, res = response) => {
       const update = { $set: { [`products.${index}.cantidad`]: cantidad } };
 
       // se guarda el producto a editar con todas sus propiedades para hacer las respectivas modificaciones
-      const lastProduct = modelo ?? false ? await Product.find({ name, modelo }) : await Product.find({ name });
+      const lastProduct = modelo ?? false ? await Product.findOne({ name, modelo }) : await Product.findOne({ name });
       
 
       if (lastProduct) {
 
-        if (lastProduct[0].numero) {
+        if (lastProduct.numero) {
           tipoProd = 'numero',
           valor = numero;
           cont = 1;
-          lastProValor = lastProduct[0].numero;
+          lastProValor = lastProduct.numero;
         }
-        if (lastProduct[0].color) {
+        if (lastProduct.color) {
           tipoProd = 'color',
           cont = 2;
           valor = color;
-          lastProValor = lastProduct[0].color;
+          lastProValor = lastProduct.color;
         }
-        if (lastProduct[0].tipo) {
+        if (lastProduct.tipo) {
           tipoProd = 'tipo',
           cont = 3;
           valor = tipo;
-          lastProValor = lastProduct[0].tipo;
+          lastProValor = lastProduct.tipo;
         }
         if ( cantidadTienda >= cantidad ) {
 
-          cantTienda = lastProduct[0].cantTienda - ( cantidad - cantinventario ) ;
+          cantTienda = lastProduct.cantTienda - ( cantidad - cantinventario ) ;
 
           if (cont) {
             // cantidad Productos en tienda = cantidad total de productos que existian en tienda desde que se vendio el 1er producto - cantidad de procutos vendidos
             cantidadProd = cantidadTienda - cantidad ;
-            // cancant total de productos en Tienda = lastProduct[0].cantTienda - ( la cantidad que he vendido - la cantidad vendida en el inventario )
+            // cancant total de productos en Tienda = lastProduct.cantTienda - ( la cantidad que he vendido - la cantidad vendida en el inventario )
             const cambios = { $set: { [`${tipoProd}.${valor}.tienda`]: cantidadProd, cantTienda } };
 
-            await Product.updateOne( { _id: lastProduct[0].id } , cambios );
+            await Product.updateOne( { _id: lastProduct.id } , cambios );
           }
           else{
-            await Product.updateOne( { _id: lastProduct[0].id } , { $set: { cantTienda } } );
+            await Product.updateOne( { _id: lastProduct.id } , { $set: { cantTienda } } );
           }
 
           await CopieInventario.updateOne( { _id: id } , update );

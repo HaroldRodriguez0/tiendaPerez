@@ -3,7 +3,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import path from 'path';
-import { authRoutes, inventarioRouters, productRouters, usersRoutes, }  from './routes/index.js'
+import { authRoutes, inventarioRouters, productRouters, usersRoutes, shopping }  from './routes/index.js'
 import { fileURLToPath } from "url";
 import { dbConnection } from "./db/config.js";
 import cron from 'node-cron';
@@ -37,6 +37,7 @@ app.use('/api/auth', authRoutes );
 app.use('/api/users', usersRoutes );
 app.use('/api/product', productRouters );
 app.use('/api/inventario', inventarioRouters );
+app.use('/api/shopping', shopping );
 
 // Usar cron.schedule para crear una tarea
 /* cron.schedule('59 23 * * *', async () => {

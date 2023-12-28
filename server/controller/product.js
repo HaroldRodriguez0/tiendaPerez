@@ -154,9 +154,11 @@ const editAdmin = async (req, res = response) => {
   }
 };
 
+
 const edit = async (req, res = response) => {
   try {
     const { cantTienda, numero, color, tipo } = req.body;
+    console.log(req.body)
     const data = { cantTienda, numero, color, tipo };
     const { id } = req.params;
     const lastProduct = await Product.findById(id);
@@ -164,6 +166,7 @@ const edit = async (req, res = response) => {
     const autocalcular = autocalcularToolsCafeteria(data, lastProduct, res);
 
     if (!autocalcular) {
+      console.log(data)
       const product = await Product.findByIdAndUpdate(id, data, { new: true });
 
       return res.status(200).json({
@@ -177,6 +180,7 @@ const edit = async (req, res = response) => {
     });
   }
 };
+
 
 const deleteProduct = async (req, res = response) => {
   try {

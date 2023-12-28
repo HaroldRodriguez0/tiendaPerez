@@ -8,7 +8,6 @@ import {
   Grid,
   IconButton,
   InputAdornment,
-  Skeleton,
   TextField,
   Tooltip,
   Typography,
@@ -32,6 +31,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { turnCategoria } from "../../helpers/turnCategoria";
 import Image from "../Image";
+import { shoppingNew } from "../../reducer/shoppingReducer";
 
 // eslint-disable-next-line react/prop-types
 export const Producto = (data) => {
@@ -112,7 +112,7 @@ export const Producto = (data) => {
     if (data.numero || data.tipo || data.color) {
       dispatch(productDescShow(data));
     } else {
-      console.log(data.precio);
+      dispatch( shoppingNew( data ));
     }
   };
 

@@ -22,6 +22,7 @@ import ZapatoIcon from "../icons/ZapatoIcon";
 import DisabledByDefaultOutlinedIcon from '@mui/icons-material/DisabledByDefaultOutlined';
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
 import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
+import ShoppingCartCheckoutOutlinedIcon from '@mui/icons-material/ShoppingCartCheckoutOutlined';
 import { Button, Container, Typography, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -66,6 +67,7 @@ export const NavBar = () => {
   const dispatch = useDispatch();
   const { rol } = useSelector((state) => state.auth);
   const { name } = useSelector((state) => state.stock);
+  const { products } = useSelector((state) => state.shopping);
   const { name: cantProduts } = useSelector((state) => state.stock);
   const navigate = useNavigate();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -164,11 +166,13 @@ export const NavBar = () => {
         </IconButton>
         <p>Ventas</p>
       </MenuItem>
-      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate("/product/agotado"), handleMobileMenuClose()}}>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ /* navigate("/inventario/todos"), */ handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
-          <DisabledByDefaultOutlinedIcon />
+        <Badge badgeContent={cantProduts ?cantProduts.length :0} color="success">
+          <ShoppingCartCheckoutOutlinedIcon />
+        </Badge>
         </IconButton>
-        <p>Agotados</p>
+        <p>Pedidos</p>
       </MenuItem>
       <MenuItem sx={{ display: { md: "none" } }} onClick={() =>{ navigate("/product/cafeteria"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Cafeteria" color="inherit">
@@ -187,6 +191,12 @@ export const NavBar = () => {
           <ZapatoIcon />
         </IconButton>
         <p>Calzado</p>
+      </MenuItem>
+      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate("/product/agotado"), handleMobileMenuClose()}}>
+        <IconButton size="large" aria-label="Inventario" color="inherit">
+          <DisabledByDefaultOutlinedIcon />
+        </IconButton>
+        <p>Agotados</p>
       </MenuItem>
       <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ navigate('/product/new'), handleMobileMenuClose() }}>
         <IconButton size="large" aria-label="NevoProducto" color="inherit">
@@ -243,12 +253,13 @@ export const NavBar = () => {
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               <Button
+                onClick={() => navigate('/shopping')}
                 size="large"
                 aria-label="Inventario"
                 color="inherit"
                 sx={{ mx: 2 }}
               >
-                <Badge badgeContent={1} color="success">
+                <Badge badgeContent={products ?products.length :0} color="success">
                   <ShoppingCartOutlinedIcon />
                 </Badge>
                 <Typography
@@ -356,12 +367,13 @@ export const NavBar = () => {
               </Button>
             </Box>
             <IconButton
+              onClick={() => navigate('/shopping')}
               size="large"
               aria-label="Inventario"
               color="inherit"
               sx={{ display: { md: "none" } }}
             >
-              <Badge badgeContent={1} color="success">
+              <Badge badgeContent={products ?products.length :0} color="success">
                 <ShoppingCartOutlinedIcon />
               </Badge>
             </IconButton>

@@ -8,8 +8,6 @@ export const ProductoCategoria = () => {
   let variable;
   const { categoria, value } = useParams();
 
-  console.log(categoria)
-
   categoria ? (variable = categoria) : (variable = value);
 
   const products = useProduts(variable);

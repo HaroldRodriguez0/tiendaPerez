@@ -70,27 +70,26 @@ export const ProductoDesc = () => {
   };
 
   const handleVender = () => {
-    arr.map( async (tipo,i) => {
+    arr.map( async (value,i) => {
       await api
       .put(
         `/inventario/editNewCopie`,
         numero 
-        ? { ...product, numero: tipo, cantidad: num[i] }
+        ? { ...product, numero: value, cantidad: num[i] }
         : tipo
-          ? { ...product, numero: tipo, cantidad: num[i] }
-          : { ...product, numero: tipo, cantidad: num[i] },
+          ? { ...product, tipo: value, cantidad: num[i] }
+          : { ...product, color: value, cantidad: num[i] },
         {headers: {
             "x-token": localStorage.getItem("token"),
           },}
       )
       .then(() => {
         quueryClient.invalidateQueries(["products", turnCategoria(categoria)]);
-        dispatch(productDescHide());
-        setArr([])
-        setNum([]) 
+        handleClose()
       })
       .catch(({ response }) => {
         console.log(response);
+        handleClose()
         Swal.fire("", response.data.msg, "error");
       }); 
     })

@@ -36,7 +36,7 @@ const router = Router();
 
 /* Routes with Files */
 router.post(
-  "/new",[ 
+  "/new",[  
     validarJWT,
     esAdminRole, 
     upload.fields([{ name: 'picture', maxCount: 2 }]),

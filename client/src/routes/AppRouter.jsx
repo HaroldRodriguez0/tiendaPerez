@@ -18,6 +18,8 @@ import { InventarioDiario } from "../components/inventario/InventarioDiario";
 import { Inventarios } from "../components/inventario/Inventarios";
 import { Whatsapp } from "../components/Whatsapp";
 import { Foother } from "../components/foother/Foother";
+import { Shopping } from "../components/shopping/Shopping";
+import { Pedidos } from "../components/shopping/Pedidos";
 
 export const AppRouter = () => {
   const dispatch = useDispatch();
@@ -56,6 +58,8 @@ export const AppRouter = () => {
           </Route>
 
           <Route path="/users" element={<Usuarios />} />
+          <Route path="/shopping" element={<Shopping />} />
+          <Route path="/pedidos" element={<Pedidos />} />
 
           <Route path="/verification/*" element={<Verification />} />
           <Route path="/*" element={<HomeScreen />} />

@@ -5,6 +5,7 @@ import Product from "./product.js";
 import Categoria from "./categoria.js"; 
 import Inventario from "./inventario.js";
 import CopieInventario from "./copieInventario.js";
+import Shopping from "./shopping.js";
 
 export {
   Role,
@@ -13,4 +14,5 @@ export {
   Categoria,
   Inventario,
   CopieInventario,
+  Shopping,
 }
