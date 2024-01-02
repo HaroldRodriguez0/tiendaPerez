@@ -12,6 +12,10 @@ const ProductSchema = Schema({
     min: 0
   },
 
+  descuento: {
+    type: Number,
+  },
+
   categoria: {
     type: String,
     required: [true, "la categoria es obligatoria"],

@@ -17,7 +17,7 @@ export const useProduts = (categoria) => {
     {
 
     // vuelve a disparar un fetch
-    staleTime: 1000 * 60 * 60,
+    //staleTime: 1000 * 60 * 60,
 
     getNextPageParam: ( lastPage, pages ) => {
       if( lastPage.length === 0 ) return;

@@ -223,7 +223,6 @@ export const EditProducto = () => {
           Swal.fire("", data.msg, "success");
         })
         .catch(({ response }) => {
-          console.log(response);
           response.data?.msg
             ? Swal.fire("", response.data.msg, "error")
             : setErrorModelo(response.data.errors.name.msg);
@@ -468,8 +467,8 @@ export const EditProducto = () => {
                     label="Descripción"
                     color="success"
                     size="small"
-                    multiline
-                    maxRows={3}
+                    /* multiline
+                    maxRows={3} */
                     value={desc}
                     onChange={handlenewProduct}
                     InputLabelProps={{ style: { fontSize: ".9rem" } }}

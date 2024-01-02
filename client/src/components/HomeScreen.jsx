@@ -33,6 +33,21 @@ export const HomeScreen = () => {
   const moreTitle = useMediaQuery("(max-width:830px)");
   const marked = useProduts("marked");
 
+/*   // Pedir permiso al usuario
+Notification.requestPermission().then(function (permission) {
+  // Comprobar si el permiso fue concedido
+  if (permission === "granted") {
+    // Crear una notificación
+    var notification = new Notification("Hola, este es Bing", {
+      body: "Te estoy enviando una notificación desde React",
+      icon: "https://www.bing.com/favicon.ico",
+      // Especificar un patrón de vibración para el sonido
+      vibrate: [200, 100, 200, 100, 200, 100, 200],
+    });
+  }
+}); */
+
+
   return (
     <>
       <Grid

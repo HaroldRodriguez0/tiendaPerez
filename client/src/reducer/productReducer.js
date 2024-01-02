@@ -59,6 +59,7 @@ export const productSlice = createSlice({
 
     productDescShow: (state, action) => {
       const {
+        _id,
         name,
         precio,
         modelo,
@@ -72,6 +73,7 @@ export const productSlice = createSlice({
         color,
         tipo,
       } = action.payload;
+      state.uid = _id;
       state.name = name;
       state.precio = precio;
       state.modelo = modelo;

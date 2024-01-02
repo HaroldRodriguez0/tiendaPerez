@@ -250,12 +250,13 @@ export const Producto = (data) => {
                   fontWeight="400"
                   sx={{
                     m: 0,
-                    fontSize: { xs: "1rem", sm: "1.1rem", md: "1.3rem" },
+                    fontSize: { xs: "1rem", sm: "1.1rem", md: "1.3rem" }, py:'4.8px'
                   }}
                 >
-                  {precio} cup
+                  {cantTienda !== 0 ? precio + 'cup' : 'Agotado' }
+                  
                 </Typography>
-                <AddShoppingCartOutlinedIcon sx={{ fontSize: "1.8rem" }} />
+                <AddShoppingCartOutlinedIcon sx={{ fontSize: "1.8rem", display: cantTienda === 0 && 'none' }} />
               </IconButton>
             </span>
           </Tooltip>

@@ -29,6 +29,20 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
   }
 
   if (cont) {
+    const productEncontrado = await products.find(
+      (elemento) =>
+        elemento.name === lastProduct.name &&
+        elemento.modelo === lastProduct.modelo &&
+        elemento.precio === lastProduct.precio
+    );
+    if (
+      productEncontrado &&
+      (data.name !== lastProduct.name ||
+        data.precio !== lastProduct.precio ||
+        data.modelo !== lastProduct.modelo)
+    ) {
+      throw new Error(`En estos momentos no puede realizar estos cambios`);
+    }
     dataValor.forEach(async function (valor, clave) {
       // Comprobar si el segundo objeto Map tiene la misma clave
       if (lastProValor.has(clave)) {
@@ -40,55 +54,22 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
           const diferencia = valor.tienda - last.tienda;
           valor.almacen = Math.max(valor.almacen - diferencia, 0);
           dataValor.set(clave, valor);
-          const productEncontrado = await products.find(
-            (elemento) =>
-              elemento.name === data.name &&
-              elemento.modelo === data.modelo &&
-              elemento[tipoProd] === clave &&
-              elemento.precio === data.precio
-          );
-          if (productEncontrado &&
-            (data.name !== lastProduct.name ||
-            data.precio !== lastProduct.precio ||
-            data.modelo !== lastProduct.modelo)
-          ) {
-            throw new Error(
-              `En estos momentos no puede realizar estos cambios`
-            );
-          } else if (productEncontrado) {
-            await CopieInventario.updateOne(
-              { _id: id },
-              { $inc: { "products.$[elem].cantidadTienda": diferencia } },
-              {
-                // Usa arrayFilters para especificar las condiciones del producto
-                arrayFilters: [
-                  {
-                    "elem.precio": data.precio,
-                    "elem.name": data.name,
-                    "elem.modelo": data.modelo,
-                    [`elem.${tipoProd}`]: clave,
-                  },
-                ],
-              }
-            );
-          }/*  else {
-            //console.log(2);
-            await CopieInventario.updateOne(
-              { _id: id },
-              {
-                $push: {
-                  products: {
-                    name: data.name,
-                    categoria: data.categoria,
-                    cantidad: diferencia,
-                    precio: data.precio,
-                    modelo: data.modelo,
-                    [tipoProd]: clave,
-                  },
+
+          await CopieInventario.updateOne(
+            { _id: id },
+            { $inc: { "products.$[elem].cantidadTienda": diferencia } },
+            {
+              // Usa arrayFilters para especificar las condiciones del producto
+              arrayFilters: [
+                {
+                  "elem.precio": data.precio,
+                  "elem.name": data.name,
+                  "elem.modelo": data.modelo,
+                  [`elem.${tipoProd}`]: clave,
                 },
-              }
-            );
-          } */
+              ],
+            }
+          );
         }
       }
     });
@@ -115,51 +96,35 @@ export const autocalcularAlmacenAdmin = async (data, lastProduct) => {
     default:
       // solo editar la cantTienda-cantAlmacen si no viene ningun valor
       // si la cantidad en tienda a editar es mayor a la actual autocalcular cantidad en almacen
-
+      const productEncontrado = await products.find(
+        (elemento) =>
+          elemento.name === lastProduct.name &&
+          elemento.precio === lastProduct.precio
+      );
+      if (
+        productEncontrado &&
+        (data.name !== lastProduct.name || data.precio !== lastProduct.precio)
+      ) {
+        throw new Error(`En estos momentos no puede realizar estos cambios`);
+      }
       if (
         data.cantTienda > lastProduct.cantTienda &&
         data.cantAlmacen === lastProduct.cantAlmacen
       ) {
         const diferencia = data.cantTienda - lastProduct.cantTienda;
-        const productEncontrado = await products.find(
-          (elemento) =>
-            elemento.name === data.name && elemento.precio === data.precio
-        );
-        if ( productEncontrado &&
-          (data.name !== lastProduct.name ||
-          data.precio !== lastProduct.precio)
-        ) {
-          throw new Error(`En estos momentos no puede realizar estos cambios`);
-        } else if (productEncontrado) {
-          await CopieInventario.updateOne(
-            { _id: id },
-            { $inc: { "products.$[elem].cantidadTienda": diferencia } },
-            {
-              // Usa arrayFilters para especificar las condiciones del producto
-              arrayFilters: [
-                {
-                  "elem.precio": data.precio,
-                  "elem.name": data.name,
-                },
-              ],
-            }
-          );
-        }/*  else {
-          console.log(1);
-          await CopieInventario.updateOne(
-            { _id: id },
-            {
-              $push: {
-                products: {
-                  name: data.name,
-                  categoria: data.categoria,
-                  cantidad: diferencia,
-                  precio: data.precio,
-                },
+        await CopieInventario.updateOne(
+          { _id: id },
+          { $inc: { "products.$[elem].cantidadTienda": diferencia } },
+          {
+            // Usa arrayFilters para especificar las condiciones del producto
+            arrayFilters: [
+              {
+                "elem.precio": data.precio,
+                "elem.name": data.name,
               },
-            }
-          );
-        } */
+            ],
+          }
+        );
         data.cantAlmacen = Math.max(data.cantAlmacen - diferencia, 0);
       }
   }
