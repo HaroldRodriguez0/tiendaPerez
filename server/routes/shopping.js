@@ -3,10 +3,12 @@ host + /api/shopping/...
 */
 
 import { Router } from "express";
-import { check } from "express-validator";
 import {
+  accionShopping,
   deleteShopping,
+  editShopping,
   getShopping,
+  getShoppingPedidos,
   newShopping,
 } from "../controller/shopping.js";
 import { tieneRole, validarCampo, validarJWT } from "../middlewares/index.js";
@@ -19,22 +21,35 @@ router.post(
   [ 
     // middlewares 
     validarJWT,
-    check("nameUser", "El nombre es obligatorio").not().isEmpty(),
-    check("date", "El nombre es obligatorio").not().isEmpty(),
-    check("products", "El nombre es obligatorio").not().isEmpty(),
     validarCampo, 
   ],
   newShopping
 );
 
 router.put(
-  "/delete",
+  "/accion",
   [
     // middlewares
     validarJWT,
     tieneRole("ADMIN_ROLE", "TOOLS_ROLE", "CAFETERIA_ROLE"),
     validarCampo, 
   ],
+  accionShopping
+);
+
+router.put(
+  "/edit",
+  [
+    // middlewares
+    validarJWT,
+    tieneRole("ADMIN_ROLE", "TOOLS_ROLE", "CAFETERIA_ROLE"),
+    validarCampo, 
+  ],
+  editShopping
+);
+
+router.put(
+  "/delete",
   deleteShopping
 );
 
@@ -42,11 +57,21 @@ router.get(
   "/",
   [
     // middlewares
-    validarJWT, // HACER ESTA VALIDACION DENTRO PARA SABER QUE ROL ES
-    tieneRole("ADMIN_ROLE", "TOOLS_ROLE", "CAFETERIA_ROLE"),
+    validarJWT,
     validarCampo, 
   ],
   getShopping
+);
+
+router.get(
+  "/pedidos",
+  [
+    // middlewares
+    validarJWT, 
+    tieneRole("ADMIN_ROLE", "TOOLS_ROLE", "CAFETERIA_ROLE"),
+    validarCampo, 
+  ],
+  getShoppingPedidos
 );
 
 export default router;

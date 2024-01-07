@@ -1,18 +1,34 @@
-import { response } from "express";
 import { CopieInventario, Product, Shopping } from "../models/index.js";
 import { editCopieInventario, editNewCopie } from "./inventario.js";
 
-const newShopping = async (req, res = response) => {
+const newShopping = async (req, res) => {
   try {
-    let shopping;
-    const { nameUser, direccion, products } = req.body;
+    let shopping,
+      descuento = 0;
+    const { receptor, direccion, envio, movil, products } = req.body;
+    const nameUser = req.user.name;
 
     const found = await Shopping.findOne({ nameUser });
+
+    products.map((prod) => {
+      descuento += prod.precio * prod.cantidad;
+    });
 
     if (!found) {
       shopping = new Shopping({
         nameUser,
-        pedidos: [{ date: new Date(), direccion, products }],
+        descuento,
+        pedidos: [
+          {
+            date: new Date(),
+            receptor,
+            movil,
+            direccion,
+            envio,
+            estado: "Procesando",
+            products,
+          },
+        ],
       });
 
       await shopping.save();
@@ -20,12 +36,18 @@ const newShopping = async (req, res = response) => {
       await Shopping.updateOne(
         { _id: found._id }, // Filtra el documento por el _id
         {
+          descuento: found.descuento < 10000 ? found.descuento + descuento : 0,
           $push: {
             pedidos: {
               // Agrega un nuevo elemento al array de pedidos
               date: new Date(),
-              direccion: direccion,
-              products: products,
+              receptor,
+              movil,
+              direccion,
+              envio,
+              descuento: found.descuento > 10000 ? true : false,
+              estado: "Procesando",
+              products,
             },
           },
         }
@@ -35,7 +57,7 @@ const newShopping = async (req, res = response) => {
     for await (const prod of products) {
       req.body = {
         name: prod.name,
-        precio: prod.precio,
+        precio: found?.descuento > 10000 ? prod.precio * 0.99 : prod.precio,
         categoria: prod.categoria,
         cantidad: prod.cantidad,
         modelo: prod.modelo,
@@ -44,14 +66,14 @@ const newShopping = async (req, res = response) => {
         tipo: prod.tipo,
       };
       // Hacer la modificacion en PRODUCT y CopieInventario.
-      editNewCopie(req, res);
+      await editNewCopie(req, res);
     }
   } catch (error) {
     console.log(error.message);
   }
 };
 
-const deleteShopping = async (req, res = response) => {
+const accionShopping = async (req, res = response) => {
   try {
     const { id, products } = await CopieInventario.findOne();
     const { nameUser, date, products: productsVendidos } = req.body;
@@ -61,7 +83,64 @@ const deleteShopping = async (req, res = response) => {
 
     await Shopping.updateOne(
       { _id: found._id },
-      { $pull: { pedidos: { date } } }
+      {
+        $set: {
+          "pedidos.$[pedido].estado": productsVendidos
+            ? "Cancelado"
+            : "Enviando",
+        },
+      },
+      { arrayFilters: [{ "pedido.date": date }] }
+    );
+
+    if (!productsVendidos)
+      res.status(200).json({
+        msg: "Estado actualizado",
+      });
+    else
+      for await (const prod of productsVendidos) {
+        const indexProd = products.findIndex(
+          (elemento) =>
+            elemento.name === prod.name &&
+            elemento?.modelo === prod?.modelo &&
+            elemento?.numero === prod?.numero &&
+            elemento?.color === prod?.color &&
+            elemento?.tipo === prod?.tipo
+        );
+
+        req.body = [
+          ...req.body,
+          {
+            index: indexProd,
+            name: prod.name,
+            cantidad: products[indexProd].cantidad - prod.cantidad,
+            modelo: prod.modelo,
+            numero: prod.numero,
+            color: prod.color,
+            tipo: prod.tipo,
+          },
+        ];
+      }
+
+    // Hacer la modificacion en PRODUCT y CopieInventario.
+    await editCopieInventario(req, res);
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
+const editShopping = async (req, res = response) => {
+  try {
+    const { id, products } = await CopieInventario.findOne();
+    const { nameUser, date, products: productsVendidos } = req.body;
+    req.body = [];
+
+    const found = await Shopping.findOne({ nameUser });
+
+    await Shopping.updateOne(
+      { _id: found._id },
+      { $set: { "pedidos.$[pedido].products": productsVendidos } },
+      { arrayFilters: [{ "pedido.date": date }] }
     );
 
     for await (const prod of productsVendidos) {
@@ -86,26 +165,84 @@ const deleteShopping = async (req, res = response) => {
           tipo: prod.tipo,
         },
       ];
-
-      // Hacer la modificacion en PRODUCT y CopieInventario.
-      editCopieInventario(req, res);
     }
+
+    // Hacer la modificacion en PRODUCT y CopieInventario.
+    await editCopieInventario(req, res);
   } catch (error) {
     console.log(error.message);
   }
 };
 
+const deleteShopping = async (req, res = response) => {
+  try {
+    await Shopping.updateMany(
+      {},
+      {
+        $pull: {
+          pedidos: { estado: "Cancelado" },
+        },
+      }
+    );
+
+    res.status(200).json({
+      msg: "Pedidos eliminados con exito !",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
 const getShopping = async (req, res = response) => {
   try {
+    const { nameUser, descuento, pedidos } = await Shopping.findOne({
+      nameUser: req.user.name,
+    });
+    const datos = [];
+    const iniFecha = new Date();
+
+    pedidos.map((ped, i) => {
+      const date = new Date(ped.date);
+      date.setHours(0, 0, 0, 0) === iniFecha.setHours(0, 0, 0, 0) &&
+        datos.push({
+          nameUser,
+          descuentoTotal: descuento,
+          date: ped.date,
+          receptor: ped.receptor,
+          movil: ped.movil,
+          direccion: ped.direccion,
+          envio: ped.envio,
+          descuento: ped.descuento,
+          estado: ped.estado,
+          products: ped.products,
+        });
+    });
+
+    res
+      .status(200)
+      .json(datos.length > 0 ? datos : { msg: "No tiene Pedidos" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
+const getShoppingPedidos = async (req, res = response) => {
+  try {
     if (req.user.rol === "ADMIN_ROLE") {
-      //const allShopping = await Shopping.find();
+      const allShopping = await Shopping.find();
 
-      //res.status(200).json(allShopping);
-
+      res.status(200).json(allShopping);
+    } else {
       const iniFecha = new Date();
       const finFecha = new Date();
 
-      const resul = [];
+      const datos = [];
 
       const todayShopping = await Shopping.find({
         "pedidos.date": {
@@ -114,18 +251,27 @@ const getShopping = async (req, res = response) => {
         },
       });
 
-      todayShopping.map((user,i) => {
+      console.log(todayShopping);
 
-        user.pedidos.map((pedidos,i) => {
+      todayShopping.map((user, i) => {
+        user.pedidos.map((pedidos, i) => {
+          const date = new Date(pedidos.date);
+          date.setHours(0, 0, 0, 0) === iniFecha.setHours(0, 0, 0, 0) &&
+            datos.push({
+              nameUser: user.nameUser,
+              date: pedidos.date,
+              receptor: pedidos.receptor,
+              movil: pedidos.movil,
+              direccion: pedidos.direccion,
+              envio: pedidos.envio,
+              descuento: pedidos.descuento,
+              estado: pedidos.estado,
+              products: pedidos.products,
+            });
+        });
+      });
 
-          pedidos.date.setHours(0, 0, 0, 0) === iniFecha.setHours(0, 0, 0, 0) 
-            && resul.push(pedidos.products)
-        })
-      })
-
-      res.status(200).json(resul);
-    } else {
-      res.status(200).json(todayShopping);
+      res.status(200).json(datos);
     }
   } catch (error) {
     console.log(error.message);
@@ -135,4 +281,11 @@ const getShopping = async (req, res = response) => {
   }
 };
 
-export { newShopping, deleteShopping, getShopping };
+export {
+  newShopping,
+  accionShopping,
+  editShopping,
+  getShopping,
+  getShoppingPedidos,
+  deleteShopping
+};

@@ -78,7 +78,7 @@ import { edit } from "./product.js";
 };
  */
 
-const editNewCopie = async (req, res = response) => {
+const editNewCopie = async (req, res) => {
   try {
     let lastProValor = null, cont = null, cantidadTienda = null, valor = null, tipoProd = null ;
     const { name, precio, categoria, cantidad, modelo, numero, color, tipo } = req.body;
@@ -159,10 +159,10 @@ const editNewCopie = async (req, res = response) => {
       numero && ( req.body.numero = Object.fromEntries(lastProValor) );
       color && ( req.body.color = Object.fromEntries(lastProValor) );
       tipo && ( req.body.tipo = Object.fromEntries(lastProValor) );
-      edit( req, res );
+      await edit( req, res );
     }
     else{
-      const productEncontrado = products.find( elemento => elemento.name === name );
+      const productEncontrado = products.find( elemento => elemento.name === name && elemento.precio === precio );
 
       if( productEncontrado ){
         await CopieInventario.updateOne(
@@ -195,7 +195,7 @@ const editNewCopie = async (req, res = response) => {
       // Hacer la modificacion en PRODUCT
       req.params.id = lastProduct._id ;
       req.body.cantTienda = lastProduct.cantTienda - cantidad;
-      edit( req, res );
+      await edit( req, res );
     }
     
   } catch (error) {

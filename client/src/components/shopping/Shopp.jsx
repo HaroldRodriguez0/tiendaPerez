@@ -80,7 +80,7 @@ export const Shopp = ({ product }) => {
           sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}
         >
           <Typography color="green" width="100%" textAlign="center">
-            {product.precio}
+            {product.precio }
           </Typography>
         </Grid>
         <Grid

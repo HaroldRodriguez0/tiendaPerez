@@ -38,7 +38,7 @@ export const Producto = (data) => {
   const quueryClient = useQueryClient();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { name, img, cantAlmacen, cantTienda, precio, categoria } = data;
+  const { name, img, cantAlmacen, cantTienda, precio, descuento, categoria } = data;
   const [number, setNumber] = useState(1);
   const { rol } = useSelector((state) => state.auth);
 
@@ -243,20 +243,35 @@ export const Producto = (data) => {
                 sx={{ width: "100%", justifyContent: "space-around" }}
               >
                 <Typography
-                  color={cantTienda === 0 && "#00000050"}
+                  color={( cantTienda === 0 || descuento ) && "#00000050"}
                   textAlign={"center"}
-                  fontSize={".9rem"}
                   lineHeight={"1.2"}
                   fontWeight="400"
                   sx={{
+                    textDecoration: ( descuento && cantTienda !== 0 ) && "line-through",
+                    textDecorationColor:( descuento && cantTienda !== 0 ) && "red",
+                    pr: descuento && .7,
                     m: 0,
-                    fontSize: { xs: "1rem", sm: "1.1rem", md: "1.3rem" }, py:'4.8px'
+                    fontSize: { xs: (descuento && cantTienda !== 0) ?".85rem" :"1rem", sm: (descuento && cantTienda !== 0) ?".95rem" :"1.1rem", md: (descuento && cantTienda !== 0) ?"1.1rem" :"1.3rem" }, py:'4.8px'
                   }}
                 >
-                  {cantTienda !== 0 ? precio + 'cup' : 'Agotado' }
+                  {cantTienda !== 0  ?`${precio} ${(!descuento) ?'cup' :''}`:'Agotado' }
                   
                 </Typography>
-                <AddShoppingCartOutlinedIcon sx={{ fontSize: "1.8rem", display: cantTienda === 0 && 'none' }} />
+                <Typography
+                  textAlign={"center"}
+                  lineHeight={"1.2"}
+                  fontWeight="400"
+                  sx={{
+                    display:( cantTienda === 0 || !descuento ) && 'none',
+                    m: 0,
+                    fontSize: { xs: ".95rem", sm: "1.1rem", md: "1.3rem" }, py:'4.8px'
+                  }}
+                >
+                  { descuento }cup
+                  
+                </Typography>
+                <AddShoppingCartOutlinedIcon sx={{ fontSize: "1.6rem", display: cantTienda === 0 && 'none' }} />
               </IconButton>
             </span>
           </Tooltip>

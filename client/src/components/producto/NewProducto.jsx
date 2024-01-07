@@ -80,13 +80,14 @@ export const NewProducto = () => {
   const [newProduct, handlenewProduct, newProductReset] = useForm({
     name: "",
     precio: "",
+    descuento: "",
     cantAlmacen: "",
     cantTienda: "",
     modelo: "",
     desc: "",
   });
 
-  const { name, precio, cantAlmacen, cantTienda, modelo, desc } = newProduct;
+  const { name, precio, descuento, cantAlmacen, cantTienda, modelo, desc } = newProduct;
 
   const handleChangeCategoria = (event) => {
     setCategoria(event.target.value);
@@ -366,7 +367,8 @@ export const NewProducto = () => {
                     value={name}
                     onChange={handlenewProduct}
                   />
-                  <TextField
+                  <Box display={"flex"}>
+                    <TextField
                     required
                     type="number"
                     name="precio"
@@ -376,7 +378,21 @@ export const NewProducto = () => {
                     size="small"
                     value={precio}
                     onChange={handlenewProduct}
+                    sx={{ pr: 1 }}
+                    InputLabelProps={{ style: { fontSize: ".9rem" } }}
                   />
+                  <TextField
+                    type="number"
+                    name="descuento"
+                    variant="standard"
+                    label="Descuento..."
+                    color="success"
+                    size="small"
+                    value={descuento}
+                    onChange={handlenewProduct}
+                    InputLabelProps={{ style: { fontSize: ".9rem" } }}
+                  />
+                  </Box>
                   <Box display={"flex"}>
                     <TextField
                       required

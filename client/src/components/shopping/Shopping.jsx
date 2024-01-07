@@ -5,28 +5,69 @@ import {
   CircularProgress,
   FormControlLabel,
   Grid,
+  LinearProgress,
   TextField,
   Typography,
 } from "@mui/material";
+import PropTypes from "prop-types";
 import { Box, Container } from "@mui/system";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import { Shopp } from "./Shopp";
+import { useShopping } from "../../hooks/useShopping";
+import { AccordionPedido } from "./AccordionPedido";
+
+function LinearProgressWithLabel(props) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ width: "100%", mr: 1 }}>
+        <LinearProgress variant="determinate" {...props} />
+      </Box>
+      <Box sx={{ minWidth: 35 }}>
+        <Typography variant="body2" color="text.secondary">{`${Math.round(
+          props.value
+        )}%`}</Typography>
+      </Box>
+    </Box>
+  );
+}
+
+LinearProgressWithLabel.propTypes = {
+  /**
+   * The value of the progress indicator for the determinate and buffer variants.
+   * Value between 0 and 100.
+   */
+  value: PropTypes.number.isRequired,
+};
 
 export const Shopping = () => {
+  const shop = useShopping();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth);
   const { products } = useSelector((state) => state.shopping);
   const [name, setName] = useState(user.name);
   const [movil, setMovil] = useState(user.movil);
-  const [direccion, setDireccion] = useState('');
+  const [direccion, setDireccion] = useState("");
   const [loading, setLoading] = useState(false);
   const [lugar, setLugar] = useState(null);
   const [opcion, setOpcion] = useState(null);
   const [show, setShow] = useState(true);
+  const [showdesc, setShowdesc] = useState(true);
+
+  const progressRef = useRef(() => {});
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      progressRef.current();
+    }, 500);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   let subTotal = 0;
   products &&
@@ -66,8 +107,8 @@ export const Shopping = () => {
       });
     } else {
       console.log(name, movil);
-      console.log(lugar.nombre);
       console.log(opcion);
+      console.log(products);
     }
 
     setLoading(false);
@@ -97,7 +138,7 @@ export const Shopping = () => {
             lg: "2.7rem",
             xl: "3rem",
           },
-          mt: 10,
+          pt: 2,
           mb: { sm: 2 },
           textAlign: "center",
           color: "green",
@@ -105,12 +146,56 @@ export const Shopping = () => {
       >
         Carrito de Compra
       </Typography>
-      <Grid container >
+      <Box onClick={() => setShowdesc(!showdesc)} sx={{ width: "100%", mt: 2 }}>
+        <LinearProgressWithLabel
+          variant="buffer"
+          color="success"
+          value={
+            shop.isSuccess
+              ? shop.data[0].descuentoTotal / 100 > 100
+                ? 100
+                : shop.data[0].descuentoTotal / 100
+              : 0
+          }
+          valueBuffer={0}
+        />
+      </Box>
+      <Typography
+        display={
+          shop.isSuccess
+            ? shop.data[0].descuentoTotal < 9999
+              ? "none"
+              : "block"
+            : "block"
+        }
+        textAlign="center"
+        fontSize=".8rem"
+      >
+        ¡Felicidades! Has ganado un cupón de descuento del 1% para tu próxima
+        compra.
+      </Typography>
+      <Typography fontSize=".8rem" display={showdesc && "none"}>
+        ¿Te gustaría ahorrar dinero en tus compras? ¡Tenemos una oferta especial
+        para ti! Por cada 10000 pesos que gastes en nuestra tienda, recibirás un
+        cupón de descuento del 1% para tu próxima compra. Así podrás disfrutar
+        de nuestros productos de calidad a un precio aún más bajo. Aprovecha
+        esta oportunidad y benefíciate de nuestra promoción. ¡Te esperamos!
+      </Typography>
+      {
+        shop.isSuccess &&
+        shop.data.map((pedido, i) => (
+          <AccordionPedido key={i} pedido ={pedido}/>
+        ))
+      }
+      <Grid container>
         <Grid item xs={12} md={7}>
           <Grid
             container
             sx={{
-              display: { xs: "none", sm: products.length === 0 ?'none' :'flex'},
+              display: {
+                xs: "none",
+                sm: products.length === 0 ? "none" : "flex",
+              },
               borderBottom: "1px solid rgba(0,0,0,0.105)",
             }}
           >
@@ -253,7 +338,13 @@ export const Shopping = () => {
                     }}
                   >
                     <Typography>Sub Total</Typography>
-                    <Typography color="green">{subTotal}</Typography>
+                    <Typography color="green">
+                      {shop.isSuccess
+                        ? shop.data[0].descuentoTotal > 9999
+                          ? (subTotal *= 0.99)
+                          : 0
+                        : 0}
+                    </Typography>
                   </Box>
                   <Box
                     sx={{
@@ -286,7 +377,12 @@ export const Shopping = () => {
                       <Checkbox sx={{ p: 0 }} color="success" size="small" />
                     }
                   />
-                  <Typography textAlign={'center'} fontSize=".85rem" onClick={() => setShow(!show)} sx={{cursor:'pointer'}}>
+                  <Typography
+                    textAlign={"center"}
+                    fontSize=".85rem"
+                    onClick={() => setShow(!show)}
+                    sx={{ cursor: "pointer" }}
+                  >
                     Acepto los términos y condiciones.
                   </Typography>
                 </Box>

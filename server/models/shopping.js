@@ -6,19 +6,29 @@ const shoppingSchema = Schema({
     unique: true
   },
 
+  descuento: { type: Number },
+
   pedidos: {
     type: Array,
     of: {
 
       date: { type: Date },
 
+      receptor: { type: String },
+
+      movil: { type: String },
+
       direccion: { type: String },
+
+      envio: { type: Number },
+
+      descuento: { type: Boolean },
+
+      estado: { type: String },
 
       products: {
         type: Array,
         of: {
-    
-          receptor: { type: String },
     
           name: { type: String },
     

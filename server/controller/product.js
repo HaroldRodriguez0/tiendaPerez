@@ -18,6 +18,7 @@ const newProduct = async (req, res = response) => {
     const {
       name,
       precio,
+      descuento,
       categoria,
       cantAlmacen,
       cantTienda,
@@ -38,6 +39,7 @@ const newProduct = async (req, res = response) => {
     const product = new Product({
       name,
       precio,
+      descuento,
       categoria,
       cantAlmacen,
       cantTienda,
@@ -165,7 +167,7 @@ const edit = async (req, res = response) => {
     const autocalcular = autocalcularToolsCafeteria(data, lastProduct, res);
 
     if (!autocalcular) {
-      const product = await Product.findByIdAndUpdate(id, data, { new: true });
+      /* const product =  */await Product.findByIdAndUpdate(id, data, { new: true });
 
       return res.status(200).json({
         msg: "Producto actualizado con !Exito",
@@ -173,9 +175,9 @@ const edit = async (req, res = response) => {
     }
   } catch (error) {
     console.log(error.message);
-    return res.status(500).json({
+/*     return res.status(500).json({
       msg: "Please talk to the administrator",
-    });
+    }); */
   }
 };
 

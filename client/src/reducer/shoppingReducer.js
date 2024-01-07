@@ -13,6 +13,7 @@ export const shoppingSlice = createSlice({
       const values = { ...action.payload };
       values.uid && (values._id = values.uid)
       !values?.cant && (values.cant = 1);
+      values.descuento && (values.precio = values.descuento);
       let index = state.products.findIndex(product => product._id === values._id);
       index === -1 
       ? ( state.products = [ ...state.products, values ])

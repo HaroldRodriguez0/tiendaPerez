@@ -11,9 +11,6 @@ function App() {
       primary: {
         main: "#f7ffef",
       },
-      secondary: {
-        main: "#f50057",
-      },
       success: {
         main: "#26a430",
       },

@@ -29,6 +29,7 @@ export const productSlice = createSlice({
         _id,
         name,
         precio,
+        descuento,
         modelo,
         categoria,
         cantTienda,
@@ -44,6 +45,7 @@ export const productSlice = createSlice({
       state.uid = _id;
       state.name = name;
       state.precio = precio;
+      state.descuento = descuento;
       state.modelo = modelo;
       state.categoria = categoria;
       state.cantTienda = cantTienda;
@@ -62,6 +64,7 @@ export const productSlice = createSlice({
         _id,
         name,
         precio,
+        descuento,
         modelo,
         categoria,
         cantTienda,
@@ -76,6 +79,7 @@ export const productSlice = createSlice({
       state.uid = _id;
       state.name = name;
       state.precio = precio;
+      state.descuento = descuento;
       state.modelo = modelo;
       state.categoria = categoria;
       state.cantTienda = cantTienda;
