@@ -4,12 +4,15 @@ import { api } from "../api/myApi";
 import { sleep } from "./sleep";
 
 const getShopping = async ( ) => {
-  //await sleep(4)
-  const { data } = await api.get(`/shopping`, {
+  let value = {data: 0};
+  const token = localStorage.getItem("token");
+  token && (
+    value = await api.get(`/shopping`, {
     headers: {
-      "x-token": localStorage.getItem("token"),
+      "x-token": token,
     },
-  })
+  }))
+  const { data } = value;
   return data;
 };
 
@@ -17,7 +20,6 @@ export const useShopping = ( ) => {
   const shoppingQuery = useQuery(
     ["shopping"], 
     () => getShopping(), 
-    { staleTime: 1000 * 60 * 60 }
   );
 
   return shoppingQuery;

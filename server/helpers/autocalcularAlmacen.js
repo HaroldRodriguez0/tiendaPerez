@@ -1,7 +1,7 @@
 
 
 export const autocalcularAlmacen = ( data ) => {
-  console.log(data)
+
   let dataValor, cont, tienda=0, almacen=0 ;
 
   if (data.numero) {

@@ -98,29 +98,38 @@ const accionShopping = async (req, res = response) => {
         msg: "Estado actualizado",
       });
     else
-      for await (const prod of productsVendidos) {
-        const indexProd = products.findIndex(
-          (elemento) =>
-            elemento.name === prod.name &&
-            elemento?.modelo === prod?.modelo &&
-            elemento?.numero === prod?.numero &&
-            elemento?.color === prod?.color &&
-            elemento?.tipo === prod?.tipo
-        );
-
-        req.body = [
-          ...req.body,
-          {
-            index: indexProd,
-            name: prod.name,
-            cantidad: products[indexProd].cantidad - prod.cantidad,
-            modelo: prod.modelo,
-            numero: prod.numero,
-            color: prod.color,
-            tipo: prod.tipo,
+      await Shopping.updateOne(
+        { _id: found._id },
+        {
+          $set: {
+            "pedidos.$[pedido].products": productsVendidos,
           },
-        ];
-      }
+        },
+        { arrayFilters: [{ "pedido.date": date }] }
+      );
+    for await (const prod of productsVendidos) {
+      const indexProd = products.findIndex(
+        (elemento) =>
+          elemento.name === prod.name &&
+          elemento?.modelo === prod?.modelo &&
+          elemento?.numero === prod?.numero &&
+          elemento?.color === prod?.color &&
+          elemento?.tipo === prod?.tipo
+      );
+
+      req.body = [
+        ...req.body,
+        {
+          index: indexProd,
+          name: prod.name,
+          cantidad: products[indexProd].cantidad - prod.cantidad,
+          modelo: prod.modelo,
+          numero: prod.numero,
+          color: prod.color,
+          tipo: prod.tipo,
+        },
+      ];
+    }
 
     // Hacer la modificacion en PRODUCT y CopieInventario.
     await editCopieInventario(req, res);
@@ -251,8 +260,6 @@ const getShoppingPedidos = async (req, res = response) => {
         },
       });
 
-      console.log(todayShopping);
-
       todayShopping.map((user, i) => {
         user.pedidos.map((pedidos, i) => {
           const date = new Date(pedidos.date);
@@ -287,5 +294,5 @@ export {
   editShopping,
   getShopping,
   getShoppingPedidos,
-  deleteShopping
+  deleteShopping,
 };

@@ -151,7 +151,7 @@ export const Shopping = () => {
           variant="buffer"
           color="success"
           value={
-            shop.isSuccess
+            ( shop.isSuccess && shop.data[0] )
               ? shop.data[0].descuentoTotal / 100 > 100
                 ? 100
                 : shop.data[0].descuentoTotal / 100
@@ -162,11 +162,11 @@ export const Shopping = () => {
       </Box>
       <Typography
         display={
-          shop.isSuccess
+          ( shop.isSuccess && shop.data[0] )
             ? shop.data[0].descuentoTotal < 9999
               ? "none"
               : "block"
-            : "block"
+            : "none"
         }
         textAlign="center"
         fontSize=".8rem"
@@ -182,7 +182,7 @@ export const Shopping = () => {
         esta oportunidad y benefíciate de nuestra promoción. ¡Te esperamos!
       </Typography>
       {
-        shop.isSuccess &&
+        ( shop.isSuccess && shop.data[0] ) &&
         shop.data.map((pedido, i) => (
           <AccordionPedido key={i} pedido ={pedido}/>
         ))
@@ -339,7 +339,7 @@ export const Shopping = () => {
                   >
                     <Typography>Sub Total</Typography>
                     <Typography color="green">
-                      {shop.isSuccess
+                      {( shop.isSuccess && shop.data[0]?.descuentoTotal )
                         ? shop.data[0].descuentoTotal > 9999
                           ? (subTotal *= 0.99)
                           : 0

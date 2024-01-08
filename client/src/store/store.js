@@ -6,6 +6,7 @@ import inventarieReducer from '../reducer/inventarieReducer';
 import productReducer from '../reducer/productReducer';
 import shoppingReducer from '../reducer/shoppingReducer';
 import stockReducer from '../reducer/stockReducer';
+import pedidoReducer from '../reducer/pedidoReducer';
 
 
 export const store = configureStore({
@@ -14,6 +15,7 @@ export const store = configureStore({
     product : productReducer,
     stock : stockReducer,
     inventarie : inventarieReducer,
-    shopping : shoppingReducer
+    shopping : shoppingReducer,
+    pedido : pedidoReducer
 },
 })    

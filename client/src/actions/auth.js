@@ -26,7 +26,7 @@ export const keepLogin = ( token ) => {
         icon: 'info',
         title: 'Le recomendamos que Inicie Sesión',
         showConfirmButton: false,
-        timer: 2000, 
+        timer: 3000, 
         customClass: 'swal'
       })
     })

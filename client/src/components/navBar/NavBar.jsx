@@ -166,7 +166,7 @@ export const NavBar = () => {
         </IconButton>
         <p>Ventas</p>
       </MenuItem>
-      <MenuItem sx={{ display:  ( noAmin.some(s => s.includes(rol)) )  && "none"  }} onClick={() =>{ /* navigate("/inventario/todos"), */ handleMobileMenuClose()}}>
+      <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' )  && "none"  }} onClick={() =>{  navigate("/pedidos"),  handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
         <Badge badgeContent={cantProduts ?cantProduts.length :0} color="success">
           <ShoppingCartCheckoutOutlinedIcon />
