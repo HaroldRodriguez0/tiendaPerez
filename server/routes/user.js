@@ -4,11 +4,13 @@ host + /api/users/...
 
 import { Router } from 'express';
 import { check } from 'express-validator';
-import { users, usersEdit, usersPorNameEmail } from '../controller/users.js';
+import { user, users, usersEdit, usersPorNameEmail } from '../controller/users.js';
 import { esRolValido, existeUsuarioxID, movilValido } from '../middlewares/dbValidator.js';
 import { esAdminRole, validarCampo, validarJWT } from '../middlewares/index.js';
 
 const router = Router();
+
+router.get( '/uid/:uid?' , user )
 
 router.get( '/',[ validarJWT, esAdminRole ], users );
 

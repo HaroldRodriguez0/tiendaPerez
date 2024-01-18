@@ -162,8 +162,7 @@ const editNewCopie = async (req, res) => {
       await edit( req, res );
     }
     else{
-      const productEncontrado = products.find( elemento => elemento.name === name && elemento.precio === precio );
-
+      const productEncontrado = products.find( elemento => elemento.name === name && elemento.precio === parseInt(precio) );
       if( productEncontrado ){
         await CopieInventario.updateOne(
           { _id: id },

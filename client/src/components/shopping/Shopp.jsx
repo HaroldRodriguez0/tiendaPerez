@@ -35,7 +35,6 @@ export const Shopp = ({ product }) => {
   };
 
   const handleDelete = () => {
-    console.log(1)
     dispatch( shoppingDelete({ _id: product._id ?product._id :product.uid }))
   };
 

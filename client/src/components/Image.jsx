@@ -1,20 +1,21 @@
-import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+/* eslint-disable react/prop-types */
+import { useState } from "react";
+import { styled } from "@mui/material/styles";
 import Skeleton from "@mui/material/Skeleton";
+import Box from "@mui/material/Box";
 
 // Estilos personalizados para el componente
-const useStyles = makeStyles({
-  image: {
-    maxWidth: "100%",
-    height: "auto",
-    transition: "opacity 0.3s",
-  },
-});
+const imageStyles = {
+  maxWidth: "100%",
+  height: "auto",
+  transition: "opacity 0.3s",
+};
+
+// Componente styled a partir del componente Box
+const StyledBox = styled(Box)(imageStyles);
 
 // Componente de imagen personalizado
-const Image = ({ src, alt }) => {
-  const classes = useStyles();
-  // Estado que indica si la imagen real se ha cargado
+const CustomImage = ({ src, alt, width, height }) => {
   const [loaded, setLoaded] = useState(false);
 
   // Función que se ejecuta cuando la imagen real se carga
@@ -26,19 +27,19 @@ const Image = ({ src, alt }) => {
     <>
       {/* Esqueleto circular con animación de onda */}
       {!loaded && (
-        <Skeleton variant="rectangular" sx={{width:'45vw', height: '20vh'}}  animation="wave" />
+        <Skeleton variant="rectangular" sx={{ width: width ?width :'45vw', height: height ?height :'20vh'}}  animation="wave" />
       )}
       {/* Imagen real con atributo loading="lazy" */}
-      <img
+       <StyledBox
+        component="img"
         src={src}
         alt={alt}
-        className={classes.image}
         onLoad={handleLoad}
         loading="lazy"
         style={{ opacity: loaded ? 1 : 0 }}
-      /> 
+      />  
     </>
   );
 };
 
-export default Image;
+export default CustomImage;

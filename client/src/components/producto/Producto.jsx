@@ -217,7 +217,7 @@ export const Producto = (data) => {
               lineHeight="1.2"
               fontWeight="400"
               sx={{
-                pb: { xs: name.length < 20 && "1rem" },
+                pb: { xs: name?.length < 20 && "1rem" },
                 fontSize: { xs: "1rem", sm: "1.2rem" },
               }}
             >

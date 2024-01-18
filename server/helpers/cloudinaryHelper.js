@@ -6,9 +6,9 @@ import streamifier from "streamifier";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
-  cloud_name: "ddsfbz6wq",
-  api_key: "859687261894579",
-  api_secret: "bxevAajSzilFCFpZbPa17JNPDY8",
+  cloud_name: process.env.CLOUDONARY_CLOUD_NAME ,
+  api_key: process.env.CLOUDONARY_API_KEY ,
+  api_secret: process.env.CLOUDONARY_API_SECRET ,
 });
 
 export const cloudinaryDeleteImg = async ( img ) => {
@@ -65,13 +65,13 @@ export const cloudinaryHelper = async (pathFile, oldPathFile = "", fondo) => {
 
   } else {
     await axios({
-      method: "post",
+      method: "post",  
       url: "https://api.remove.bg/v1.0/removebg",
       data: formData,
       responseType: "arraybuffer",
       headers: {
         ...formData.getHeaders(), // crear .env
-        "X-Api-Key": "qKHRJcDqg3HSPPjcEv1jadFm",
+        "X-Api-Key": process.env.API_KEY_REMOVE ,
       },
       encoding: null,
     })

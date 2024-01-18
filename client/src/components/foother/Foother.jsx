@@ -42,7 +42,7 @@ export const Foother = () => {
         }}
       >
         <Grid item xs={7} sm={5} md={4} lg={3}>
-          <Image alt="icono" src="../../public/contact.jpg" />
+          <Image alt="icono" src="./contact.jpg" />
         </Grid>
         <Grid item xs={9} sm={7} md={8} lg={9} sx={{ px: { sm: 5 } }}>
           <Typography

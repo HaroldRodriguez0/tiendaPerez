@@ -2,6 +2,24 @@
 import { response } from "express";
 import { User } from "../models/index.js";
 
+const user = async (req, res = response) => {
+  try {
+    const { uid } = req.query;
+
+    const user = await User.findById( uid )
+    
+    res.status(200).json(
+      user,
+);
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
 
 const users = async (req, res = response) => {
   try {
@@ -104,6 +122,7 @@ const usersEdit = async (req, res = response) => {
 
 
 export {
+  user,
   users,
   usersPorNameEmail,
   usersEdit,

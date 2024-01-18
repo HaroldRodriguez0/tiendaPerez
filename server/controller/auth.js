@@ -16,14 +16,15 @@ const register = async (req, res = response) => {
     // Guardar en DB
     await user.save();
 
+
     // Generar el JWT
     const token = await generarJWT(user._id);
 
-    // enviar mensaje
-    const url = `http://localhost:4000/api/auth/verification/${token}`;
+    // enviar mensaje     
+    const url = `${process.env.SERVER_URL}/auth/verification/${token}`;
     const result = await transporter
       .sendMail({
-        from: "Verificar Email <haroldrodriguez176@gmail.com>",
+        from: "Verificar Email <tiendadenisperez@gmail.com>",
         to: email,
         subject: "Verificar tu Email ...",
         html: `<p>Hola <span>&#x1F44B;</span> verifica tu email haciendo click en el siguiente Link </p>
@@ -42,7 +43,7 @@ const register = async (req, res = response) => {
       ok: false,
       msg: "Please talk to the administrator",
     });
-  }
+  }H
 };
 
 const verificationEmail = async (req, res = response) => {
@@ -58,12 +59,11 @@ const verificationEmail = async (req, res = response) => {
 
     // leer el usuario que corresponde al uid
     const user = await User.findById(uid);
-
     if (user) {
 
       // Guardar en DB
-      user.estado = true
-      await user.save();
+      user.estado = true 
+      await user.save(); 
 
       // modificar el token
       let arr = [...token]
@@ -76,7 +76,7 @@ const verificationEmail = async (req, res = response) => {
       };
       // guardar la informacion en los params
       const query = new URLSearchParams (data).toString ();
-      const url = "http://localhost:5173/verification";
+      const url = `${process.env.CLIENT_URL}verification`;  //REVISAR
       const fullUrl = url + "?" + query;
       res.redirect (fullUrl);
 

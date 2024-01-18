@@ -101,7 +101,7 @@ Notification.requestPermission().then(function (permission) {
           }}
         >
           <Box sx={{ mx: { xl: 20, lg: 15, md: 8, sm: 4 } }}>
-            <Image alt="icono" src="../../public/logoP.png" />
+            <Image height={{xs:'15vh'}} width={'30vw'} alt="icono" src="./logoP.png" />
           </Box>
         </Grid>
       </Grid>
@@ -125,7 +125,7 @@ Notification.requestPermission().then(function (permission) {
             }}
           >
             <Box border={1} borderColor="greenyellow" mb={1}>
-              <Image src="../../public/cafeteria.jpg" alt="Cafeteria" />
+              <Image height={{xs:'30vh',sm:'18vh',md:'22vh',lg:'28vh'}} width={{xs:'70vw',sm:'27vw'}} src="./cafeteria.jpg" alt="Cafeteria" />
             </Box>
             <Button
               onClick={() => navigate("/product/cafeteria")}
@@ -146,7 +146,7 @@ Notification.requestPermission().then(function (permission) {
             }}
           >
             <Box border={1} borderColor="greenyellow" mb={1}>
-              <Image src="../../public/utileria.jpg" alt="Utileria" />
+              <Image height={{xs:'30vh',sm:'18vh',md:'22vh',lg:'28vh'}} width={{xs:'70vw',sm:'27vw'}} src="./utileria.jpg" alt="Utileria" />
             </Box>
             <Button
               onClick={() => navigate("/product/utiles")}
@@ -172,7 +172,7 @@ Notification.requestPermission().then(function (permission) {
               mb={1}
               sx={{ background: "white" }}
             >
-              <Image src="../../public/calzado.png" alt="Calzado" />
+              <Image height={{xs:'30vh',sm:'18vh',md:'22vh',lg:'28vh'}} width={{xs:'70vw',sm:'27vw'}} src="./calzado.png" alt="Calzado" />
             </Box>
             <Button
               onClick={() => navigate("/product/calzado")}
@@ -239,7 +239,7 @@ Notification.requestPermission().then(function (permission) {
             pb={{ xs: 2, md: 0 }}
           >
             <Grid item xs={10} sm={8} md={6}>
-              <Image alt="icono" src="../../public/nosotros.jpg" />
+              <Image alt="icono" src="./nosotros.jpg" />
             </Grid>
             <Grid item md={6}>
               <Typography

@@ -24,11 +24,12 @@ import { NewProductoVariable } from "./NewProductoVariable";
 import { useForm } from "../../hooks/useForm";
 
 import Dropzone from "react-dropzone";
-import FlexBetween from "../../../../../../Sociopedia Fullstack/client/src/components/FlexBetween";
+
 import { api } from "../../api/myApi";
 import Swal from "sweetalert2";
 import { useQueryClient } from "@tanstack/react-query";
 import { turnCategoria } from "../../helpers/turnCategoria";
+import FlexBetween from "../FlexBetween";
 
 export const NewProducto = () => {
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } };

@@ -20,9 +20,9 @@ export const Verification = () => {
     const uid = params.get("uid");
     const token = params.get("token");
     // hacer peticion  para buscar el user con ese uid y guardar en store sus datos
-    api.get( `/users/${uid}` )
+    api.get( `/users/uid/?uid=${uid}` )
       .then(body => {
-        setData({ token, ...body.data.user });
+        setData({ token, ...body });
       })
       .catch(error => {
         console.log(error);

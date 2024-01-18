@@ -339,10 +339,10 @@ export const Shopping = () => {
                   >
                     <Typography>Sub Total</Typography>
                     <Typography color="green">
-                      {( shop.isSuccess && shop.data[0]?.descuentoTotal )
+                      {( shop.isSuccess && shop.data[0] )
                         ? shop.data[0].descuentoTotal > 9999
                           ? (subTotal *= 0.99)
-                          : 0
+                          : subTotal
                         : 0}
                     </Typography>
                   </Box>

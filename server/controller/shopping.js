@@ -4,15 +4,16 @@ import { editCopieInventario, editNewCopie } from "./inventario.js";
 const newShopping = async (req, res) => {
   try {
     let shopping,
-      descuento = 0;
+      descuento = 0, arrProdts = [];
     const { receptor, direccion, envio, movil, products } = req.body;
     const nameUser = req.user.name;
 
     const found = await Shopping.findOne({ nameUser });
 
-    products.map((prod) => {
-      descuento += prod.precio * prod.cantidad;
-    });
+    for (let i = 0; i < products.length; i++) {
+      descuento += products[i].precio * products[i].cantidad;
+      arrProdts.push({ ...products[i], precio: products[i].precio * 0.99})
+    }
 
     if (!found) {
       shopping = new Shopping({
@@ -47,7 +48,7 @@ const newShopping = async (req, res) => {
               envio,
               descuento: found.descuento > 10000 ? true : false,
               estado: "Procesando",
-              products,
+              products: found.descuento > 10000 ?arrProdts :products,
             },
           },
         }
@@ -111,6 +112,7 @@ const accionShopping = async (req, res = response) => {
       const indexProd = products.findIndex(
         (elemento) =>
           elemento.name === prod.name &&
+          elemento.precio === prod.precio &&
           elemento?.modelo === prod?.modelo &&
           elemento?.numero === prod?.numero &&
           elemento?.color === prod?.color &&
@@ -132,7 +134,7 @@ const accionShopping = async (req, res = response) => {
     }
 
     // Hacer la modificacion en PRODUCT y CopieInventario.
-    await editCopieInventario(req, res);
+  await editCopieInventario(req, res);
   } catch (error) {
     console.log(error.message);
   }
@@ -144,30 +146,40 @@ const editShopping = async (req, res = response) => {
     const { nameUser, date, products: productsVendidos } = req.body;
     req.body = [];
 
-    const found = await Shopping.findOne({ nameUser });
+    //const found = await Shopping.findOne({ nameUser });
 
-    await Shopping.updateOne(
-      { _id: found._id },
+    const found = await Shopping.findOneAndUpdate(
+      { nameUser },
       { $set: { "pedidos.$[pedido].products": productsVendidos } },
       { arrayFilters: [{ "pedido.date": date }] }
     );
+    const arr = found.pedidos.find(ped => new Date(ped.date).getTime() === new Date(date).getTime());
 
     for await (const prod of productsVendidos) {
       const indexProd = products.findIndex(
         (elemento) =>
           elemento.name === prod.name &&
+          elemento.precio === prod.precio &&
           elemento?.modelo === prod?.modelo &&
           elemento?.numero === prod?.numero &&
           elemento?.color === prod?.color &&
           elemento?.tipo === prod?.tipo
       );
-
+      const indexShop = arr.products.findIndex(
+        (elemento) =>
+          elemento.name === prod.name &&
+          elemento.precio === prod.precio &&
+          elemento?.modelo === prod?.modelo &&
+          elemento?.numero === prod?.numero &&
+          elemento?.color === prod?.color &&
+          elemento?.tipo === prod?.tipo
+      );
       req.body = [
         ...req.body,
         {
           index: indexProd,
           name: prod.name,
-          cantidad: products[indexProd].cantidad - prod.cantidad,
+          cantidad: products[indexProd].cantidad - (arr.products[indexShop].cantidad - prod.cantidad),
           modelo: prod.modelo,
           numero: prod.numero,
           color: prod.color,
@@ -175,7 +187,6 @@ const editShopping = async (req, res = response) => {
         },
       ];
     }
-
     // Hacer la modificacion en PRODUCT y CopieInventario.
     await editCopieInventario(req, res);
   } catch (error) {

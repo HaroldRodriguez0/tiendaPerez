@@ -52,7 +52,7 @@ export const AppRouter = () => {
           <Route
             path="/login"
             element={
-              <PublicRouter>
+              <PublicRouter >
                 <LoginScreen />
               </PublicRouter>
             }

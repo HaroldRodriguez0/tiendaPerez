@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authLogout } from "../../reducer/authReducer";
 import { stockShow } from "../../reducer/stockReducer";
+import { usePedidos } from "../../hooks/usePedidos";
 
 const noAmin = ['USER_ROLE', 'CAFETERIA_ROLE', 'TOOLS_ROLE' ];
 
@@ -72,6 +73,7 @@ export const NavBar = () => {
   const navigate = useNavigate();
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
   const [valueSearch, setValueSearch] = React.useState("");
+  const pedidos = usePedidos();
 
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
 
@@ -125,7 +127,7 @@ export const NavBar = () => {
         <IconButton size="large" aria-label="Login" color="inherit">
           <PersonOutlineOutlinedIcon />
         </IconButton>
-        <p>Login / Registro</p>
+        <p> Login / Registro </p>
       </MenuItem>
       <MenuItem
         sx={{
@@ -168,7 +170,7 @@ export const NavBar = () => {
       </MenuItem>
       <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' )  && "none"  }} onClick={() =>{  navigate("/pedidos"),  handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
-        <Badge badgeContent={cantProduts ?cantProduts.length :0} color="success">
+        <Badge badgeContent={pedidos.isSuccess ?pedidos.data.length :0} color="success">
           <ShoppingCartCheckoutOutlinedIcon />
         </Badge>
         </IconButton>
@@ -232,7 +234,7 @@ export const NavBar = () => {
                   width: "65px",
                   height: "auto",
                 }}
-                src="../../../public/favicon.png"
+                src="./favicon.png"
                 alt="logo"
               />
             </IconButton>

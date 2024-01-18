@@ -20,29 +20,27 @@ import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 const Prod = ({ prod, index, ban }) => {
-
   const dispatch = useDispatch();
   const [number, setNumber] = useState(prod.cantidad);
 
   const handleChange = (event) => {
     setNumber(event.target.value);
-    dispatch( pedidoChange({ index, cantidad: event.target.value }));
+    dispatch(pedidoChange({ index, cantidad: event.target.value }));
   };
 
   useEffect(() => {
     setNumber(prod.cantidad);
-  }, [ban])
-  
+  }, [ban]);
 
   return (
     <Grid container>
-      <Grid item xs={4}>
-        <Typography fontSize=".9rem" textAlign="center">
+      <Grid item xs={4} display='flex' alignItems='center' justifyContent='center'>
+        <Typography fontSize=".9rem" >
           {prod.name}
         </Typography>
       </Grid>
-      <Grid item xs={4}>
-        <Box display="flex" justifyContent="center">
+      <Grid item xs={4} display='flex' alignItems='center' justifyContent='center'>
+        <Box display="flex" >
           <TextField
             sx={{ width: "40px" }}
             variant="standard"
@@ -54,8 +52,8 @@ const Prod = ({ prod, index, ban }) => {
           />
         </Box>
       </Grid>
-      <Grid item xs={4}>
-        <Typography fontSize=".9rem" textAlign="center">
+      <Grid item xs={4} display='flex' alignItems='center' justifyContent='center'>
+        <Typography fontSize=".9rem" >
           {prod.precio}
         </Typography>
       </Grid>
@@ -64,6 +62,7 @@ const Prod = ({ prod, index, ban }) => {
 };
 
 const Pedido = ({ pedido }) => {
+  
   const fecha = new Date(pedido.date);
   const ano = fecha.getFullYear();
   const mes = fecha.getMonth() + 1;
@@ -151,59 +150,106 @@ const PedidoAdmin = ({ pedido }) => {
 export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
   const dispatch = useDispatch();
   const quueryClient = useQueryClient();
-  const [ban, setBan] = useState(false)
-  const {products} = useSelector( state => state.pedido );
+  const [ban, setBan] = useState(false);
+  const { products } = useSelector((state) => state.pedido);
   const total = pedido.products?.reduce(
     (acum, item) => acum + item.precio * item.cantidad,
     0
   );
 
+  // No pueden haber 2 Accordion abiertos
   const handleChange = (panel) => (event, isExpanded) => {
-    isExpanded &&( dispatch( pedidoNew( pedido.products )), setBan(!ban));
+    isExpanded && (dispatch(pedidoNew( pedido.products )), setBan(!ban));
     setExpanded(isExpanded ? panel : false);
   };
-  
-  console.log(expanded);
-  console.log(pedido);
-  console.log(products);
 
   const handleEdit = async () => {
     products !== pedido.products &&
-    await api
-      .put(
-        `/shopping/accion`,
-        {
-          nameUser: pedido.nameUser,
-          date: pedido.date,
-          products: products,
-        },
-        {
-          headers: {
-            "x-token": localStorage.getItem("token"),
+      (await api
+        .put(
+          `/shopping/edit`,
+          {
+            nameUser: pedido.nameUser,
+            date: pedido.date,
+            products: products,
           },
-        }
-      )
-      .then(() => {
-        quueryClient.invalidateQueries([
-          "pedidos",
-        ]);
-        Swal.fire({
-          text: "Pedido Actualizado con Exito!",
-          icon: "success",
-        });
-      })
-      .catch(({ response }) => {
-        console.log(response);
-        Swal.fire("", response.data.msg, "error");
-      });
+          {
+            headers: {
+              "x-token": localStorage.getItem("token"),
+            },
+          }
+        )
+        .then(() => {
+          quueryClient.invalidateQueries(["pedidos"]);
+          Swal.fire({
+            text: "Pedido Actualizado con Exito!",
+            icon: "success",
+          });
+        })
+        .catch(( response ) => {
+          console.log(response);
+          Swal.fire("", response.data.msg, "error");
+        }));
   };
 
-  const handleAcept = () => {};
+  const handleAcept = async () => {
+    await api
+        .put(
+          `/shopping/accion`,
+          {
+            nameUser: pedido.nameUser,
+            date: pedido.date,
+          },
+          {
+            headers: {
+              "x-token": localStorage.getItem("token"),
+            },
+          }
+        )
+        .then(() => {
+          quueryClient.invalidateQueries(["pedidos"]);
+          Swal.fire({
+            text: "Pedido Enviandose con Exito!",
+            icon: "success",
+          });
+        })
+        .catch(({ response }) => {
+          console.log(response);
+        });
+  };
 
-  const handleDelete = () => {};
+  const handleDelete = async () => {
+    await api
+        .put(
+          `/shopping/accion`,
+          {
+            nameUser: pedido.nameUser,
+            date: pedido.date,
+            products: products,
+          },
+          {
+            headers: {
+              "x-token": localStorage.getItem("token"),
+            },
+          }
+        )
+        .then(() => {
+          quueryClient.invalidateQueries(["pedidos"]);
+          Swal.fire({
+            text: "Pedido Cancelado con Exito!",
+            icon: "success",
+          });
+        })
+        .catch(({ response }) => {
+          console.log(response);
+          Swal.fire("", response.data.msg, "error");
+        });
+  };
 
   return (
-    <Accordion  expanded={ expanded === i } onChange={handleChange( i )}
+    <Accordion
+      expanded={expanded === i}
+      onChange={handleChange(i)}
       sx={{ mt: 1, border: pedido.descuento && "1px solid greenyellow" }}
     >
       <AccordionSummary
@@ -218,62 +264,84 @@ export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
         aria-controls="panel1a-content"
         id="panel1a-header"
       >
-        <Box width="100%" display="flex" justifyContent="space-around">
+        <Box
+          width="100%"
+          display="flex"
+          justifyContent="space-around"
+          borderBottom="1px solid rgba(0,0,0,0.105)"
+        >
           <Typography fontSize=".9rem">Receptor: {pedido.receptor}</Typography>
-          <Typography fontSize=".9rem">
+          <Typography fontSize=".9rem" display={{xs:"none", md:'flex'}}>
             Total:{" "}
-            {pedido.descuento
-              ? total * 0.99 + pedido.envio
-              : total + pedido.envio}
+            {total + pedido.envio}
           </Typography>
+          <Typography color="green">{pedido.estado}</Typography>
         </Box>
       </AccordionSummary>
       <AccordionDetails sx={{ p: 0, pb: 1 }}>
-        <Box display="flex" justifyContent="space-around">
-          <Typography fontSize=".9rem">Móvil: {pedido.movil}</Typography>
-          <Typography fontSize=".9rem">Envio: {pedido.envio}</Typography>
-        </Box>
-        <Typography fontSize=".9rem">Dirección: {pedido.direccion}</Typography>
-        <Grid container>
-          <Grid item xs={4}>
-            <Typography textAlign="center">Nombre</Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography textAlign="center">Cantidad</Typography>
-          </Grid>
-          <Grid item xs={4}>
-            <Typography textAlign="center">Precio</Typography>
-          </Grid>
-        </Grid>
-        {pedido.products.map((prod, i) => (
-          <Prod key={i} prod={prod} index={i} ban={ban}/>
-        ))}
-        <Box mt={1} display="flex" justifyContent="space-around">
-          <Button
-            onClick={handleAcept}
-            size="small"
-            color="success"
-            variant="outlined"
+        <Container>
+          <Box
+            display="flex"
+            justifyContent="space-around"
+            borderBottom="1px solid rgba(0,0,0,0.105)"
           >
-            Aceptar
-          </Button>
-          <Button
-            onClick={handleEdit}
-            size="small"
-            color="info"
-            variant="outlined"
+            <Typography fontSize=".9rem">Móvil: {pedido.movil}</Typography>
+            <Typography fontSize=".9rem">Envio: {pedido.envio}</Typography>
+          </Box>
+          <Typography
+            sx={{ borderBottom: "1px solid rgba(0,0,0,0.105)", py:.5 }}
+            fontSize=".9rem"
           >
-            Editar
-          </Button>
-          <Button
-            onClick={handleDelete}
-            size="small"
-            color="error"
-            variant="outlined"
-          >
-            Eliminar
-          </Button>
-        </Box>
+            Dirección: {pedido.direccion}
+          </Typography>
+          <Grid container sx={{ borderBottom: "1px solid rgba(0,0,0,0.105)", py:.5 }}>
+            <Grid item xs={4}>
+              <Typography textAlign="center">Nombre</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography textAlign="center">Cantidad</Typography>
+            </Grid>
+            <Grid item xs={4}>
+              <Typography textAlign="center">Precio</Typography>
+            </Grid>
+          </Grid>
+          {pedido.products.map((prod, i) => (
+            <Prod key={i} prod={prod} index={i} ban={ban} />
+          ))}
+          <Typography mr='1.5rem' textAlign='end' display={{xs:"block", md:'none'}}>
+            Total:{" "}
+            {total + pedido.envio}
+          </Typography>
+          <Box mt={.5} display="flex" justifyContent="space-around">
+            <Button
+              disabled={pedido.estado === 'Cancelado'}
+              onClick={handleAcept}
+              size="small"
+              color="success"
+              variant="outlined"
+            >
+              Aceptar
+            </Button>
+            <Button
+              disabled={pedido.estado === 'Cancelado'}
+              onClick={handleEdit}
+              size="small"
+              color="info"
+              variant="outlined"
+            >
+              Editar
+            </Button>
+            <Button
+              disabled={pedido.estado === 'Cancelado'}
+              onClick={handleDelete}
+              size="small"
+              color="error"
+              variant="outlined"
+            >
+              Cancelar
+            </Button>
+          </Box>
+        </Container>
       </AccordionDetails>
     </Accordion>
   );
@@ -309,7 +377,13 @@ export const Pedidos = () => {
           rol === "ADMIN_ROLE" ? (
             <PedidoAdmin key={i} pedido={ped} />
           ) : (
-            <PedidoUser key={i} pedido={ped} i={i} expanded={expanded} setExpanded={setExpanded}/>
+            <PedidoUser
+              key={i}
+              pedido={ped}
+              i={i}
+              expanded={expanded}
+              setExpanded={setExpanded}
+            />
           )
         )}
     </Container>

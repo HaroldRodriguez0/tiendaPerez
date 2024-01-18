@@ -62,6 +62,7 @@ export const AccordionPedido = ({ pedido }) => {
             width: "100%",
             display: "flex",
             justifyContent: "space-around",
+            borderBottom: "1px solid rgba(0,0,0,0.105)"
           }}
         >
           <Typography fontSize=".9rem">
@@ -69,23 +70,20 @@ export const AccordionPedido = ({ pedido }) => {
           </Typography>
           <Box display={{xs:"none", md:'flex'}} justifyContent="center">
           <Typography>Total: </Typography>
-          <Typography mx={1} textAlign="center" sx={{textDecoration: pedido.descuento && "line-through",}}>
-            {total + pedido.envio}
-          </Typography>
-          <Typography display={!pedido.descuento && 'none'}  textAlign="center">
-            {(total * 0.99 + pedido.envio) }
+          <Typography textAlign="center">
+            {(total + pedido.envio) }
           </Typography>
         </Box>
           <Typography color="green">{pedido.estado}</Typography>
         </Box>
       </AccordionSummary>
       <AccordionDetails sx={{ pt: 0, pb: 1 }}>
-        <Box display="flex" justifyContent="space-around">
+        <Box display="flex" justifyContent="space-around" sx={{borderBottom: "1px solid rgba(0,0,0,0.105)", py:.5}}>
           <Typography fontSize=".9rem">Receptor: {pedido.receptor}</Typography>
           <Typography fontSize=".9rem">Móvil: {pedido.movil}</Typography>
         </Box>
-        <Typography fontSize=".9rem">Dirección: {pedido.direccion}</Typography>
-        <Grid container>
+        <Typography fontSize=".9rem" sx={{borderBottom: "1px solid rgba(0,0,0,0.105)", py:.5}}>Dirección: {pedido.direccion}</Typography>
+        <Grid container >
           <Grid item xs={4}>
             <Typography textAlign="center">Nombre</Typography>
           </Grid>
@@ -101,11 +99,8 @@ export const AccordionPedido = ({ pedido }) => {
         ))}
         <Box display={{xs:"flex", md:'none'}} justifyContent="center">
           <Typography>Total: </Typography>
-          <Typography mx={1} textAlign="center" sx={{textDecoration: pedido.descuento && "line-through",}}>
-            {total + pedido.envio}
-          </Typography>
-          <Typography display={!pedido.descuento && 'none'}  textAlign="center">
-            {(total * 0.99 + pedido.envio) }
+          <Typography textAlign="center">
+            { total + pedido.envio }
           </Typography>
         </Box>
       </AccordionDetails>
