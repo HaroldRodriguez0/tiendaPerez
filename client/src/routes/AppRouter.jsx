@@ -1,25 +1,33 @@
+import { Suspense, lazy } from "react";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { HomeScreen } from "../components/HomeScreen";
 import { Verification } from "./Verification";
 import { NavBar } from "../components/navBar/NavBar";
-import { LoginScreen } from "../components/login&register/LoginScreen";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useLayoutEffect } from "react";
 import { keepLogin } from "../actions/auth";
 import { PublicRouter } from "./PublicRouter";
-import { NewProducto } from "../components/producto/NewProducto";
-
-import { EditProducto } from "../components/producto/EditProducto";
-import { ProductoDesc } from "../components/producto/ProductoDesc";
-import { Usuarios } from "../components/users/Usuarios";
-import { Venta } from "../components/inventario/Venta";
-import { ProductoCategoria } from "../components/producto/ProductoCategoria";
-import { InventarioDiario } from "../components/inventario/InventarioDiario";
-import { Inventarios } from "../components/inventario/Inventarios";
 import { Whatsapp } from "../components/Whatsapp";
 import { Foother } from "../components/foother/Foother";
-import { Shopping } from "../components/shopping/Shopping";
-import { Pedidos } from "../components/shopping/Pedidos";
+import { Box, CircularProgress } from "@mui/material";
+const LoginScreen = lazy(() =>
+  import("../components/login&register/LoginScreen")
+);
+const NewProducto = lazy(() => import("../components/producto/NewProducto"));
+const ProductoDesc = lazy(() => import("../components/producto/ProductoDesc"));
+const Usuarios = lazy(() => import("../components/users/Usuarios"));
+const Venta = lazy(() => import("../components/inventario/Venta"));
+const ProductoCategoria = lazy(() =>
+  import("../components/producto/ProductoCategoria")
+);
+const InventarioDiario = lazy(() =>
+  import("../components/inventario/InventarioDiario")
+);
+const Inventarios = lazy(() => import("../components/inventario/Inventarios"));
+const Shopping = lazy(() => import("../components/shopping/Shopping"));
+const EditProducto = lazy(() => import("../components/producto/EditProducto"));
+const Pedidos = lazy(() => import("../components/shopping/Pedidos"));
+const ListaProducts = lazy(() => import("../components/inventario/ListaProducts"));
 
 const ScrollToTop = ({ children }) => {
   const location = useLocation();
@@ -48,33 +56,50 @@ export const AppRouter = () => {
       <Whatsapp />
       <NavBar />
       <ScrollToTop>
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              <PublicRouter >
-                <LoginScreen />
-              </PublicRouter>
-            }
-          />
-          <Route path="/product/*">
-            <Route path="new" element={<NewProducto />} />
-            <Route path="edit" element={<EditProducto />} />
-            <Route path=":categoria" element={<ProductoCategoria />} />
-          </Route>
+        <Suspense
+          fallback={
+            <Box
+              sx={{
+                display: "flex",
+                width: "100%",
+                height: "92vh",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <CircularProgress color="success" size="10rem" />
+            </Box>
+          }
+        >
+          <Routes>
+            <Route
+              path="/login"
+              element={
+                <PublicRouter>
+                  <LoginScreen />
+                </PublicRouter>
+              }
+            />
+            <Route path="/product/*">
+              <Route path="new" element={<NewProducto />} />
+              <Route path="edit" element={<EditProducto />} />
+              <Route path=":categoria" element={<ProductoCategoria />} />
+            </Route>
 
-          <Route path="/inventario/*">
-            <Route path="diario" element={<InventarioDiario />} />
-            <Route path="todos" element={<Inventarios />} />
-          </Route>
+            <Route path="/inventario/*">
+              <Route path="diario" element={<InventarioDiario />} />
+              <Route path="todos" element={<Inventarios />} />
+              <Route path="list" element={<ListaProducts />} />
+            </Route>
 
-          <Route path="/users" element={<Usuarios />} />
-          <Route path="/shopping" element={<Shopping />} />
-          <Route path="/pedidos" element={<Pedidos />} />
+            <Route path="/users" element={<Usuarios />} />
+            <Route path="/shopping" element={<Shopping />} />
+            <Route path="/pedidos" element={<Pedidos />} />
 
-          <Route path="/verification/*" element={<Verification />} />
-          <Route path="/*" element={<HomeScreen />} />
-        </Routes>
+            <Route path="/verification/*" element={<Verification />} />
+            <Route path="/*" element={<HomeScreen />} />
+          </Routes>
+        </Suspense>
       </ScrollToTop>
 
       <ProductoDesc />

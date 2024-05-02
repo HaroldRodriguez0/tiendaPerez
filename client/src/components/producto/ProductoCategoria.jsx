@@ -1,10 +1,10 @@
 import { Container, Typography } from "@mui/material";
-import { useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useProduts } from "../../hooks/useProduts";
-import { Productos } from "./Productos";
+const Productos = lazy(() => import("./Productos"));
 
-export const ProductoCategoria = () => {
+export default function ProductoCategoria () {
   let variable;
   const { categoria, value } = useParams();
 
@@ -59,12 +59,14 @@ export const ProductoCategoria = () => {
       >
         { 
           categoria === 'cafeteria' 
-            ? 'Productos Cafeteía'
+            ? 'Productos Cafetería'
             : categoria === 'utiles' 
-              ? 'Productos Utileía'
+              ? 'Productos Utilería'
               : categoria === 'calzado'
                 ? 'Productos Calzado'
-                : 'Productos Buscados'
+                : categoria === 'pormayor'
+                  ? 'Productos Por Mayor'
+                  : 'Productos Buscados'
         }
       </Typography>
 

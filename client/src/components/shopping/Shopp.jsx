@@ -10,7 +10,8 @@ import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Box } from "@mui/system";
-import Image from "../Image";
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 import { useDispatch } from "react-redux";
 import { shoppingChange, shoppingDecrement, shoppingDelete, shoppingIncrement } from "../../reducer/shoppingReducer";
 
@@ -61,7 +62,7 @@ export const Shopp = ({ product }) => {
           </IconButton>
 
           <Box pr={1} sx={{ maxWidth: { sm: "50%" } }}>
-            <Image alt="icono" src={product.img} />
+            <LazyLoadImage alt="icono" src={product.img} effect="blur" />
           </Box>
 
           <Typography

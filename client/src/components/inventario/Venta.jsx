@@ -41,7 +41,7 @@ const Row = ({ name, cantidad, precio }) => {
   );
 };
 
-export const Venta = () => {
+export default function Venta () {
   const { show, name, cantidad, precio } = useSelector((state) => state.stock);
   const dispatch = useDispatch();
 

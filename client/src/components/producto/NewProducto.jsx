@@ -31,7 +31,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { turnCategoria } from "../../helpers/turnCategoria";
 import FlexBetween from "../FlexBetween";
 
-export const NewProducto = () => {
+export default function NewProducto () {
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
   const quueryClient = useQueryClient();
   const [i, seti] = useState(0);
@@ -81,6 +81,7 @@ export const NewProducto = () => {
   const [newProduct, handlenewProduct, newProductReset] = useForm({
     name: "",
     precio: "",
+    costoProducto: "",
     descuento: "",
     cantAlmacen: "",
     cantTienda: "",
@@ -88,7 +89,7 @@ export const NewProducto = () => {
     desc: "",
   });
 
-  const { name, precio, descuento, cantAlmacen, cantTienda, modelo, desc } = newProduct;
+  const { name, precio, costoProducto, descuento, cantAlmacen, cantTienda, modelo, desc } = newProduct;
 
   const handleChangeCategoria = (event) => {
     setCategoria(event.target.value);
@@ -356,6 +357,7 @@ export const NewProducto = () => {
                       <MenuItem value="UTILES">Utiles</MenuItem>
                       <MenuItem value="CAFETERIA">Cafeteria</MenuItem>
                       <MenuItem value="CALZADO">Calzado</MenuItem>
+                      <MenuItem value="PORMAYOR">Por Mayor</MenuItem>
                     </Select>
                   </FormControl>
                   <TextField
@@ -383,6 +385,19 @@ export const NewProducto = () => {
                     InputLabelProps={{ style: { fontSize: ".9rem" } }}
                   />
                   <TextField
+                    required
+                    type="number"
+                    name="costoProducto"
+                    variant="standard"
+                    label="Costo Producto..."
+                    color="success"
+                    size="small"
+                    value={costoProducto}
+                    onChange={handlenewProduct}
+                    InputLabelProps={{ style: { fontSize: ".9rem" } }}
+                  />
+                  </Box>
+                  <TextField
                     type="number"
                     name="descuento"
                     variant="standard"
@@ -391,9 +406,7 @@ export const NewProducto = () => {
                     size="small"
                     value={descuento}
                     onChange={handlenewProduct}
-                    InputLabelProps={{ style: { fontSize: ".9rem" } }}
                   />
-                  </Box>
                   <Box display={"flex"}>
                     <TextField
                       required

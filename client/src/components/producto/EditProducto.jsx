@@ -32,8 +32,9 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { turnCategoria } from "../../helpers/turnCategoria";
 
-export const EditProducto = () => {
+export default function EditProducto () {
 
+  const { rol } = useSelector((state) => state.auth);
   const label = { inputProps: { 'aria-label': 'Checkbox demo' } };
   const navigate = useNavigate();
   const quueryClient = useQueryClient();
@@ -119,6 +120,7 @@ export const EditProducto = () => {
   const [newProduct, handlenewProduct, /* newProductReset */] = useForm({
     name: data.name,
     precio: data.precio,
+    costoProducto: data.costoProducto,
     descuento: data.descuento,
     cantAlmacen: data.cantAlmacen,
     cantTienda: data.cantTienda,
@@ -126,7 +128,7 @@ export const EditProducto = () => {
     desc: data.desc,
   });
 
-  const { name, precio, descuento = 0, cantAlmacen, cantTienda, modelo, desc } = newProduct;
+  const { name, precio, costoProducto, descuento = 0, cantAlmacen, cantTienda, modelo, desc } = newProduct;
 
   const handleChangeCategoria = (event) => {
     setCategoria(event.target.value);
@@ -411,6 +413,7 @@ export const EditProducto = () => {
                       <MenuItem value="UTILES">Utiles</MenuItem>
                       <MenuItem value="CAFETERIA">Cafeteria</MenuItem>
                       <MenuItem value="CALZADO">Calzado</MenuItem>
+                      <MenuItem value="PORMAYOR">Por Mayor</MenuItem>
                     </Select>
                   </FormControl>
                   <TextField
@@ -437,6 +440,20 @@ export const EditProducto = () => {
                     sx={{ pr: 1 }}
                     InputLabelProps={{ style: { fontSize: ".9rem" } }}
                   />
+                    <TextField
+                    required
+                    type="number"
+                    name="costoProducto"
+                    variant="standard"
+                    label="costo Producto..."
+                    color="success"
+                    size="small"
+                    value={costoProducto}
+                    onChange={handlenewProduct}
+                    sx={{ pr: 1, display: rol !== 'ADMIN_ROLE' ?'none' :'inline-flex' }}
+                    InputLabelProps={{ style: { fontSize: ".9rem" }  }}
+                  />
+                  </Box>
                   <TextField
                     type="number"
                     name="descuento"
@@ -448,7 +465,6 @@ export const EditProducto = () => {
                     onChange={handlenewProduct}
                     InputLabelProps={{ style: { fontSize: ".9rem" } }}
                   />
-                  </Box>
                   <Box display={"flex"}>
                     <TextField
                       

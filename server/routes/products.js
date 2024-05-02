@@ -11,10 +11,12 @@ import {
   editAdmin,
   getProduct,
   getProductAgotado,
+  getProductAll,
   getProductCafeteria,
   getProductCalzado,
   getProductMarked,
   getProductName,
+  getProductPorMayor,
   getProductUtiles,
   newProduct,
 } from "../controller/product.js";
@@ -62,7 +64,7 @@ router.put(
   [
     // middlewares
     validarJWT,
-    esAdminRole,
+    tieneRole("ADMIN_ROLE", "STORE_ROLE"),
     upload.fields([{ name: 'picture', maxCount: 2 }]),
     check("id", "No es un id de Mongo ").isMongoId(),
     check("id").custom(existeProductoxID),
@@ -77,7 +79,7 @@ router.put(
   [
     // middlewares
     validarJWT,
-    tieneRole("ADMIN_ROLE", "TOOLS_ROLE", "CAFETERIA_ROLE"),
+    tieneRole("ADMIN_ROLE", "TOOLS_ROLE", "CAFETERIA_ROLE", "STORE_ROLE"),
     check("id", "No es un id de Mongo ").isMongoId(),
     validarProductorole(),
     validarCampo,
@@ -99,6 +101,10 @@ router.delete(
 );
 
 router.get("/", getProduct);
+
+router.get("/all", getProductAll);
+
+router.get("/pormayor", getProductPorMayor);
 
 router.get("/utiles", getProductUtiles);
 

@@ -11,8 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-
+import { lazy, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Swal from "sweetalert2";
 import { api } from "../../api/myApi";
@@ -20,8 +19,9 @@ import { turnCategoria } from "../../helpers/turnCategoria";
 import { productDescHide } from "../../reducer/productReducer";
 import { shoppingNew } from "../../reducer/shoppingReducer";
 import { ProductDescCant } from "./ProductDescCant";
+//const ProductDescCant = lazy(() => import("./ProductDescCant"));
 
-export const ProductoDesc = () => {
+export default function ProductoDesc () {
   const product = useSelector((state) => state.product);
   const { show, name, desc, img, imgDesc, numero, color, tipo, categoria } =
     product;

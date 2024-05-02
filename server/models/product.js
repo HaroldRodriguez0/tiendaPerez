@@ -12,6 +12,10 @@ const ProductSchema = Schema({
     min: 0
   },
 
+  costoProducto: {
+    type: Number,
+  },
+
   descuento: {
     type: Number,
   },

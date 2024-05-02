@@ -26,7 +26,7 @@ import Swal from "sweetalert2";
 import { authLogin } from "../../reducer/authReducer";
 import { useNavigate } from "react-router-dom";
 
-export const LoginScreen = () => {
+export default function LoginScreen () {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -184,7 +184,7 @@ export const LoginScreen = () => {
                   </Box>
                   <FormControl variant="standard" color="success">
                     <InputLabel htmlFor="standard-adornment-password">
-                      Password...
+                      Contraseña...
                     </InputLabel>
                     <Input
                       type={showPassword ? "text" : "password"}

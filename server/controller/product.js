@@ -18,6 +18,7 @@ const newProduct = async (req, res = response) => {
     const {
       name,
       precio,
+      costoProducto,
       descuento,
       categoria,
       cantAlmacen,
@@ -39,6 +40,7 @@ const newProduct = async (req, res = response) => {
     const product = new Product({
       name,
       precio,
+      costoProducto,
       descuento,
       categoria,
       cantAlmacen,
@@ -50,6 +52,8 @@ const newProduct = async (req, res = response) => {
       desc,
       marked
     });
+
+    
 
     const file = req.files.picture[0].path;
     const fileDesc = req.files.picture[1]?.path;
@@ -236,6 +240,21 @@ const getProduct = async (req, res = response) => {
   }
 };
 
+const getProductAll = async (req, res = response) => {
+  try {
+
+    const produts = await Product.find();
+
+    res.status(200).json( produts );
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
 const getProductUtiles = async (req, res = response) => {
   try {
     const { limite = 12, page = 1, desde = (page - 1) * limite } = req.query;
@@ -243,6 +262,28 @@ const getProductUtiles = async (req, res = response) => {
     const [total, product] = await Promise.all([
       Product.countDocuments(),
       Product.find({ categoria: "UTILES" })
+        .skip(Number(desde))
+        .limit(Number(limite)),
+    ]);
+
+    res.status(200).json(
+      product
+    );
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
+const getProductPorMayor = async (req, res = response) => {
+  try {
+    const { limite = 12, page = 1, desde = (page - 1) * limite } = req.query;
+
+    const [total, product] = await Promise.all([
+      Product.countDocuments(),
+      Product.find({ categoria: "PORMAYOR" })
         .skip(Number(desde))
         .limit(Number(limite)),
     ]);
@@ -380,5 +421,7 @@ export {
   getProductCafeteria,
   getProductCalzado,
   getProductMarked,
-  getProductAgotado
+  getProductAgotado,
+  getProductAll,
+  getProductPorMayor
 };

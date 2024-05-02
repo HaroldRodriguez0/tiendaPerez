@@ -43,7 +43,7 @@ LinearProgressWithLabel.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
-export const Shopping = () => {
+export default function Shopping () {
   const shop = useShopping();
   const navigate = useNavigate();
   const user = useSelector((state) => state.auth);
@@ -151,7 +151,7 @@ export const Shopping = () => {
           variant="buffer"
           color="success"
           value={
-            ( shop.isSuccess && shop.data[0] )
+            shop.isSuccess && shop.data[0]
               ? shop.data[0].descuentoTotal / 100 > 100
                 ? 100
                 : shop.data[0].descuentoTotal / 100
@@ -162,7 +162,7 @@ export const Shopping = () => {
       </Box>
       <Typography
         display={
-          ( shop.isSuccess && shop.data[0] )
+          shop.isSuccess && shop.data[0]
             ? shop.data[0].descuentoTotal < 9999
               ? "none"
               : "block"
@@ -181,12 +181,11 @@ export const Shopping = () => {
         de nuestros productos de calidad a un precio aún más bajo. Aprovecha
         esta oportunidad y benefíciate de nuestra promoción. ¡Te esperamos!
       </Typography>
-      {
-        ( shop.isSuccess && shop.data[0] ) &&
+      {shop.isSuccess &&
+        shop.data[0] &&
         shop.data.map((pedido, i) => (
-          <AccordionPedido key={i} pedido ={pedido}/>
-        ))
-      }
+          <AccordionPedido key={i} pedido={pedido} />
+        ))}
       <Grid container>
         <Grid item xs={12} md={7}>
           <Grid
@@ -339,11 +338,11 @@ export const Shopping = () => {
                   >
                     <Typography>Sub Total</Typography>
                     <Typography color="green">
-                      {( shop.isSuccess && shop.data[0] )
-                        ? shop.data[0].descuentoTotal > 9999
-                          ? (subTotal *= 0.99)
-                          : subTotal
-                        : 0}
+                      {shop.isSuccess &&
+                      shop.data[0] &&
+                      shop.data[0].descuentoTotal > 9999
+                        ? (subTotal *= 0.99)
+                        : subTotal}
                     </Typography>
                   </Box>
                   <Box

@@ -6,7 +6,7 @@ export const dbConnection = async() => {
     await mongoose.connect(process.env.MONGO_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    });
+    }); 
     console.log('DB Inline')
     
   } catch (error) {

@@ -147,12 +147,12 @@ const PedidoAdmin = ({ pedido }) => {
   );
 };
 
-export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
+ const PedidoUs = ({ pedido, i, expanded, setExpanded }) => {
   const dispatch = useDispatch();
   const quueryClient = useQueryClient();
   const [ban, setBan] = useState(false);
   const { products } = useSelector((state) => state.pedido);
-  const total = pedido.products?.reduce(
+  const total = pedido?.products?.reduce(
     (acum, item) => acum + item.precio * item.cantidad,
     0
   );
@@ -250,7 +250,7 @@ export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
     <Accordion
       expanded={expanded === i}
       onChange={handleChange(i)}
-      sx={{ mt: 1, border: pedido.descuento && "1px solid greenyellow" }}
+      sx={{ mt: 1, border: pedido?.descuento && "1px solid greenyellow" }}
     >
       <AccordionSummary
         sx={{
@@ -270,12 +270,12 @@ export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
           justifyContent="space-around"
           borderBottom="1px solid rgba(0,0,0,0.105)"
         >
-          <Typography fontSize=".9rem">Receptor: {pedido.receptor}</Typography>
+          <Typography fontSize=".9rem">Receptor: {pedido?.receptor}</Typography>
           <Typography fontSize=".9rem" display={{xs:"none", md:'flex'}}>
             Total:{" "}
-            {total + pedido.envio}
+            {total + pedido?.envio}
           </Typography>
-          <Typography color="green">{pedido.estado}</Typography>
+          <Typography color="green">{pedido?.estado}</Typography>
         </Box>
       </AccordionSummary>
       <AccordionDetails sx={{ p: 0, pb: 1 }}>
@@ -285,14 +285,14 @@ export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
             justifyContent="space-around"
             borderBottom="1px solid rgba(0,0,0,0.105)"
           >
-            <Typography fontSize=".9rem">Móvil: {pedido.movil}</Typography>
-            <Typography fontSize=".9rem">Envio: {pedido.envio}</Typography>
+            <Typography fontSize=".9rem">Móvil: {pedido?.movil}</Typography>
+            <Typography fontSize=".9rem">Envio: {pedido?.envio}</Typography>
           </Box>
           <Typography
             sx={{ borderBottom: "1px solid rgba(0,0,0,0.105)", py:.5 }}
             fontSize=".9rem"
           >
-            Dirección: {pedido.direccion}
+            Dirección: {pedido?.direccion}
           </Typography>
           <Grid container sx={{ borderBottom: "1px solid rgba(0,0,0,0.105)", py:.5 }}>
             <Grid item xs={4}>
@@ -305,17 +305,17 @@ export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
               <Typography textAlign="center">Precio</Typography>
             </Grid>
           </Grid>
-          {pedido.products.map((prod, i) => (
+          {pedido?.products?.map((prod, i) => (
             <Prod key={i} prod={prod} index={i} ban={ban} />
           ))}
           <Typography mr='1.5rem' textAlign='end' display={{xs:"block", md:'none'}}>
             Total:{" "}
-            {total + pedido.envio}
+            {total + pedido?.envio}
           </Typography>
           <Box mt={.5} display="flex" justifyContent="space-around">
             <Button
-              disabled={pedido.estado === 'Cancelado'}
-              onClick={handleAcept}
+              disabled={pedido?.estado === 'Cancelado'}
+              onClick={handleAcept} 
               size="small"
               color="success"
               variant="outlined"
@@ -323,7 +323,7 @@ export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
               Aceptar
             </Button>
             <Button
-              disabled={pedido.estado === 'Cancelado'}
+              disabled={pedido?.estado === 'Cancelado'}
               onClick={handleEdit}
               size="small"
               color="info"
@@ -332,7 +332,7 @@ export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
               Editar
             </Button>
             <Button
-              disabled={pedido.estado === 'Cancelado'}
+              disabled={pedido?.estado === 'Cancelado'}
               onClick={handleDelete}
               size="small"
               color="error"
@@ -347,11 +347,11 @@ export const PedidoUser = ({ pedido, i, expanded, setExpanded }) => {
   );
 };
 
-export const Pedidos = () => {
+export default function Pedidos () {
   const [expanded, setExpanded] = useState(null);
   const pedidos = usePedidos();
   const { rol } = useSelector((state) => state.auth);
-
+  
   return (
     <Container>
       <Typography
@@ -373,11 +373,13 @@ export const Pedidos = () => {
         Pedidos
       </Typography>
       {pedidos.isSuccess &&
-        pedidos.data.map((ped, i) =>
-          rol === "ADMIN_ROLE" ? (
+        pedidos?.data.map((ped, i) =>
+          rol === "ADMIN_ROLE" 
+          ? (
             <PedidoAdmin key={i} pedido={ped} />
-          ) : (
-            <PedidoUser
+          ) 
+          : (
+            <PedidoUs
               key={i}
               pedido={ped}
               i={i}

@@ -5,14 +5,14 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { InventarioDay } from "./InventarioDay";
 
 
-export const AccordionDay = ({ inv, total }) => {
+export const AccordionDay = ({ inv, total, gastos, id }) => {
   return (
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel1a-content"
           id="panel1a-header"
-          sx={{ p: 0 }}
+          sx={{ p: 0, '& .css-o4b71y-MuiAccordionSummary-content.Mui-expanded': {mb:0} }}
         >
           <Box
             sx={{
@@ -39,7 +39,7 @@ export const AccordionDay = ({ inv, total }) => {
           </Box>
         </AccordionSummary>
         <AccordionDetails sx={{ p: 0 }}>
-          <InventarioDay inventario={inv.inventarie} />
+          <InventarioDay id={id} gastos={gastos} inventario={inv.inventarie} />
         </AccordionDetails>
       </Accordion>
   );

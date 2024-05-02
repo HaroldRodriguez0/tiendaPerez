@@ -57,7 +57,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export const Usuarios = () => {
+export default function Usuarios () {
   const [filter, setFilter] = useState("");
   const [value, setValue] = useState("");
 

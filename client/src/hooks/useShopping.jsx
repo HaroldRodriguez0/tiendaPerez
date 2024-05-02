@@ -20,6 +20,9 @@ export const useShopping = ( ) => {
   const shoppingQuery = useQuery(
     ["shopping"], 
     () => getShopping(), 
+    {
+      staleTime: 1000 * 60 * 60,
+    }
   );
 
   return shoppingQuery;

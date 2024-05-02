@@ -6,9 +6,9 @@ import streamifier from "streamifier";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
-  cloud_name: process.env.CLOUDONARY_CLOUD_NAME ,
-  api_key: process.env.CLOUDONARY_API_KEY ,
-  api_secret: process.env.CLOUDONARY_API_SECRET ,
+  cloud_name:  process.env.CLOUDONARY_CLOUD_NAME   /* 'ddsfbz6wq' */,
+  api_key:  process.env.CLOUDONARY_API_KEY   /* '859687261894579' */,
+  api_secret:   process.env.CLOUDONARY_API_SECRET   /* 'bxevAajSzilFCFpZbPa17JNPDY8' */,
 });
 
 export const cloudinaryDeleteImg = async ( img ) => {

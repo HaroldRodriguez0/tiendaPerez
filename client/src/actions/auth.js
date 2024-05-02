@@ -21,6 +21,7 @@ export const keepLogin = ( token ) => {
     })
 
     .catch( () => {
+      localStorage.removeItem('token');
       Swal.fire({
         position: 'top-end',
         icon: 'info',

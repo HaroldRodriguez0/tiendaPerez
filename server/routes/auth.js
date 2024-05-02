@@ -5,7 +5,7 @@ host + /api/auth/...
 
 import { Router } from 'express';
 import { check } from 'express-validator';
-import { forgotPassword, login, loginToken, register, verificationDelete, verificationEmail } from '../controller/auth.js';
+import { contactEmail, forgotPassword, login, loginToken, register, verificationDelete, verificationEmail } from '../controller/auth.js';
 import { emailExiste, esRolValido, movilValido, nameExiste } from '../middlewares/dbValidator.js';
 import { validarCampo, validarJWT } from '../middlewares/index.js';
 
@@ -53,8 +53,7 @@ router.post(
 
   router.delete( '/verification/delete', (verificationDelete) );
 
-
-
+  router.post( '/contact', contactEmail );
 
   export default router;
 

@@ -23,6 +23,8 @@ import DisabledByDefaultOutlinedIcon from '@mui/icons-material/DisabledByDefault
 import HandymanOutlinedIcon from "@mui/icons-material/HandymanOutlined";
 import PlaylistAddOutlinedIcon from '@mui/icons-material/PlaylistAddOutlined';
 import ShoppingCartCheckoutOutlinedIcon from '@mui/icons-material/ShoppingCartCheckoutOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import { Button, Container, Typography, useMediaQuery } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,7 +32,7 @@ import { authLogout } from "../../reducer/authReducer";
 import { stockShow } from "../../reducer/stockReducer";
 import { usePedidos } from "../../hooks/usePedidos";
 
-const noAmin = ['USER_ROLE', 'CAFETERIA_ROLE', 'TOOLS_ROLE' ];
+const noAmin = ['USER_ROLE', 'CAFETERIA_ROLE', 'TOOLS_ROLE', 'STORE_ROLE' ];
 
 // eslint-disable-next-line no-unused-vars
 const Search = styled("div")(({ theme }) => ({
@@ -156,6 +158,12 @@ export const NavBar = () => {
         </IconButton>
         <p>Calcular</p>
       </MenuItem>
+      <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }} onClick={() =>{ navigate("/inventario/list"), handleMobileMenuClose()}}>
+        <IconButton size="large" aria-label="Inventario" color="inherit">
+          <DescriptionOutlinedIcon />
+        </IconButton>
+        <p>Inventario</p>
+      </MenuItem>
       <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' ) && "none" }} onClick={() =>{ navigate("/inventario/diario"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <InventoryOutlinedIcon />
@@ -166,7 +174,7 @@ export const NavBar = () => {
         <IconButton size="large" aria-label="Inventario" color="inherit">
           <Inventory2OutlinedIcon />
         </IconButton>
-        <p>Ventas</p>
+        <p>Historial de Ventas</p>
       </MenuItem>
       <MenuItem sx={{ display: ( !rol || rol === 'USER_ROLE' )  && "none"  }} onClick={() =>{  navigate("/pedidos"),  handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Inventario" color="inherit">
@@ -176,17 +184,23 @@ export const NavBar = () => {
         </IconButton>
         <p>Pedidos</p>
       </MenuItem>
+      <MenuItem sx={{ display: { md: "none" } }} onClick={() =>{ navigate("/product/pormayor"), handleMobileMenuClose()}}>
+        <IconButton size="large" aria-label="PorMayor" color="inherit">
+          <LocalShippingOutlinedIcon />
+        </IconButton>
+        <p>Por Mayor</p>
+      </MenuItem>
       <MenuItem sx={{ display: { md: "none" } }} onClick={() =>{ navigate("/product/cafeteria"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Cafeteria" color="inherit">
           <FastfoodOutlinedIcon />
         </IconButton>
-        <p>Cafeteria</p>
+        <p>Cafetería</p>
       </MenuItem>
       <MenuItem sx={{ display: { md: "none" } }} onClick={() =>{ navigate("/product/utiles"), handleMobileMenuClose()}}>
         <IconButton size="large" aria-label="Utiles" color="inherit">
           <HandymanOutlinedIcon />
         </IconButton>
-        <p>Utiles</p>
+        <p>Útiles</p>
       </MenuItem>
       <MenuItem sx={{ display: { md: "none" } }} onClick={() =>{ navigate("/product/calzado"), handleMobileMenuClose() }}>
         <IconButton size="large" aria-label="Calzado" color="inherit">
@@ -234,7 +248,7 @@ export const NavBar = () => {
                   width: "65px",
                   height: "auto",
                 }}
-                src="./favicon.png"
+                src="https://res.cloudinary.com/dcl924dfw/image/upload/v1714058331/favicon_drooja.png"
                 alt="logo"
               />
             </IconButton>
@@ -250,6 +264,11 @@ export const NavBar = () => {
               onChange={handleChangeSearch} 
               placeholder="Buscar producto…"
               inputProps={{ "aria-label": "search" }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
             />
           </Search>
             <Box sx={{ flexGrow: 1 }} />
@@ -289,7 +308,7 @@ export const NavBar = () => {
                     fontSize: "13px",
                   }}
                 >
-                  Cafeteria
+                  Cafetería
                 </Typography>
               </Button>
               <Button
@@ -307,7 +326,7 @@ export const NavBar = () => {
                     fontSize: "13px",
                   }}
                 >
-                  Utiles
+                  Útiles
                 </Typography>
               </Button>
               <Button

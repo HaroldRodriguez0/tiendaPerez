@@ -13,10 +13,13 @@ import {
   SgvYoutube,
 } from "../../assets/svg";
 import { useForm } from "../../hooks/useForm";
-import Image from "../Image";
+import { api } from "../../api/myApi";
+import Swal from "sweetalert2";
+import { useState } from "react";
 
 export const Foother = () => {
   const moreTitle = useMediaQuery("(max-width:830px)");
+  const [first, setFirst] = useState(false);
   const [contact, handleContact, contactReset] = useForm({
     email: "",
     comentario: "",
@@ -24,10 +27,20 @@ export const Foother = () => {
 
   const { email, comentario } = contact;
 
-  const handleSubmite = (e) => {
+  const handleSubmite = async (e) => {
     e.preventDefault();
-    console.log(contact);
+    setFirst(true);
+    await api.post("/auth/contact", contact)
+    .then(() => {
+      Swal.fire("", 'Mensaje enviado con éxito !', "success");
+      return;
+    })
+    .catch(() => {
+      Swal.fire("", 'Mensaje no Enviado', "error");
+      return;
+    });
     contactReset();
+    setFirst(false);
   };
 
   return (
@@ -42,7 +55,7 @@ export const Foother = () => {
         }}
       >
         <Grid item xs={7} sm={5} md={4} lg={3}>
-          <Image alt="icono" src="./contact.jpg" />
+          <img alt="icono" src="https://res.cloudinary.com/dcl924dfw/image/upload/v1714058411/contact_ty3qib.jpg" />
         </Grid>
         <Grid item xs={9} sm={7} md={8} lg={9} sx={{ px: { sm: 5 } }}>
           <Typography
@@ -65,8 +78,8 @@ export const Foother = () => {
             <Typography sx={{ fontSize: { xs: "1.2rem", lg: "1.5rem" } }}>
               Número telefónico:{" "}
             </Typography>
-            <a href="tel:5353760295" className="enlace">
-              +53 53760295
+            <a href="tel:5350889404" className="enlace">
+              +53 50889404
             </a>
           </Box>
           <form onSubmit={handleSubmite}>
@@ -103,6 +116,7 @@ export const Foother = () => {
             </Box>
             <Box>
               <Button
+                disabled={first}
                 type="submit"
                 variant="outlined"
                 color="success"

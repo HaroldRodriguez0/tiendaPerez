@@ -2,86 +2,11 @@ import { request, response } from "express";
 import { CopieInventario, Inventario, Product } from "../models/index.js";
 import { edit } from "./product.js";
 
-/* const newCopieInventario = async (req, res = response) => {
-  try {
-
-    let lastProValor = null, cont = null, cantidadTienda = null, valor = null;
-    const { name, precio, categoria, cantidad, modelo, numero, color, tipo } = req.body;
-    // se guarda el producto a editar con todas sus propiedades para hacer las respectivas modificaciones
-    const lastProduct = modelo ?? false ? await Product.find({ name, modelo }) : await Product.find({ name });
-    
-    if (lastProduct.numero) {
-      cont = 1;
-      valor = numero;
-      lastProValor = lastProduct.numero;
-    }
-    if (lastProduct.color) {
-      cont = 2;
-      valor = color;
-      lastProValor = lastProduct.color;
-    }
-    if (lastProduct.tipo) {
-      cont = 3;
-      valor = tipo;
-      lastProValor = lastProduct.tipo;
-    }
-    if (cont) {
-      cantidadTienda = lastProValor.get( valor ).tienda;
-    }
-    else{
-      cantidadTienda = lastProValor.cantTienda;
-    }
-
-    if( cantidadTienda < cantidad ){
-      return res.status(400).json({
-        msg: `No puedes vender mas de la cantidad existente en tienda ${ cantidadTienda }`,
-      });
-    }
-
-    const copieInventario = new CopieInventario({
-      products: [
-        {
-          name,
-          categoria,
-          cantidad,
-          cantidadTienda,
-          precio,
-          modelo,
-          numero,
-          color,
-          tipo,
-        },
-      ],
-    });
-
-    await copieInventario.save();
-
-    if( cont ){
-      // pasarle al req.body.numero (para que funcione el edit) el lastProValor.get( valor ).tienda - cantidad pero este objeto es un map y hay q convertirlo a un objeto de objetos
-      lastProValor.get( valor ).tienda -= cantidad;
-      req.params.id = lastProduct._id ;
-      req.body.numero = Object.fromEntries(lastProValor) ;
-      edit( req, res );
-    }
-    else{
-      req.params.id = lastProduct._id ;
-      req.body.cantTienda = lastProduct.cantTienda - cantidad;
-      edit( req, res );
-    }
-    
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      msg: "Please talk to the administrator",
-    });
-  }
-};
- */
-
 const editNewCopie = async (req, res) => {
+  
   try {
     let lastProValor = null, cont = null, cantidadTienda = null, valor = null, tipoProd = null ;
-    const { name, precio, categoria, cantidad, modelo, numero, color, tipo } = req.body;
+    const { name, precio, costoProducto, descuento, categoria, cantidad, modelo, numero, color, tipo } = req.body;
     // se guarda el producto a editar con todas sus propiedades para hacer las respectivas modificaciones
     const lastProduct = modelo ?? false ? await Product.findOne({ name, modelo }) : await Product.findOne({ name });
     const { id, products } = await CopieInventario.findOne();
@@ -118,17 +43,16 @@ const editNewCopie = async (req, res) => {
     }
     // Hacer la modificacion en CopieInventario
     if( cont ){
-      const productEncontrado = products.find( elemento => elemento.name === name && elemento.modelo === modelo && elemento[ tipoProd ] === valor && elemento.precio === precio);
+      const productEncontrado = products.find( elemento => elemento.name === name && elemento.modelo === modelo &&  elemento[ tipoProd ] === valor &&  elemento.precio === (descuento ?descuento :precio) );
       
-      if( productEncontrado ){
-
+      if( productEncontrado ){ 
         await CopieInventario.updateOne(
           { _id: id },
           { $inc: { "products.$[elem].cantidad": cantidad } },
           { // Usa arrayFilters para especificar las condiciones del producto
             arrayFilters: [
               {
-                "elem.precio": precio,
+                "elem.precio": descuento ?descuento :precio,
                 "elem.name": name,
                 "elem.modelo": modelo,
                 "elem.categoria": categoria,
@@ -145,7 +69,8 @@ const editNewCopie = async (req, res) => {
             "name": name,
             "categoria": categoria,
             "cantidad": cantidad,
-            "precio": precio,
+            "precio": descuento ?descuento :precio,
+            "costoProducto": costoProducto,
             "cantidadTienda": cantidadTienda,
             "modelo": modelo,
             [tipoProd]: valor
@@ -162,7 +87,8 @@ const editNewCopie = async (req, res) => {
       await edit( req, res );
     }
     else{
-      const productEncontrado = products.find( elemento => elemento.name === name && elemento.precio === parseInt(precio) );
+      const productEncontrado = products.find( elemento => elemento.name === name && elemento.precio === parseInt(descuento ?descuento :precio) );
+      console.log(productEncontrado)
       if( productEncontrado ){
         await CopieInventario.updateOne(
           { _id: id },
@@ -170,23 +96,23 @@ const editNewCopie = async (req, res) => {
           { // Usa arrayFilters para especificar las condiciones del producto
             arrayFilters: [
               {
-                "elem.precio": precio,
+                "elem.precio": descuento ?descuento :precio,
                 "elem.name": name,
                 "elem.categoria": categoria,
               }
             ]
           }
-        )
+        )   
       }
       else{
-
         await CopieInventario.updateOne(
           { _id: id },
           { $push: { products: {
             "name": name,
             "categoria": categoria,
             "cantidad": cantidad,
-            "precio": precio,
+            "precio": descuento ?descuento :precio,
+            "costoProducto": costoProducto,
             "cantidadTienda": cantidadTienda,
           } } }
         )
@@ -316,8 +242,8 @@ const getCopieInventario = async (req, res = response) => {
 
 const newInventario = async (req, res = response) => {
   try {
-    const { id } = await CopieInventario.findOne();
-    const { products } = await CopieInventario.findOne();
+
+    const { id, products } = await CopieInventario.findOne();
     const date = new Date(); date.setHours(0, 0, 0, 0);
     
     const encontrarDate = await Inventario.find({ date: { $eq: date } })
@@ -334,14 +260,13 @@ const newInventario = async (req, res = response) => {
       products
     });
 
-    await inventario.save();
+    await inventario.save(); 
 
     await CopieInventario.updateOne(
       { _id: id }, { $set: { products: [] } }
     ) 
 
     return res.status(200).json({
-      inventario,
       msg: "Inventario creado",
     });
     
@@ -363,6 +288,25 @@ const editInventario = async (req, res = response) => {
 
     return res.status(200).json({
       msg: "Inventario actualizado con exito",
+    });
+
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+}
+
+const editGastos = async (req, res = response) => {
+  try {
+
+    const { id, gastos } = req.body;
+
+    await Inventario.updateOne({ _id: id }, { gastos })
+
+    return res.status(200).json({
+      msg: "Gasto actualizado con exito",
     });
 
   } catch (error) {
@@ -410,4 +354,4 @@ const getInventario = async (req, res = response) => {
   }
 }
 
-export { /* newCopieInventario, */ editCopieInventario, editNewCopie, getCopieInventario, newInventario, editInventario, getInventario, };
+export { /* newCopieInventario, */ editGastos, editCopieInventario, editNewCopie, getCopieInventario, newInventario, editInventario, getInventario, };

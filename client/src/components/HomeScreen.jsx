@@ -7,8 +7,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useProduts } from "../hooks/useProduts";
-import Image from "./Image";
-import { Productos } from "./producto/Productos";
 import {
   LayersControl,
   MapContainer,
@@ -20,6 +18,9 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import { useNavigate } from "react-router-dom";
+import { lazy } from "react";
+
+const Productos = lazy(() => import("./producto/Productos"));
 
 const iconLocation = new L.icon({
   iconUrl: icon,
@@ -101,7 +102,7 @@ Notification.requestPermission().then(function (permission) {
           }}
         >
           <Box sx={{ mx: { xl: 20, lg: 15, md: 8, sm: 4 } }}>
-            <Image height={{xs:'15vh'}} width={'30vw'} alt="icono" src="./logoP.png" />
+            <img src="https://res.cloudinary.com/dcl924dfw/image/upload/v1714058227/logoP_pldue8.png"  alt="logoP" />
           </Box>
         </Grid>
       </Grid>
@@ -125,7 +126,7 @@ Notification.requestPermission().then(function (permission) {
             }}
           >
             <Box border={1} borderColor="greenyellow" mb={1}>
-              <Image height={{xs:'30vh',sm:'18vh',md:'22vh',lg:'28vh'}} width={{xs:'70vw',sm:'27vw'}} src="./cafeteria.jpg" alt="Cafeteria" />
+              <img src="https://res.cloudinary.com/dcl924dfw/image/upload/v1714058170/cafeteria_ipb2ks.jpg" alt="Cafeteria" />
             </Box>
             <Button
               onClick={() => navigate("/product/cafeteria")}
@@ -146,7 +147,7 @@ Notification.requestPermission().then(function (permission) {
             }}
           >
             <Box border={1} borderColor="greenyellow" mb={1}>
-              <Image height={{xs:'30vh',sm:'18vh',md:'22vh',lg:'28vh'}} width={{xs:'70vw',sm:'27vw'}} src="./utileria.jpg" alt="Utileria" />
+              <img src="https://res.cloudinary.com/dcl924dfw/image/upload/v1714058434/utileria_mbrmpq.jpg" alt="Utileria" />
             </Box>
             <Button
               onClick={() => navigate("/product/utiles")}
@@ -172,7 +173,7 @@ Notification.requestPermission().then(function (permission) {
               mb={1}
               sx={{ background: "white" }}
             >
-              <Image height={{xs:'30vh',sm:'18vh',md:'22vh',lg:'28vh'}} width={{xs:'70vw',sm:'27vw'}} src="./calzado.png" alt="Calzado" />
+              <img src="https://res.cloudinary.com/dcl924dfw/image/upload/v1714058206/calzado_qct1yg.png" alt="Calzado" />
             </Box>
             <Button
               onClick={() => navigate("/product/calzado")}
@@ -185,7 +186,7 @@ Notification.requestPermission().then(function (permission) {
           </Box>
         </Box>
 
-        <Box mt={{xs:3, lg:5}}>
+        <Box mt={{xs:4.5, lg:6.5}}>
           <Typography
             variant="h2"
             sx={{
@@ -210,7 +211,7 @@ Notification.requestPermission().then(function (permission) {
           </Box>
         </Box>
 
-        <Box sx={{ mt:{xs:4, lg:5}}}>
+        <Box sx={{ mt:{xs:4.5, lg:6.5}}}>
           <Typography
             variant="h2"
             sx={{
@@ -239,7 +240,7 @@ Notification.requestPermission().then(function (permission) {
             pb={{ xs: 2, md: 0 }}
           >
             <Grid item xs={10} sm={8} md={6}>
-              <Image alt="icono" src="./nosotros.jpg" />
+              <img alt="icono" src="https://res.cloudinary.com/dcl924dfw/image/upload/v1714058425/nosotros_mnpsy6.jpg" />
             </Grid>
             <Grid item md={6}>
               <Typography
@@ -263,7 +264,7 @@ Notification.requestPermission().then(function (permission) {
           </Grid>
         </Box>
 
-        <Box mt={{xs:3, lg:5}}>
+        <Box mt={{xs:4.5, lg:6.5}}>
           <Typography
             variant="h2"
             sx={{

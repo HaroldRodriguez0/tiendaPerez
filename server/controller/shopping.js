@@ -218,17 +218,19 @@ const deleteShopping = async (req, res = response) => {
 
 const getShopping = async (req, res = response) => {
   try {
-    const { nameUser, descuento, pedidos } = await Shopping.findOne({
+    let nameUser, descuento, pedidos;
+    const data = await Shopping.findOne({
       nameUser: req.user.name,
     });
+    data && (nameUser = data.nameUser, descuento = data.descuento, pedidos = data.pedidos);
     const datos = [];
     const iniFecha = new Date();
 
-    pedidos.map((ped, i) => {
+    data && pedidos.map((ped, i) => {
       const date = new Date(ped.date);
       date.setHours(0, 0, 0, 0) === iniFecha.setHours(0, 0, 0, 0) &&
         datos.push({
-          nameUser,
+          nameUser : nameUser,
           descuentoTotal: descuento,
           date: ped.date,
           receptor: ped.receptor,

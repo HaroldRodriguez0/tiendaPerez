@@ -7,6 +7,7 @@ const CopieInventarioSchema = new Schema({
     categoria: { type: String, required: [true ,  "La categoria es obligatoria"] },
     cantidad: { type: Number, required: [true ,  "la cantidad es obligatorio"], min: 0 },
     precio: { type: Number, required: [true, "el precio es obligatorio"], min: 0 },
+    costoProducto: { type: Number, required: [true, "el costo del Producto es obligatorio"], min: 0 },
     cantidadTienda: { type: Number, required: [true ,  "la cantidad existente en tienda es obligatorio"], min: 0},
     modelo: { type: String },
     numero: { type: String },

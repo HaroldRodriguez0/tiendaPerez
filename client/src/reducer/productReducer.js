@@ -4,6 +4,7 @@ const initialState = {
   uid: "",
   name: "",
   precio: "",
+  costoProducto: "",
   modelo: "",
   categoria: "",
   cantTienda: "",
@@ -29,6 +30,7 @@ export const productSlice = createSlice({
         _id,
         name,
         precio,
+        costoProducto,
         descuento,
         modelo,
         categoria,
@@ -45,6 +47,7 @@ export const productSlice = createSlice({
       state.uid = _id;
       state.name = name;
       state.precio = precio;
+      state.costoProducto = costoProducto;
       state.descuento = descuento;
       state.modelo = modelo;
       state.categoria = categoria;
@@ -64,6 +67,7 @@ export const productSlice = createSlice({
         _id,
         name,
         precio,
+        costoProducto,
         descuento,
         modelo,
         categoria,
@@ -79,6 +83,7 @@ export const productSlice = createSlice({
       state.uid = _id;
       state.name = name;
       state.precio = precio;
+      state.costoProducto = costoProducto;
       state.descuento = descuento;
       state.modelo = modelo;
       state.categoria = categoria;

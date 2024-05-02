@@ -4,6 +4,29 @@ import bcryptjs from "bcryptjs";
 import { User } from "../models/index.js";
 import { generarJWT, transporter } from "../helpers/index.js";
 
+const contactEmail = async (req, res = response) => {
+  
+  const { email, comentario } = req.body;
+  try {
+    await transporter
+      .sendMail({
+        to: 'tiendadenisperez@gmail.com',
+        subject: "Mensaje",
+        html: `<p>Usuario: ${email}</p>
+        <p>Comentario: ${comentario}</p>`
+      })
+
+    res.status(200).json({
+      msg: "Mensaje enviado con Exito",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      msg: "Please talk to the administrator",
+    });
+  }
+};
+
 const register = async (req, res = response) => {
   try {
     const { name, email, password, movil } = req.body;
@@ -43,7 +66,7 @@ const register = async (req, res = response) => {
       ok: false,
       msg: "Please talk to the administrator",
     });
-  }H
+  }
 };
 
 const verificationEmail = async (req, res = response) => {
@@ -201,7 +224,7 @@ const loginToken = async (req, res = response) => {
     res.status(200).json({
       user: req.user
     });
-    
+     
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -216,5 +239,6 @@ export {
   verificationDelete,
   login,
   forgotPassword,
-  loginToken
+  loginToken,
+  contactEmail
 };

@@ -75,16 +75,18 @@ const Row = ({ product, index }) => {
           />
         </TableCell>
         <TableCell align="center">{precio}</TableCell>
+        <TableCell align="center">{precio * number}</TableCell>
       </TableRow>
     </Fragment>
   );
 };
 
-export const InventarioDiario = () => {
+export default function InventarioDiario () {
   const quueryClient = useQueryClient();
   let total = 0,
     totalUti = 0,
-    totalCaf = 0;
+    totalCaf = 0,
+    totalPor = 0;
   const { rol } = useSelector((state) => state.auth);
   const { products } = useSelector((state) => state.inventarie);
   const inventario = useCopieInventarie();
@@ -93,6 +95,7 @@ export const InventarioDiario = () => {
   if (inventario.isSuccess) {
     for (const i of inventario.data) {
       total += i.precio * i.cantidad;
+      i.categoria === "PORMAYOR" && (totalPor += i.precio * i.cantidad);
       i.categoria === "CAFETERIA" && (totalCaf += i.precio * i.cantidad);
       (i.categoria === "UTILES" || i.categoria === "CALZADO") &&
         (totalUti += i.precio * i.cantidad);
@@ -154,6 +157,7 @@ export const InventarioDiario = () => {
                   {isMobile ? "Cant" : "Cantidad"}
                 </TableCell>
                 <TableCell align="center">Precio</TableCell>
+                <TableCell align="center">SubTotal</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -187,6 +191,7 @@ export const InventarioDiario = () => {
                   {isMobile ? "Cant" : "Cantidad"}
                 </TableCell>
                 <TableCell align="center">Precio</TableCell>
+                <TableCell align="center">SubTotal</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -197,6 +202,39 @@ export const InventarioDiario = () => {
                   (product, i) =>
                     (product.categoria === "UTILES" ||
                       product.categoria === "CALZADO") && (
+                      <Row key={i} product={product} index={i} />
+                    )
+                )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+
+      <Box display={(rol !== "STORE_ROLE" && rol !== "ADMIN_ROLE") && "none"}>
+        <Typography textAlign="center" pt={2}>
+          Importe Por Mayor: <b>{totalPor}</b>
+        </Typography>
+        <TableContainer component={Paper}>
+          <Table aria-label="collapsible table" size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Nombre</TableCell>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell align="center">
+                  {isMobile ? "Cant" : "Cantidad"}
+                </TableCell>
+                <TableCell align="center">Precio</TableCell>
+                <TableCell align="center">SubTotal</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {inventario.isLoading &&
+                skeletons.map((skeleton, i) => <SkeletonInventario key={i} />)}
+              {inventario.isSuccess &&
+                inventario.data.map(
+                  (product, i) =>
+                    product.categoria === "PORMAYOR"  && (
                       <Row key={i} product={product} index={i} />
                     )
                 )}

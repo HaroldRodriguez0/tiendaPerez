@@ -6,6 +6,7 @@ import { Router } from "express";
 import { check } from "express-validator";
 import {
   editCopieInventario,
+  editGastos,
   editInventario,
   editNewCopie,
   getCopieInventario, 
@@ -88,6 +89,17 @@ router.put(
     validarCampo,
   ],
   editInventario
+);
+
+router.put(
+  "/editGastos",
+  [
+    // middlewares
+    validarJWT,
+    tieneRole( "ADMIN_ROLE" ),
+    validarCampo,
+  ],
+  editGastos
 );
 
 router.get("/get",[ 

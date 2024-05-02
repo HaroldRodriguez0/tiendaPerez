@@ -5,18 +5,21 @@ import {
   CardContent,
   Skeleton,
 } from "@mui/material";
+import placeholder from '../../assets/placeholder.svg';
+import { LazyLoadImage } from "react-lazy-load-image-component";
+import "react-lazy-load-image-component/src/effects/blur.css";
 
 export const SkeletonProduct = () => {
   return (
     <>
       <Card elevation={3}>
         <CardActionArea>
-          <Skeleton
-            variant="rounded"
-            width=''
-            height=''
-            sx={{width:'45vw', height: '20vh'}}
-          />
+          <LazyLoadImage 
+          width='100%'
+                alt="produucts"
+                src={placeholder}
+                effect="blur"
+                 />
           <CardContent sx={{ p: "16px 5px 0 5px" }}>
             <Skeleton
               variant="text"
